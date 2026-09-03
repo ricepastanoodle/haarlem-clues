@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>De Tour — Ontdek Haarlem</title>
+<meta name="theme-color" content="#a0522d">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
+<!-- Analytics (Umami — privacyvriendelijk, geen cookiebanner nodig) -->
+<script defer src="https://cloud.umami.is/script.js" data-website-id="fadc39ba-d7ef-467a-b2f1-259b749d3144"></script>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="tour.css?v=38">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lora:wght@400;500&display=swap" rel="stylesheet">
+<!-- CLIP-model (via transformers.js) wordt dynamisch geladen in tour.js zodra de eerste foto wordt geanalyseerd. -->
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body class="tour-body">
+
+<header class="tour-topbar" id="tourTopbar">
+  <a href="index.html" class="tour-logo">Ontdek Haarlem</a>
+  <div class="progress-track">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+  <div class="progress-label" id="progressLabel">Stap 0 / 0</div>
+</header>
+
+<div class="points-label" id="pointsLabel">100 punten</div>
+<button class="btn-help hidden" id="btnHelpOverlay" aria-label="Uitleg opnieuw bekijken">?</button>
+
+<main class="tour-main">
+
+  <!-- Intro screen -->
+  <section class="tour-screen" id="screen-intro">
+    <div class="tour-card">
+      <span class="tour-kicker">De tour begint</span>
+      <h1>Klaar om Haarlem te ontdekken?</h1>
+      <p>Vanaf de Grote Markt volg je hints naar bijzondere plekken door de stad. Los onderweg opdrachten op — een vraag, een foto, een korte zoektocht — en verzamel punten tot je de hele route hebt afgelegd. Kom je er niet uit? Een extra hint of het antwoord kan je altijd inwisselen voor wat punten.</p>
+
+      <div class="intro-features">
+        <div class="intro-feature">
+          <div class="intro-feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15 9l-2 6-6 2 2-6z"/></svg></div>
+          <span>Volg de hints</span>
+        </div>
+        <div class="intro-feature">
+          <div class="intro-feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-2h6l2 2h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="14" r="4"/></svg></div>
+          <span>Los de opdracht op</span>
+        </div>
+        <div class="intro-feature">
+          <div class="intro-feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.6 6.2.6-4.6 4.2 1.3 6.1L12 16.8 6.5 19.5l1.3-6.1L3.2 9.2l6.2-.6z"/></svg></div>
+          <span>Verdien punten</span>
+        </div>
+      </div>
+
+      <button class="btn-primary large" id="btnStart">Begin de speurtocht</button>
+    </div>
+  </section>
+
+  <!-- Uitlegscherm 1: hoe werkt een vraag-opdracht (tussen intro en de eerste stap) -->
+  <section class="tour-screen hidden" id="screen-instructions">
+    <div class="tour-card">
+      <span class="tour-kicker">Voordat je begint</span>
+      <h1>Zo beantwoord je een vraag</h1>
+      <p>Bij sommige stops los je een korte vraag op. Dit voorbeeld komt niet in de echte tour voor, maar laat precies zien hoe het werkt:</p>
+
+      <div class="mini-mockup">
+        <div class="mini-mockup-card">
+          <span class="mini-mockup-kicker">Voorbeeldopdracht</span>
+          <p class="mini-mockup-hint">Boven de voordeur van dit pand staat een jaartal in gouden cijfers.</p>
+          <div class="mini-quiz-row">
+            <div class="mini-quiz-input" id="demoQuizInput"><span id="demoQuizInputText"></span><span class="mini-caret"></span></div>
+            <div class="mini-quiz-btn" id="demoQuizBtn">Controleer</div>
+          </div>
+          <p class="mini-status hidden" id="demoQuizStatus"></p>
+        </div>
+        <div class="mini-cursor" id="demoQuizCursor"></div>
+      </div>
+
+      <div class="instructions-dots">
+        <span class="instructions-dot active" data-dot="1"></span>
+        <span class="instructions-dot" data-dot="2"></span>
+        <span class="instructions-dot" data-dot="3"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Uitlegscherm 2: hoe werken hints en het onthullen van het antwoord -->
+  <section class="tour-screen hidden" id="screen-instructions-hints">
+    <div class="tour-card">
+      <span class="tour-kicker">Voordat je begint</span>
+      <h1>Zo werken hints</h1>
+      <p>Kom je er zelf niet helemaal uit? Dan kan je een extra hint opvragen, of meteen het antwoord laten zien. Beide kosten wel wat van je punten:</p>
+
+      <div class="mini-mockup">
+        <div class="mini-mockup-card">
+          <span class="mini-mockup-kicker">Voorbeeldopdracht</span>
+          <p class="mini-mockup-hint">Boven de voordeur van dit pand staat een jaartal in gouden cijfers.</p>
+
+          <div class="mini-hint-row">
+            <div class="mini-quiz-btn" id="demoHintBtn">Extra hint (-10 punten)</div>
+          </div>
+          <p class="mini-mockup-extra-hint hidden" id="demoExtraHint">Het jaartal staat vlak boven de deurlijst, in sierlijke cijfers gegraveerd.</p>
+
+          <div class="mini-hint-row hidden" id="demoRevealRow">
+            <div class="mini-quiz-btn" id="demoRevealBtn">Onthul antwoord (-20 punten)</div>
+          </div>
+          <p class="mini-status hidden" id="demoHintsStatus"></p>
+        </div>
+        <div class="mini-cursor" id="demoHintsCursor"></div>
+        <div class="mini-points-badge" id="demoPointsBadge"></div>
+      </div>
+
+      <p class="instructions-note">Extra hints en het antwoord onthullen kosten dus punten — bewaar ze voor als je er écht niet uitkomt.</p>
+
+      <div class="instructions-dots">
+        <span class="instructions-dot" data-dot="1"></span>
+        <span class="instructions-dot active" data-dot="2"></span>
+        <span class="instructions-dot" data-dot="3"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Uitlegscherm 3: hoe werkt een foto-opdracht -->
+  <section class="tour-screen hidden" id="screen-instructions-photo">
+    <div class="tour-card">
+      <span class="tour-kicker">Voordat je begint</span>
+      <h1>Zo maak je een foto-opdracht</h1>
+      <p>Bij andere stops maak je juist een foto op de plek zelf. Ook dit voorbeeld komt niet in de echte tour voor:</p>
+
+      <div class="mini-mockup">
+        <div class="mini-mockup-card">
+          <span class="mini-mockup-kicker">Voorbeeldopdracht</span>
+          <p class="mini-mockup-hint">Een ijzeren kantwerk prikt de lucht in — een dame van staal die de hele wereld kent.</p>
+
+          <div class="mini-photo-stage" id="demoPhotoStage">
+            <!-- Cameraperspectief: zoemt rond tussen de bladeren, vindt de toren, vergrendelt en maakt de foto -->
+            <div class="mini-viewfinder" id="demoViewfinder">
+              <div class="mini-viewfinder-scene" id="demoScene"></div>
+              <div class="mini-viewfinder-reticle" id="demoReticle"></div>
+              <span class="vf-corner tl"></span><span class="vf-corner tr"></span>
+              <span class="vf-corner bl"></span><span class="vf-corner br"></span>
+              <div class="mini-viewfinder-flash" id="demoFlash"></div>
+            </div>
+
+            <!-- Resultaat: de gemaakte foto, terug op de pagina met de hint -->
+            <div class="mini-photo-result" id="demoPhotoResult">
+              <div class="mini-photo-preview" id="demoPhotoPreview"></div>
+            </div>
+          </div>
+          <p class="mini-status hidden" id="demoPhotoStatus"></p>
+        </div>
+      </div>
+
+      <p class="instructions-note">Een ingebouwde AI checkt direct of je foto klopt — er wordt niets opgeslagen of gedeeld, alles gebeurt in je eigen browser.</p>
+      <p class="demo-photo-credit">Foto: Mark.thurman92, <a href="https://creativecommons.org/licenses/by-sa/3.0/deed.nl" target="_blank" rel="noopener">CC BY-SA 3.0</a>, via Wikimedia Commons</p>
+
+      <div class="instructions-dots">
+        <span class="instructions-dot" data-dot="1"></span>
+        <span class="instructions-dot" data-dot="2"></span>
+        <span class="instructions-dot active" data-dot="3"></span>
+      </div>
+
+      <button class="btn-primary large" id="btnInstructionsStart">Start de tour!</button>
+    </div>
+  </section>
+
+  <!-- Step screen (template filled by JS) -->
+  <section class="tour-screen hidden" id="screen-step">
+    <div class="tour-card">
+      <span class="tour-kicker" id="stepKicker">Stop 1</span>
+      <h1 id="stepTitle">Titel</h1>
+
+      <div class="hint-box">
+        <span class="hint-label">Jouw hint</span>
+        <p id="stepHint">Hint tekst</p>
+        <p class="hint-tip hidden" id="stepTip"></p>
+        <button class="btn-text hidden" id="btnInfoOverlay"></button>
+      </div>
+
+      <div class="hint-box extra-hint hidden" id="extraHintBox">
+        <span class="hint-label">Extra hint</span>
+        <p id="extraHintText"></p>
+        <div class="map-wrap hidden" id="hintMapWrap">
+          <div class="hint-map" id="hintMap"></div>
+          <button class="map-expand-btn" data-expand-target="hintMap" aria-label="Kaart vergroten"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H4v5"/><path d="M4 4l6 6"/><path d="M15 4h5v5"/><path d="M20 4l-6 6"/><path d="M9 20H4v-5"/><path d="M4 20l6-6"/><path d="M15 20h5v-5"/><path d="M20 20l-6-6"/></svg></button>
+        </div>
+      </div>
+
+      <!-- Alleen voor vraag-stops (niet foto) — het antwoord komt hier gewoon
+           inline te staan, geen aparte pagina nodig zoals bij de foto-stops. -->
+      <div class="hint-box extra-hint hidden" id="answerBox">
+        <span class="hint-label">Antwoord</span>
+        <p id="answerText"></p>
+      </div>
+
+      <div class="photo-zone">
+        <p class="photo-instruction">Ben je op de plek? Maak een foto om verder te gaan.</p>
+        <label class="photo-upload" id="photoLabel">
+          <input type="file" accept="image/*" capture="environment" id="photoInput" hidden>
+          <span id="photoUploadText">Maak een foto</span>
+        </label>
+        <img id="photoPreview" class="photo-preview hidden" alt="Jouw foto van deze stop">
+        <p class="photo-status hidden" id="photoStatus"></p>
+        <button class="btn-text hidden" id="btnOverride">Toch doorgaan met deze foto</button>
+      </div>
+
+      <div class="gps-zone hidden" id="gpsZone">
+        <p class="photo-instruction">Deze minigame wordt hier binnenkort toegevoegd, zodra hier een panoramafoto van is gemaakt.</p>
+        <button class="btn-text" id="btnTestComplete">(test) Markeer als voltooid</button>
+      </div>
+
+      <div class="quiz-zone hidden" id="quizZone">
+        <p class="quiz-question" id="quizQuestion">Vraag</p>
+        <input type="text" id="quizInput" class="quiz-input" placeholder="Jouw antwoord" inputmode="numeric">
+        <button class="btn-primary" id="btnCheckAnswer">Controleer antwoord</button>
+        <p class="photo-status hidden" id="quizStatus"></p>
+      </div>
+
+      <div class="step-actions">
+        <button class="btn-secondary hidden" id="btnBack">Vorige stap</button>
+        <button class="btn-secondary" id="btnHint">Extra hint (-10 punten)</button>
+        <button class="btn-secondary hidden" id="btnRevealAnswer">Onthul antwoord (-20 punten)</button>
+        <button class="btn-primary hidden" id="btnNext" disabled>Ga verder</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Antwoord-onthulscherm — losse tussenpagina zodat de opdracht-pagina zelf
+       rustig blijft. Kaart bovenaan (exacte locatie), eventueel een foto onderaan. -->
+  <section class="tour-screen hidden" id="screen-reveal">
+    <div class="tour-card">
+      <span class="tour-kicker" id="revealKicker">Antwoord</span>
+      <h1 id="revealTitle">Titel</h1>
+
+      <div class="reveal-map-container map-wrap" id="revealMapContainer">
+        <div class="reveal-map" id="revealMap"></div>
+        <button class="map-expand-btn" data-expand-target="revealMap" aria-label="Kaart vergroten"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H4v5"/><path d="M4 4l6 6"/><path d="M15 4h5v5"/><path d="M20 4l-6 6"/><path d="M9 20H4v-5"/><path d="M4 20l6-6"/><path d="M15 20h5v-5"/><path d="M20 20l-6-6"/></svg></button>
+      </div>
+
+      <img id="revealPhoto" class="reveal-photo hidden" alt="Referentiefoto van deze stop">
+
+      <p id="revealAnswerText" class="reveal-answer-text"></p>
+
+      <div class="step-actions">
+        <button class="btn-secondary hidden" id="btnRevealBack">Terug naar de opdracht</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Info screen (tussen elke stop) -->
+  <section class="tour-screen hidden" id="screen-info">
+    <div class="tour-card">
+      <span class="tour-kicker" id="infoKicker">Stop 1 van 7</span>
+      <h1 id="infoTitle">Titel</h1>
+      <p>Goed gedaan! Wil je meer weten over deze plek voordat je verdergaat?</p>
+
+      <div class="info-actions">
+        <button class="btn-primary large hidden" id="btnContinue">Doorgaan naar volgende stop</button>
+        <button class="btn-secondary" id="btnAudio">Luister audio</button>
+      </div>
+
+      <div class="step-actions">
+        <button class="btn-secondary hidden" id="btnInfoBack">Vorige stap</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Map screen (route die stap voor stap ontgrendelt) -->
+  <section class="tour-screen hidden" id="screen-map">
+    <div class="tour-card map-card">
+      <span class="tour-kicker" id="mapKicker">Route</span>
+      <h1>Jouw route tot nu toe</h1>
+      <p>Het gouden pad laat zien welk stuk je al hebt afgelegd. De rest van de route ontgrendelt naarmate je verder komt.</p>
+
+      <div class="map-wrap">
+        <div class="map-container" id="mapContainer"></div>
+        <button class="map-expand-btn" data-expand-target="mapContainer" aria-label="Kaart vergroten"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H4v5"/><path d="M4 4l6 6"/><path d="M15 4h5v5"/><path d="M20 4l-6 6"/><path d="M9 20H4v-5"/><path d="M4 20l6-6"/><path d="M15 20h5v-5"/><path d="M20 20l-6-6"/></svg></button>
+      </div>
+
+      <div class="step-actions">
+        <button class="btn-secondary hidden" id="btnMapBack">Vorige stap</button>
+        <button class="btn-primary large hidden" id="btnMapContinue">Verder naar de volgende stop</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Finish screen -->
+  <section class="tour-screen hidden" id="screen-finish">
+    <div class="tour-card">
+      <span class="tour-kicker">Gefeliciteerd</span>
+      <h1>Je hebt de tour voltooid!</h1>
+      <p>Je hebt alle stops gevonden en Haarlem ontdekt zoals maar weinig bezoekers dat doen. Bedankt voor het meelopen.</p>
+
+      <div class="finish-stats" id="finishStats"></div>
+
+      <div class="finish-badges" id="finishBadges"></div>
+
+      <div class="finish-gallery" id="finishGallery"></div>
+
+      <div class="share-row">
+        <button class="btn-secondary" id="btnShareScore">Deel je resultaat</button>
+        <a class="btn-secondary" id="linkShareWhatsapp" target="_blank" rel="noopener">Via WhatsApp</a>
+      </div>
+      <p class="photo-status hidden" id="shareStatus"></p>
+
+      <div class="leaderboard-submit" id="leaderboardSubmit">
+        <input type="text" id="leaderboardName" placeholder="Jouw naam" maxlength="30">
+        <button class="btn-primary" id="btnSubmitScore">Zet op het scorebord</button>
+      </div>
+      <p class="photo-status hidden" id="leaderboardSubmitStatus"></p>
+
+      <div class="leaderboard-box">
+        <span class="hint-label">Scorebord</span>
+        <div id="leaderboardList"><p class="leaderboard-loading">Scorebord laden...</p></div>
+      </div>
+
+      <button class="btn-secondary hidden" id="btnFinishBack">Terug naar laatste stop</button>
+      <button class="btn-primary large hidden" id="btnFinishForward">Verder</button>
+    </div>
+  </section>
+
+  <!-- Feedback + review screen -->
+  <section class="tour-screen hidden" id="screen-review">
+    <div class="tour-card">
+      <span class="tour-kicker">Bedankt</span>
+      <h1>Nog één laatste ding...</h1>
+      <p>Vond je de tour de moeite waard? Je feedback en een review helpen ons enorm om deze tour te blijven verbeteren.</p>
+
+      <div class="review-block">
+        <span class="hint-label">Feedback</span>
+        <p class="review-block-text">Heb je nog dingen gezien die verbeterd kunnen worden? Laat het ons weten.</p>
+        <textarea id="feedbackText" maxlength="1000" rows="4" placeholder="Schrijf hier je feedback..."></textarea>
+        <button class="btn-secondary" id="btnSubmitFeedback">Versturen</button>
+        <p class="photo-status hidden" id="feedbackStatus"></p>
+      </div>
+
+      <div class="review-block">
+        <span class="hint-label">Review</span>
+        <div class="review-buttons">
+          <a href="#" class="btn-secondary" id="linkReviewGoogle" target="_blank" rel="noopener">Review op Google</a>
+          <a href="#" class="btn-secondary" id="linkReviewTripadvisor" target="_blank" rel="noopener">Review op TripAdvisor</a>
+        </div>
+      </div>
+
+      <a href="index.html" class="btn-primary large">Terug naar home</a>
+      <button class="btn-secondary hidden" id="btnReviewBack">Terug naar het scorebord</button>
+    </div>
+  </section>
+
+</main>
+
+<div class="floating-nav hidden" id="floatingNav">
+  <button class="nav-round-btn" id="btnFloatingBack" aria-label="Vorige stap">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M15 18l-6-6 6-6"/>
+    </svg>
+  </button>
+  <button class="nav-round-btn nav-round-btn-primary" id="btnFloatingForward" aria-label="Volgende stap">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9 18l6-6-6-6"/>
+    </svg>
+  </button>
+</div>
+
+<div class="audio-bar hidden" id="audioBar">
+  <audio id="audioBarPlayer" controls controlslist="nodownload"></audio>
+  <button class="audio-bar-close" id="audioBarClose" aria-label="Audio sluiten">✕</button>
+</div>
+
+<!-- Uitvergrote kaartweergave — de aangeklikte kaart verhuist hier tijdelijk naartoe -->
+<div class="map-overlay hidden" id="mapOverlay">
+  <button class="map-overlay-close" id="mapOverlayClose" aria-label="Kaart sluiten">✕</button>
+  <div class="map-overlay-inner" id="mapOverlayInner"></div>
+</div>
+
+<!-- Generiek uitleg-overlay (bv. "hoe werken Romeinse cijfers") — zelfde opzet als
+     het kaart-overlay: een knop bij de extra hint opent 'm, kruisje sluit 'm weer. -->
+<div class="info-overlay hidden" id="infoOverlay">
+  <button class="map-overlay-close" id="infoOverlayClose" aria-label="Sluiten">✕</button>
+  <div class="info-overlay-inner">
+    <h2 id="infoOverlayTitle"></h2>
+    <div id="infoOverlayBody"></div>
+  </div>
+</div>
+
+<!-- Uitleg-overlay opgeroepen met de "?"-knop — de drie uitlegschermen (vraag,
+     hints, foto) verhuizen hier tijdelijk naartoe, net als bij het kaart-overlay. -->
+<div class="help-overlay hidden" id="helpOverlay">
+  <button class="map-overlay-close" id="helpOverlayClose" aria-label="Sluiten">✕</button>
+  <div class="help-overlay-inner" id="helpOverlayInner"></div>
+</div>
+
+<script src="tour.js?v=97"></script>
+</body>
+</html>
