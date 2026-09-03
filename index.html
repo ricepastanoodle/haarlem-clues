@@ -26,7 +26,7 @@
 <!-- Analytics (Umami — privacyvriendelijk, geen cookiebanner nodig) -->
 <script defer src="https://cloud.umami.is/script.js" data-website-id="fadc39ba-d7ef-467a-b2f1-259b749d3144"></script>
 
-<link rel="stylesheet" href="style.css?v=4">
+<link rel="stylesheet" href="style.css?v=5">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lora:wght@400;500&display=swap" rel="stylesheet">
 </head>
@@ -224,6 +224,22 @@
   </div>
 </div>
 
+<!-- iOS heeft geen automatische installatie-popup (Apple staat dat niet toe) —
+     deze banner legt de handmatige stappen uit i.p.v. een knop die niks doet. -->
+<div class="install-banner hidden" id="iosInstallBanner">
+  <div class="install-banner-text">
+    <strong>Installeer Ontdek Haarlem</strong>
+    <span>
+      Tik onderin op
+      <svg class="ios-share-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4"/><path d="M7 8l5-5 5 5"/><rect x="4" y="12" width="16" height="8" rx="2"/></svg>
+      en dan op <strong>"Zet op beginscherm"</strong>.
+    </span>
+  </div>
+  <div class="install-banner-actions">
+    <button class="install-dismiss" id="btnDismissIosInstall" aria-label="Sluiten">✕</button>
+  </div>
+</div>
+
 <footer class="footer">
   <div class="container">
     <p>&copy; 2026 Ontdek Haarlem — Digitale Wandeltour</p>
@@ -283,6 +299,40 @@ if ("serviceWorker" in navigator) {
   window.addEventListener("appinstalled", () => {
     banner.classList.add("hidden");
     deferredPrompt = null;
+  });
+})();
+
+// iOS: geen beforeinstallprompt-event beschikbaar (Apple-beperking), dus tonen
+// we hier zelf een banner met de handmatige "Zet op beginscherm"-stappen.
+(function () {
+  const iosBanner = document.getElementById("iosInstallBanner");
+  const btnDismissIos = document.getElementById("btnDismissIosInstall");
+
+  function isStandalone() {
+    return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+  }
+
+  function isIOS() {
+    return /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  }
+
+  function isSafari() {
+    const ua = navigator.userAgent;
+    return /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS/.test(ua);
+  }
+
+  if (!isIOS() || !isSafari() || isStandalone()) return;
+
+  let dismissed = false;
+  try { dismissed = localStorage.getItem("iosInstallBannerDismissed") === "1"; } catch (err) {}
+  if (dismissed) return;
+
+  iosBanner.classList.remove("hidden");
+
+  btnDismissIos.addEventListener("click", () => {
+    iosBanner.classList.add("hidden");
+    try { localStorage.setItem("iosInstallBannerDismissed", "1"); } catch (err) {}
   });
 })();
 </script>

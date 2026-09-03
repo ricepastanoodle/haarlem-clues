@@ -490,6 +490,14 @@ h1, h2, h3, .logo {
 
 .install-dismiss:hover { color: var(--cream); }
 
+.ios-share-icon {
+  width: 15px;
+  height: 15px;
+  vertical-align: -2px;
+  margin: 0 2px;
+  color: var(--gold);
+}
+
 @media (max-width: 560px) {
   .install-banner {
     flex-direction: column;
