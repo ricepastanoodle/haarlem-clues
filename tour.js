@@ -3,7 +3,7 @@
 // type "photo": gebruiker maakt een foto, wordt gecheckt met een gratis AI-model (MobileNet).
 // type "gps": wordt straks een panorama-zoekspelletje met jouw eigen 360°-foto's
 //             (zoals getest in panorama-test.html) — nog niet gekoppeld.
-const STOPS = [
+const STOPS_NL = [
   {
     title: "Standbeeld Laurens Janszoon Coster",
     audio: "audio/01-standbeeld-laurens-janszoon-coster.mp3",
@@ -249,51 +249,51 @@ const STOP_TO_ROUTE_INDEX = ROUTE_STOP_INDEX.reduce((acc, stopIdx, routeIdx) => 
 // midden van het plein. Zodra je de extra hint gebruikt, toont die een kleinere,
 // nauwkeurigere cirkel — de exacte locatie zelf blijft voorbehouden aan het
 // antwoord-onthulscherm.
-STOPS[0].searchCenter = START_COORD;
-STOPS[0].searchRadius = 50;
-STOPS[0].hintSearchCenter = [52.38144193203604, 4.6364082052682996];
-STOPS[0].hintSearchRadius = 30;
+STOPS_NL[0].searchCenter = START_COORD;
+STOPS_NL[0].searchRadius = 50;
+STOPS_NL[0].hintSearchCenter = [52.38144193203604, 4.6364082052682996];
+STOPS_NL[0].hintSearchRadius = 30;
 
 // Stop 4 (Teylers Museum): de foto-opdracht zelf (de juiste beeldengroep op het dak
 // vinden) is al lastig genoeg — geen extra zoekcirkel ervoor, de kaart wijst gewoon
 // direct naar de stop, net als bij een vraag- of gps-stop.
-STOPS[3].skipCircle = true;
+STOPS_NL[3].skipCircle = true;
 // Op het antwoordscherm is de kaart hier overbodig — alleen de foto is nodig.
-STOPS[3].skipRevealMap = true;
+STOPS_NL[3].skipRevealMap = true;
 
 // Stop 6 (Molen De Adriaan): geen kaartje bij de extra hint nodig (de hoofdkaart
 // wijst al de weg) — wel een kleine tip onder de eerste hint.
-STOPS[5].skipHintMap = true;
-STOPS[5].tip = "Tip: maak de foto van een afstand.";
+STOPS_NL[5].skipHintMap = true;
+STOPS_NL[5].tip = "Tip: maak de foto van een afstand.";
 
 // Stop 8 (Amsterdamse Poort): geen zoekcirkel, de kaart wijst direct naar de stop —
 // en op de antwoordpagina is alleen de foto nodig, geen kaart.
-STOPS[7].skipCircle = true;
-STOPS[7].skipRevealMap = true;
+STOPS_NL[7].skipCircle = true;
+STOPS_NL[7].skipRevealMap = true;
 
 // Stop 10 (Waalse Kerk): het te fotograferen beeldje is klein en lastig te vinden —
 // een kleinere cirkel, precies gecentreerd op het beeldje zelf, maakt de zoektocht behapbaar.
-STOPS[9].searchCenter = [52.38247, 4.638948];
-STOPS[9].searchRadius = 30;
+STOPS_NL[9].searchCenter = [52.38247, 4.638948];
+STOPS_NL[9].searchRadius = 30;
 // Bij de extra hint mag de cirkel nog kleiner, zelfde (precieze) middelpunt.
-STOPS[9].hintSearchCenter = [52.38247, 4.638948];
-STOPS[9].hintSearchRadius = 18;
+STOPS_NL[9].hintSearchCenter = [52.38247, 4.638948];
+STOPS_NL[9].hintSearchRadius = 18;
 // Ook op het antwoordscherm wijst de kaart precies naar het beeldje, niet naar de
 // algemene locatie van de kerk.
-STOPS[9].preciseCoord = [52.38247, 4.638948];
+STOPS_NL[9].preciseCoord = [52.38247, 4.638948];
 
 // Stop 12 (Monument Kenau Simonsdochter): bij de extra hint een kleinere cirkel
 // dan de standaard 70m.
-STOPS[11].hintSearchRadius = 30;
+STOPS_NL[11].hintSearchRadius = 30;
 
 // Stop 20 (Frans Hals Museum): de foto-opdracht (de geveltop vinden) is al lastig
 // genoeg — geen extra zoekcirkel, de kaart wijst direct naar de stop.
-STOPS[19].skipCircle = true;
+STOPS_NL[19].skipCircle = true;
 // Op het antwoordscherm is de kaart hier overbodig — alleen de foto is nodig.
-STOPS[19].skipRevealMap = true;
+STOPS_NL[19].skipRevealMap = true;
 
 // Stop 21 (Stadhuis Haarlem): geen zoekcirkel, de kaart wijst direct naar de stop.
-STOPS[20].skipCircle = true;
+STOPS_NL[20].skipCircle = true;
 
 // Gedeelde uitlegpagina over Romeinse cijfers (met een willekeurig ander voorbeeldjaar,
 // nooit het echte antwoord) — herbruikbaar bij elke stop waar het jaartal zo genoteerd staat.
@@ -319,9 +319,211 @@ const ROMAN_NUMERALS_INFO_OVERLAY = {
 };
 
 // Stop 5 (Teylers Hofje): het jaartal staat er in Romeinse cijfers.
-STOPS[4].infoOverlay = ROMAN_NUMERALS_INFO_OVERLAY;
+STOPS_NL[4].infoOverlay = ROMAN_NUMERALS_INFO_OVERLAY;
 // Stop 19 (Nieuwe Kerk): ook hier staat het jaartal in Romeinse cijfers.
-STOPS[18].infoOverlay = ROMAN_NUMERALS_INFO_OVERLAY;
+STOPS_NL[18].infoOverlay = ROMAN_NUMERALS_INFO_OVERLAY;
+
+// ---- Engelse variant ----
+// EN_OVERRIDES bevat alleen de vertaalde velden per stop (positioneel gelijk aan
+// STOPS_NL) — audio/answerPhoto/type/description/skipCircle/preciseCoord e.d.
+// worden via de spread hieronder automatisch overgenomen uit STOPS_NL, zodat
+// die nooit dubbel onderhouden hoeven te worden.
+const ROMAN_NUMERALS_INFO_OVERLAY_EN = {
+  label: "How do Roman numerals work?",
+  title: "Roman numerals",
+  html: `
+    <p>Roman numerals use letters instead of 0 through 9:</p>
+    <table>
+      <tr><th>Letter</th><th>Value</th></tr>
+      <tr><td>I</td><td>1</td></tr>
+      <tr><td>V</td><td>5</td></tr>
+      <tr><td>X</td><td>10</td></tr>
+      <tr><td>L</td><td>50</td></tr>
+      <tr><td>C</td><td>100</td></tr>
+      <tr><td>D</td><td>500</td></tr>
+      <tr><td>M</td><td>1000</td></tr>
+    </table>
+    <p>When a smaller letter comes before a larger one, you subtract instead of add. So <strong>IV</strong> isn't 6, but 5&nbsp;−&nbsp;1&nbsp;=&nbsp;4. And <strong>IX</strong> is 10&nbsp;−&nbsp;1&nbsp;=&nbsp;9.</p>
+    <p><strong>Example</strong> (a different, random year — not the answer): 1994 becomes <strong>MCMXCIV</strong>.</p>
+    <p>M = 1000, CM = 900 (1000&nbsp;−&nbsp;100), XC = 90 (100&nbsp;−&nbsp;10), IV = 4 (5&nbsp;−&nbsp;1). Together: 1000 + 900 + 90 + 4 = 1994.</p>
+  `
+};
+
+const EN_OVERRIDES = [
+  {
+    title: "Standbeeld Laurens Janszoon Coster",
+    hint: "For centuries, a bronze man on the Grote Markt has held up the letter that taught the world to read.",
+    extraHint: "",
+    answer: "The weathered green bronze statue of Laurens Janszoon Coster on his pedestal, hand raised, with the tower of the Grote Kerk in the background.",
+    type: "photo"
+  },
+  {
+    title: "De St. Bavokerk",
+    hint: "Past the church, the city grows quieter, until you reach the place where justice is spoken.",
+    extraHint: "Look for the stone gate with a lion's head above it.",
+    question: "What is Haarlem's courthouse called?",
+    answer: "De Appelaar",
+    answers: ["De Appelaar", "Appelaar"],
+    type: "quiz"
+  },
+  {
+    title: "Taverne De Waag",
+    hint: "On the facade of the old weigh house, red shutters are waiting for you to count them.",
+    extraHint: "Count carefully: there are more than seventeen but fewer than twenty-six — look both upstairs and downstairs, across the whole facade.",
+    question: "How many red shutters are there?",
+    answer: "20",
+    type: "quiz"
+  },
+  {
+    title: "Teylers Museum",
+    hint: "High above the facade, a weathered company keeps watch, green with age.",
+    extraHint: "A winged figure raises two laurel wreaths, while her companions look on in silence.",
+    answer: "The group of weathered green bronze statues on top of the roof of Teylers Museum.",
+    type: "photo"
+  },
+  {
+    title: "Teylers Hofje",
+    hint: "Stone columns carry a secret, carved in Latin.",
+    extraHint: "The year is after 1781, but before 1794.",
+    question: "In what year was the Teylers Hofje founded?",
+    answer: "1785",
+    infoOverlay: ROMAN_NUMERALS_INFO_OVERLAY_EN,
+    type: "quiz"
+  },
+  {
+    title: "Molen De Adriaan",
+    hint: "By the water, a giant with waving arms has been turning for centuries.",
+    extraHint: "It's a real windmill with wooden sails, right next to the water where boats are moored.",
+    answer: "Molen De Adriaan, the wooden polder windmill on the Spaarne river.",
+    tip: "Tip: take the photo from a distance.",
+    type: "photo"
+  },
+  {
+    title: "De Koepel",
+    hint: "Go inside, where a round giant once guarded hundreds of souls behind numbered doors.",
+    extraHint: "Look up carefully — the numbers increase the higher you look in the dome, until you find the highest number on the top floor.",
+    question: "What is the highest-numbered prison cell inside De Koepel?",
+    answer: "204",
+    type: "quiz"
+  },
+  {
+    title: "Amsterdamse Poort",
+    hint: "High in the brick wall of the gate, three silent emblems hide, built into the stone through the centuries.",
+    extraHint: "Look for the row of three diamond-shaped emblems above the passage, with a woven knot in the middle.",
+    answer: "The three diamond-shaped emblems built into the wall of the Amsterdamse Poort, with a woven knot in the middle.",
+    type: "photo"
+  },
+  {
+    title: "Gravestenenbrug",
+    hint: "Over the water arches a bridge you must climb, step by step.",
+    extraHint: "It's a trick question — take a good look before you start counting.",
+    question: "How many steps does the Gravestenenbrug have?",
+    answer: "0",
+    type: "quiz"
+  },
+  {
+    title: "Waalse Kerk",
+    hint: "Not everyone at the church stands in the pulpit. Somewhere nearby, a bronze woman sits quietly reading, her back against the brick wall.",
+    extraHint: "She sits on a stack of pages, one hand against her head. Find the small bronze statue on its pedestal and photograph it up close.",
+    answer: "The small bronze statue 'Kort Jakje,' a seated woman on a stack of pages, near the Waalse Kerk.",
+    type: "photo"
+  },
+  {
+    title: "Huis Barnaart",
+    hint: "A stately house on the canal looks back at you with a great many eyes on its facade.",
+    extraHint: "Count all the windows you see on the front of the house, from left to right.",
+    question: "How many windows are on the front of Huis Barnaart?",
+    answer: "26",
+    type: "quiz"
+  },
+  {
+    title: "Monument Kenau Simonsdochter",
+    hint: "Two heroes turned to bronze still guard the city they once defended.",
+    extraHint: "",
+    answer: "The bronze statue of Kenau Simonsdochter Hasselaer and Wigbolt Ripperda, standing together on one pedestal.",
+    type: "photo"
+  },
+  {
+    title: "Vrouw in het Verzet monument",
+    hint: "A young resistance fighter was given a place here in bronze, surrounded by greenery.",
+    extraHint: "Beneath her feet, carved in stone, her real name is hidden.",
+    question: "What was the name of the resistance fighter honored with a statue here?",
+    answer: "Hannie Schaft",
+    type: "quiz"
+  },
+  {
+    title: "Hofje van Oorschot",
+    hint: "Behind a simple gate lies a hofje where women once found a safe home.",
+    extraHint: "The year is carved above the gate — somewhere in the 1760s or 1770s.",
+    question: "In what year was the Begijnhof founded?",
+    answer: "1769",
+    type: "quiz"
+  },
+  {
+    title: "Ten Boom Museum",
+    hint: "On the side wall of this house there's something to discover, if you look closely.",
+    extraHint: "It's a map of her travels around the world — you'll find the year on it.",
+    question: "In what year did Ten Boom first travel to Australia?",
+    answer: "1953",
+    type: "quiz"
+  },
+  {
+    title: "Prinsenhof",
+    hint: "In a quiet, green garden stands a familiar face you've already met before.",
+    extraHint: "The same man who holds up the letter on the Grote Markt stands here too — his name is carved beneath his feet.",
+    question: "Who is the man standing in the Hortus garden?",
+    answer: "Laurens Janszoon Coster",
+    answers: ["Laurens Janszoon Coster", "Laurens Jz Coster"],
+    type: "quiz"
+  },
+  {
+    title: "Lutherse Hofje",
+    hint: "Every Sunday, a church bell still rings here, right on time for the service.",
+    extraHint: "You don't need to go inside — a sign by the gate gives away the secret.",
+    question: "What time does the Sunday service start?",
+    answer: "10:30",
+    answers: ["10:30", "half past ten"],
+    type: "quiz"
+  },
+  {
+    title: "Jopen",
+    hint: "A church without services, but with a very different kind of salvation within its walls.",
+    extraHint: "What was once sacred here has now been replaced by hops and barley.",
+    question: "What is mainly sold in the Jopenkerk today?",
+    answer: "beer",
+    answers: ["beer", "bier"],
+    type: "quiz"
+  },
+  {
+    title: "Nieuwe Kerk",
+    hint: "On a quiet little square, not far from the center, stands a church that — despite its name — hasn't been new for a very long time.",
+    extraHint: "Walk to the east side of the building — the year is carved there in Roman numerals.",
+    question: "In what year was the Nieuwe Kerk built?",
+    answer: "1649",
+    infoOverlay: ROMAN_NUMERALS_INFO_OVERLAY_EN,
+    type: "quiz"
+  },
+  {
+    title: "Frans Hals Museum",
+    hint: "Not the door, but the top of the facade hides two stone guardians.",
+    extraHint: "Between them stands a coat of arms with a year that begins with 19.",
+    answer: "The gable top with the year 1912, two statues on the corners, and a small statue at the very top.",
+    type: "photo"
+  },
+  {
+    title: "Stadhuis Haarlem",
+    hint: "Above the entrance, a facade has been speaking for centuries in an old, forgotten language.",
+    extraHint: "Golden letters on a dark background — a Latin inscription above the door.",
+    answer: "The gable stone above the entrance, inscribed 'S.P.Q.H.' with the year 1650.",
+    type: "photo"
+  }
+];
+
+const STOPS_EN = STOPS_NL.map((stop, i) => ({ ...stop, ...EN_OVERRIDES[i] }));
+
+// Eén schakelpunt voor de taal — alle ~20 plekken verderop die STOPS[...]
+// gebruiken blijven ongewijzigd werken, ongeacht welke taal actief is.
+let STOPS = getLang() === "en" ? STOPS_EN : STOPS_NL;
 
 const STORAGE_KEY = "haarlemTourProgress";
 
@@ -724,7 +926,7 @@ function initMapIfNeeded() {
   // (CartoDB vereist inmiddels een API-key voor hun gratis basemaps, vandaar deze wissel.)
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 19,
-    attribution: "&copy; OpenStreetMap-bijdragers"
+    attribution: t("osmAttribution")
   }).addTo(leafletMap);
 
   routeLineUnlocked = L.polyline([], { color: "#c08a3e", weight: 5 }).addTo(leafletMap);
@@ -762,7 +964,7 @@ function showHintMap(center, radius) {
     }).setView(center, 17); // eerst een geldige view zetten, anders faalt fitBounds() hieronder
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 19,
-      attribution: "&copy; OpenStreetMap-bijdragers"
+      attribution: t("osmAttribution")
     }).addTo(hintMap);
     hintMapCircle = L.circle(center, {
       radius,
@@ -797,7 +999,7 @@ function showRevealMap(coord) {
     }).setView(coord, 19);
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 19,
-      attribution: "&copy; OpenStreetMap-bijdragers"
+      attribution: t("osmAttribution")
     }).addTo(revealMap);
     revealMapMarker = L.marker(coord).addTo(revealMap);
     updateUserLocationMarker(revealMap, "reveal", lastKnownLatLng);
@@ -999,8 +1201,8 @@ async function renderMap() {
   const nextStopNumber = state.currentStep + 2; // 1-based nummer van de volgende, nog op te lossen stop
   mapKicker.textContent =
     nextStopNumber <= STOPS.length
-      ? `Op weg naar stop ${nextStopNumber} van ${STOPS.length}`
-      : "Route voltooid";
+      ? t("mapKickerNext", { n: nextStopNumber, total: STOPS.length })
+      : t("mapKickerDone");
   initMapIfNeeded();
   // Meteen de cirkel/markers tekenen (die hangen niet af van de looproute-data),
   // zodat je nooit een lege kaart ziet terwijl de wandelroutes nog opgehaald worden.
@@ -1014,8 +1216,8 @@ function updateProgressBar() {
   const total = STOPS.length;
   const done = Math.min(Math.max(state.currentStep, 0), total);
   progressFill.style.width = `${(done / total) * 100}%`;
-  progressLabel.textContent = `Stap ${done} / ${total}`;
-  pointsLabel.textContent = `${state.points} punten`;
+  progressLabel.textContent = t("stepLabel", { done, total });
+  pointsLabel.textContent = t("pointsLabelText", { points: state.points });
   // Het puntenvakje zweeft los (position: fixed) en wisselt in breedte mee
   // met het aantal cijfers — de topbar houdt daarom precies zoveel ruimte
   // vrij als dat vakje op dit moment breed is, i.p.v. een vaste schatting
@@ -1153,7 +1355,7 @@ btnFloatingForward.addEventListener("click", () => {
 
 function renderInfo() {
   const stop = STOPS[state.currentStep];
-  infoKicker.textContent = `Stop ${state.currentStep + 1} van ${STOPS.length}`;
+  infoKicker.textContent = t("stopKicker", { n: state.currentStep + 1, total: STOPS.length });
   infoTitle.textContent = stop.title;
 }
 
@@ -1171,7 +1373,7 @@ function setQuizStatus(kind, text) {
 
 function renderStep() {
   const stop = STOPS[state.currentStep];
-  stepKicker.textContent = `Stop ${state.currentStep + 1} van ${STOPS.length}`;
+  stepKicker.textContent = t("stopKicker", { n: state.currentStep + 1, total: STOPS.length });
   stepTitle.textContent = stop.title;
   stepHint.textContent = stop.hint;
   stepTip.textContent = stop.tip || "";
@@ -1194,14 +1396,14 @@ function renderStep() {
     // alleen van label, zodat je die pagina gratis kan terugbekijken.
     answerBox.classList.add("hidden");
     btnRevealAnswer.classList.toggle("hidden", !hintUsed);
-    btnRevealAnswer.textContent = answerRevealed ? "Bekijk antwoord" : `Onthul antwoord (-${ANSWER_REVEAL_COST} punten)`;
+    btnRevealAnswer.textContent = answerRevealed ? t("btnRevealAnswerView") : t("btnRevealAnswerCost", { cost: ANSWER_REVEAL_COST });
   } else {
     // Geen aparte pagina nodig — de knop verdwijnt na onthullen, want het
     // antwoord staat er dan al gewoon.
     answerText.textContent = stop.answer;
     answerBox.classList.toggle("hidden", !answerRevealed);
     btnRevealAnswer.classList.toggle("hidden", !hintUsed || answerRevealed);
-    btnRevealAnswer.textContent = `Onthul antwoord (-${ANSWER_REVEAL_COST} punten)`;
+    btnRevealAnswer.textContent = t("btnRevealAnswerCost", { cost: ANSWER_REVEAL_COST });
   }
 
   if (hintUsed && stop.type === "photo" && !stop.skipCircle && !stop.skipHintMap) {
@@ -1240,7 +1442,7 @@ function renderStep() {
     quizInput.value = solved ? stop.answer : "";
     quizInput.disabled = solved;
     btnCheckAnswer.classList.toggle("hidden", solved);
-    setQuizStatus(solved ? "matched" : null, solved ? "Goed beantwoord!" : "");
+    setQuizStatus(solved ? "matched" : null, solved ? t("quizCorrect") : "");
     btnNext.disabled = !solved;
 
     if (answerRevealed) quizZone.classList.add("hidden"); // antwoord al onthuld via de hint-knop
@@ -1259,14 +1461,14 @@ function renderStep() {
   if (photo) {
     photoPreview.src = photo;
     photoPreview.classList.remove("hidden");
-    photoUploadText.textContent = "Foto goedgekeurd — nog een keer?";
+    photoUploadText.textContent = t("photoUploadTextDone");
     photoLabel.classList.add("done");
-    setPhotoStatus("matched", "Deze foto is goedgekeurd voor deze stop.");
+    setPhotoStatus("matched", t("photoMatchedPrevious"));
     btnNext.disabled = false;
   } else {
     photoPreview.classList.add("hidden");
     photoPreview.src = "";
-    photoUploadText.textContent = "Maak een foto";
+    photoUploadText.textContent = t("photoUploadTextDefault");
     photoLabel.classList.remove("done");
     setPhotoStatus(null, "");
     btnNext.disabled = true;
@@ -1283,7 +1485,7 @@ function renderStep() {
 // foto-stops) en, indien aanwezig, een referentiefoto van wat je moet vinden.
 function renderReveal() {
   const stop = STOPS[state.currentStep];
-  revealKicker.textContent = `Stop ${state.currentStep + 1} van ${STOPS.length}`;
+  revealKicker.textContent = t("stopKicker", { n: state.currentStep + 1, total: STOPS.length });
   revealTitle.textContent = stop.title;
 
   // De tekst is alleen nog een terugvaloptie voor stops zonder eigen referentiefoto —
@@ -1351,10 +1553,10 @@ function renderFinishStats() {
   finishStatsData = { totalSeconds, hintsUsedCount, points: state.points };
 
   finishStats.innerHTML = `
-    <div class="finish-stat"><div class="finish-stat-value">${timeLabel}</div><div class="finish-stat-label">Tijd</div></div>
-    <div class="finish-stat"><div class="finish-stat-value">${state.points}</div><div class="finish-stat-label">Punten</div></div>
-    <div class="finish-stat"><div class="finish-stat-value">${hintsUsedCount}</div><div class="finish-stat-label">Hints gebruikt</div></div>
-    <div class="finish-stat"><div class="finish-stat-value">${answersRevealedCount}</div><div class="finish-stat-label">Antwoorden onthuld</div></div>
+    <div class="finish-stat"><div class="finish-stat-value">${timeLabel}</div><div class="finish-stat-label">${t("finishStatTime")}</div></div>
+    <div class="finish-stat"><div class="finish-stat-value">${state.points}</div><div class="finish-stat-label">${t("finishStatPoints")}</div></div>
+    <div class="finish-stat"><div class="finish-stat-value">${hintsUsedCount}</div><div class="finish-stat-label">${t("finishStatHints")}</div></div>
+    <div class="finish-stat"><div class="finish-stat-value">${answersRevealedCount}</div><div class="finish-stat-label">${t("finishStatRevealed")}</div></div>
   `;
 
   renderFinishBadges({ totalSeconds, hintsUsedCount, answersRevealedCount });
@@ -1366,13 +1568,13 @@ function renderFinishStats() {
 
 function renderFinishBadges({ totalSeconds, hintsUsedCount, answersRevealedCount }) {
   const badges = [
-    { emoji: "🌟", label: "Speurtocht voltooid", earned: true }
+    { emoji: "🌟", label: t("badgeCompleted"), earned: true }
   ];
   if (hintsUsedCount === 0 && answersRevealedCount === 0) {
-    badges.push({ emoji: "🏆", label: "Perfecte score", earned: true });
+    badges.push({ emoji: "🏆", label: t("badgePerfect"), earned: true });
   }
   if (totalSeconds > 0 && totalSeconds < FAST_TOUR_SECONDS) {
-    badges.push({ emoji: "⚡", label: "Snelle wandelaar", earned: true });
+    badges.push({ emoji: "⚡", label: t("badgeFast"), earned: true });
   }
   finishBadges.innerHTML = badges
     .map((b) => `<span class="badge-chip"><span class="badge-chip-emoji">${b.emoji}</span>${escapeHtml(b.label)}</span>`)
@@ -1383,7 +1585,7 @@ function buildShareText() {
   const points = finishStatsData ? finishStatsData.points : state.points;
   const totalSeconds = finishStatsData ? finishStatsData.totalSeconds : 0;
   const minutes = Math.max(1, Math.round(totalSeconds / 60));
-  return `Ik heb de Ontdek Haarlem speurtocht voltooid met ${points} punten in ${minutes} minuten! 🏆`;
+  return t("shareText", { points, minutes });
 }
 
 function buildShareUrl() {
@@ -1410,7 +1612,7 @@ async function shareScore() {
   }
   try {
     await navigator.clipboard.writeText(`${text} ${url}`);
-    shareStatus.textContent = "Gekopieerd naar klembord!";
+    shareStatus.textContent = t("shareCopied");
   } catch (err) {
     shareStatus.textContent = `${text} ${url}`;
   }
@@ -1443,7 +1645,7 @@ async function submitScore(name) {
 }
 
 async function loadLeaderboard() {
-  leaderboardList.innerHTML = '<p class="leaderboard-loading">Scorebord laden...</p>';
+  leaderboardList.innerHTML = `<p class="leaderboard-loading">${t("leaderboardLoading")}</p>`;
   try {
     const res = await fetch(
       `${SUPABASE_URL}/rest/v1/leaderboard?select=name,points,duration_seconds,completed_at&order=points.desc,duration_seconds.asc&limit=10`,
@@ -1453,13 +1655,13 @@ async function loadLeaderboard() {
     const rows = await res.json();
     renderLeaderboardRows(rows);
   } catch (e) {
-    leaderboardList.innerHTML = '<p class="leaderboard-loading">Scorebord kon niet geladen worden.</p>';
+    leaderboardList.innerHTML = `<p class="leaderboard-loading">${t("leaderboardLoadError")}</p>`;
   }
 }
 
 function renderLeaderboardRows(rows) {
   if (!rows.length) {
-    leaderboardList.innerHTML = '<p class="leaderboard-loading">Nog niemand op het scorebord — wees de eerste!</p>';
+    leaderboardList.innerHTML = `<p class="leaderboard-loading">${t("leaderboardEmpty")}</p>`;
     return;
   }
   leaderboardList.innerHTML = rows.map((row, i) => {
@@ -1482,25 +1684,25 @@ btnShareScore.addEventListener("click", shareScore);
 btnSubmitScore.addEventListener("click", async () => {
   const name = leaderboardName.value.trim();
   if (!name) {
-    leaderboardSubmitStatus.textContent = "Vul eerst je naam in.";
+    leaderboardSubmitStatus.textContent = t("leaderboardNameRequired");
     leaderboardSubmitStatus.className = "photo-status mismatch";
     leaderboardSubmitStatus.classList.remove("hidden");
     return;
   }
   btnSubmitScore.disabled = true;
-  leaderboardSubmitStatus.textContent = "Versturen...";
+  leaderboardSubmitStatus.textContent = t("sending");
   leaderboardSubmitStatus.className = "photo-status analyzing";
   leaderboardSubmitStatus.classList.remove("hidden");
   try {
     await submitScore(name);
-    leaderboardSubmitStatus.textContent = "Toegevoegd aan het scorebord!";
+    leaderboardSubmitStatus.textContent = t("addedToLeaderboard");
     leaderboardSubmitStatus.className = "photo-status matched";
     state.scoreSubmitted = true;
     saveState();
     leaderboardSubmit.classList.add("hidden");
     await loadLeaderboard();
   } catch (e) {
-    leaderboardSubmitStatus.textContent = "Versturen mislukt, probeer het nog eens.";
+    leaderboardSubmitStatus.textContent = t("sendFailed");
     leaderboardSubmitStatus.className = "photo-status mismatch";
     btnSubmitScore.disabled = false;
   }
@@ -1525,24 +1727,24 @@ async function submitFeedback(message) {
 btnSubmitFeedback.addEventListener("click", async () => {
   const message = feedbackText.value.trim();
   if (!message) {
-    feedbackStatus.textContent = "Schrijf eerst iets voordat je verstuurt.";
+    feedbackStatus.textContent = t("feedbackEmpty");
     feedbackStatus.className = "photo-status mismatch";
     feedbackStatus.classList.remove("hidden");
     return;
   }
   btnSubmitFeedback.disabled = true;
-  feedbackStatus.textContent = "Versturen...";
+  feedbackStatus.textContent = t("sending");
   feedbackStatus.className = "photo-status analyzing";
   feedbackStatus.classList.remove("hidden");
   try {
     await submitFeedback(message);
-    feedbackStatus.textContent = "Bedankt voor je feedback!";
+    feedbackStatus.textContent = t("feedbackThanks");
     feedbackStatus.className = "photo-status matched";
     feedbackText.value = "";
     feedbackText.classList.add("hidden");
     btnSubmitFeedback.classList.add("hidden");
   } catch (e) {
-    feedbackStatus.textContent = "Versturen mislukt, probeer het nog eens.";
+    feedbackStatus.textContent = t("sendFailed");
     feedbackStatus.className = "photo-status mismatch";
     btnSubmitFeedback.disabled = false;
   }
@@ -1553,7 +1755,7 @@ function acceptPhoto(dataUrl) {
   markCompleted(state.currentStep);
   saveState();
   photoLabel.classList.add("done");
-  photoUploadText.textContent = "Foto goedgekeurd — nog een keer?";
+  photoUploadText.textContent = t("photoUploadTextDone");
   btnNext.disabled = false;
   btnOverride.classList.add("hidden");
   pendingPhotoDataUrl = null;
@@ -1574,7 +1776,7 @@ const CLIP_MIN_CONFIDENCE = 0.4;
 async function analyzePhoto(dataUrl) {
   const stop = STOPS[state.currentStep];
 
-  setPhotoStatus("analyzing", "Foto wordt geanalyseerd...");
+  setPhotoStatus("analyzing", t("photoAnalyzing"));
   btnOverride.classList.add("hidden");
 
   try {
@@ -1585,19 +1787,16 @@ async function analyzePhoto(dataUrl) {
     const matched = top.label === stop.description && top.score >= CLIP_MIN_CONFIDENCE;
 
     if (matched) {
-      setPhotoStatus("matched", "Herkend! Dit lijkt op de juiste plek.");
+      setPhotoStatus("matched", t("photoRecognized"));
       acceptPhoto(dataUrl);
     } else {
-      setPhotoStatus(
-        "mismatch",
-        "Deze foto lijkt niet op de bezienswaardigheid. Probeer een andere foto, of ga toch door."
-      );
+      setPhotoStatus("mismatch", t("photoMismatch"));
       pendingPhotoDataUrl = dataUrl;
       btnOverride.classList.remove("hidden");
     }
   } catch (err) {
     // model kon niet laden (bv. geen internet) — foto gewoon accepteren
-    setPhotoStatus("matched", "Foto vastgelegd.");
+    setPhotoStatus("matched", t("photoCapturedNoAI"));
     acceptPhoto(dataUrl);
   }
 }
@@ -1617,7 +1816,7 @@ photoInput.addEventListener("change", () => {
 
 btnOverride.addEventListener("click", () => {
   if (pendingPhotoDataUrl) {
-    setPhotoStatus("matched", "Foto vastgelegd (handmatig doorgegaan).");
+    setPhotoStatus("matched", t("photoCapturedOverride"));
     acceptPhoto(pendingPhotoDataUrl);
   }
 });
@@ -1672,7 +1871,7 @@ async function runQuizDemo(gen) {
     if (reduceMotion) {
       // Rustige, statische eindstand tonen i.p.v. bewegende animatie.
       inputText.textContent = answer;
-      status.textContent = "Goed geraden! +20 punten";
+      status.textContent = t("demoQuizCorrect");
       status.classList.remove("hidden");
       status.classList.add("matched");
       await sleep(4000);
@@ -1704,7 +1903,7 @@ async function runQuizDemo(gen) {
     await sleep(350);
     if (gen !== quizDemoGen) return;
     btn.classList.remove("pressed");
-    status.textContent = "Goed geraden! +20 punten";
+    status.textContent = t("demoQuizCorrect");
     status.classList.remove("hidden");
     status.classList.add("matched");
     cursor.classList.remove("visible");
@@ -1762,7 +1961,7 @@ async function runHintsDemo(gen) {
     if (reduceMotion) {
       hintBtn.classList.add("hidden");
       extraHint.classList.remove("hidden");
-      status.textContent = "Antwoord: 1651";
+      status.textContent = t("demoHintAnswer");
       status.classList.remove("hidden");
       status.classList.add("matched");
       await sleep(4000);
@@ -1779,7 +1978,7 @@ async function runHintsDemo(gen) {
     if (gen !== hintsDemoGen) return;
     // Net als in het echt: de hint-knop maakt plaats voor de extra hint en de
     // "onthul antwoord"-knop verschijnt pas nu (die kan je niet overslaan).
-    showBadge(hintBtn, "-10 punten");
+    showBadge(hintBtn, t("badgeCostHint"));
     hintBtn.classList.add("hidden");
     extraHint.classList.remove("hidden");
     revealRow.classList.remove("hidden");
@@ -1793,7 +1992,7 @@ async function runHintsDemo(gen) {
 
     await sleep(450);
     if (gen !== hintsDemoGen) return;
-    showBadge(revealBtn, "-20 punten");
+    showBadge(revealBtn, t("badgeCostReveal"));
     cursor.classList.remove("visible");
 
     // De badge eerst zelf laten wegvagen en die animatie afwachten, vóórdat
@@ -1806,7 +2005,7 @@ async function runHintsDemo(gen) {
     await sleep(400);
     if (gen !== hintsDemoGen) return;
     revealRow.classList.add("hidden");
-    status.textContent = "Antwoord: 1651";
+    status.textContent = t("demoHintAnswer");
     status.classList.remove("hidden");
     status.classList.add("matched");
 
@@ -1863,7 +2062,7 @@ async function runPhotoDemo(gen) {
       setScene(reveal);
       viewfinder.classList.add("zoomed-out");
       result.classList.add("visible");
-      status.textContent = "Foto goedgekeurd! +20 punten";
+      status.textContent = t("demoPhotoApproved");
       status.classList.remove("hidden");
       status.classList.add("matched");
       await sleep(4000);
@@ -1895,13 +2094,13 @@ async function runPhotoDemo(gen) {
 
     await sleep(500);
     if (gen !== photoDemoGen) return;
-    status.textContent = "AI controleert je foto...";
+    status.textContent = t("demoPhotoAnalyzing");
     status.classList.remove("hidden");
     status.classList.add("analyzing");
 
     await sleep(1300);
     if (gen !== photoDemoGen) return;
-    status.textContent = "Foto goedgekeurd! +20 punten";
+    status.textContent = t("demoPhotoApproved");
     status.classList.remove("analyzing");
     status.classList.add("matched");
 
@@ -2071,7 +2270,7 @@ btnHint.addEventListener("click", () => {
   extraHintBox.classList.remove("hidden");
   btnHint.classList.add("hidden"); // maakt plaats voor de antwoordknop, op dezelfde plek
   btnRevealAnswer.classList.remove("hidden");
-  btnRevealAnswer.textContent = `Onthul antwoord (-${ANSWER_REVEAL_COST} punten)`;
+  btnRevealAnswer.textContent = t("btnRevealAnswerCost", { cost: ANSWER_REVEAL_COST });
 
   if (
     STOPS[state.currentStep].type === "photo" &&
@@ -2128,13 +2327,13 @@ btnCheckAnswer.addEventListener("click", () => {
   if (given && acceptable.includes(given)) {
     markCompleted(state.currentStep);
     updateProgressBar();
-    setQuizStatus("matched", "Goed beantwoord!");
+    setQuizStatus("matched", t("quizCorrect"));
     quizInput.disabled = true;
     btnCheckAnswer.classList.add("hidden");
     btnNext.disabled = false;
     updateFloatingNav();
   } else {
-    setQuizStatus("mismatch", "Dat is niet helemaal juist. Probeer het nog eens.");
+    setQuizStatus("mismatch", t("quizIncorrect"));
   }
 });
 

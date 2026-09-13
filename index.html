@@ -26,9 +26,10 @@
 <!-- Analytics (Umami — privacyvriendelijk, geen cookiebanner nodig) -->
 <script defer src="https://cloud.umami.is/script.js" data-website-id="fadc39ba-d7ef-467a-b2f1-259b749d3144"></script>
 
-<link rel="stylesheet" href="style.css?v=5">
+<link rel="stylesheet" href="style.css?v=6">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lora:wght@400;500&display=swap" rel="stylesheet">
+<script src="i18n.js?v=1"></script>
 </head>
 <body>
 
@@ -36,26 +37,27 @@
   <nav class="navbar">
     <div class="logo">Ontdek Haarlem</div>
     <ul class="nav-links">
-      <li><a href="#hoe-het-werkt">Hoe het werkt</a></li>
-      <li><a href="#stops">Hoogtepunten</a></li>
-      <li><a href="#punten">Punten &amp; scorebord</a></li>
-      <li><a href="tour.html" class="nav-cta">Start de tour</a></li>
+      <li><a href="#hoe-het-werkt" data-i18n="navHoeHetWerkt">Hoe het werkt</a></li>
+      <li><a href="#stops" data-i18n="navHoogtepunten">Hoogtepunten</a></li>
+      <li><a href="#punten" data-i18n="navPuntenScorebord">Punten &amp; scorebord</a></li>
+      <li><a href="tour.html" class="nav-cta" data-i18n="navStartTour">Start de tour</a></li>
+      <li class="nav-lang-item"><button class="lang-toggle" id="btnLangToggle">EN</button></li>
     </ul>
   </nav>
 
   <div class="hero-content">
-    <span class="hero-label">Een digitale speurtocht door</span>
-    <h1>Haarlem, zoals je het nog nooit hebt gezien</h1>
-    <p class="hero-sub">21 stops door de binnenstad, met een audioverhaal bij elke plek. Volg poëtische hints, los onderweg vragen en foto-opdrachten op, en verzamel punten tot je de hele route hebt afgelegd.</p>
-    <a href="tour.html" class="btn-primary large">Begin je tour</a>
+    <span class="hero-label" data-i18n="heroLabel">Een digitale speurtocht door</span>
+    <h1 data-i18n="heroTitle">Haarlem, zoals je het nog nooit hebt gezien</h1>
+    <p class="hero-sub" data-i18n="heroSub">21 stops door de binnenstad, met een audioverhaal bij elke plek. Volg poëtische hints, los onderweg vragen en foto-opdrachten op, en verzamel punten tot je de hele route hebt afgelegd.</p>
+    <a href="tour.html" class="btn-primary large" data-i18n="heroBegin">Begin je tour</a>
     <div class="hero-meta">
-      <span><strong>21</strong> stops</span>
+      <span><strong>21</strong> <span data-i18n="heroMetaStops">stops</span></span>
       <span class="hero-meta-divider">·</span>
-      <span>Audiotour</span>
+      <span data-i18n="heroMetaAudio">Audiotour</span>
       <span class="hero-meta-divider">·</span>
-      <span>Eigen tempo</span>
+      <span data-i18n="heroMetaTempo">Eigen tempo</span>
       <span class="hero-meta-divider">·</span>
-      <span>Gratis</span>
+      <span data-i18n="heroMetaGratis">Gratis</span>
     </div>
   </div>
 </header>
@@ -64,35 +66,35 @@
 
   <section id="hoe-het-werkt" class="section tour-intro">
     <div class="container">
-      <span class="eyebrow">Hoe het werkt</span>
-      <h2>Een speurtocht, geen rondleiding</h2>
-      <p class="section-sub">Geen gids, geen groep, geen vaste route-tijden. Jij bepaalt het tempo — de stad doet de rest.</p>
+      <span class="eyebrow" data-i18n="eyebrowHoeHetWerkt">Hoe het werkt</span>
+      <h2 data-i18n="hhwTitle">Een speurtocht, geen rondleiding</h2>
+      <p class="section-sub" data-i18n="hhwSub">Geen gids, geen groep, geen vaste route-tijden. Jij bepaalt het tempo — de stad doet de rest.</p>
 
       <div class="steps">
         <div class="step">
           <div class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15 9l-2 6-6 2 2-6z"/></svg></div>
-          <h3>Volg de hints</h3>
-          <p>Elke stop begint met een kleine, poëtische hint — geen adres, wel een raadsel.</p>
+          <h3 data-i18n="step1Title">Volg de hints</h3>
+          <p data-i18n="step1Text">Elke stop begint met een kleine, poëtische hint — geen adres, wel een raadsel.</p>
         </div>
         <div class="step">
           <div class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-2h6l2 2h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="14" r="4"/></svg></div>
-          <h3>Los de opdracht op</h3>
-          <p>Beantwoord een vraag of maak een foto ter plekke — een gratis, ingebouwde AI checkt 'm direct.</p>
+          <h3 data-i18n="step2Title">Los de opdracht op</h3>
+          <p data-i18n="step2Text">Beantwoord een vraag of maak een foto ter plekke — een gratis, ingebouwde AI checkt 'm direct.</p>
         </div>
         <div class="step">
           <div class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.6 6.2.6-4.6 4.2 1.3 6.1L12 16.8 6.5 19.5l1.3-6.1L3.2 9.2l6.2-.6z"/></svg></div>
-          <h3>Verdien punten</h3>
-          <p>Elke opgeloste stop levert punten op. Kom je er niet uit, dan kosten een extra hint of het antwoord wat punten.</p>
+          <h3 data-i18n="step3Title">Verdien punten</h3>
+          <p data-i18n="step3Text">Elke opgeloste stop levert punten op. Kom je er niet uit, dan kosten een extra hint of het antwoord wat punten.</p>
         </div>
         <div class="step">
           <div class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14v-3a9 9 0 0 1 18 0v3"/><path d="M21 14a2 2 0 0 1-2 2h-1v-6h1a2 2 0 0 1 2 2v2z"/><path d="M3 14a2 2 0 0 0 2 2h1v-6H5a2 2 0 0 0-2 2v2z"/></svg></div>
-          <h3>Audiotour</h3>
-          <p>Bij elke stop hoor je een kort audioverhaal over de plek — gewoon in je browser, geen extra app nodig.</p>
+          <h3 data-i18n="step4Title">Audiotour</h3>
+          <p data-i18n="step4Text">Bij elke stop hoor je een kort audioverhaal over de plek — gewoon in je browser, geen extra app nodig.</p>
         </div>
         <div class="step">
           <div class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v4a5 5 0 0 1-10 0V4z"/><path d="M7 6H4a3 3 0 0 0 3 3"/><path d="M17 6h3a3 3 0 0 1-3 3"/></svg></div>
-          <h3>Deel je score</h3>
-          <p>Aan het eind zie je hoe jij het deed op het scorebord, samen met andere deelnemers.</p>
+          <h3 data-i18n="step5Title">Deel je score</h3>
+          <p data-i18n="step5Text">Aan het eind zie je hoe jij het deed op het scorebord, samen met andere deelnemers.</p>
         </div>
       </div>
     </div>
@@ -100,9 +102,9 @@
 
   <section id="stops" class="section stops">
     <div class="container">
-      <span class="eyebrow">Hoogtepunten</span>
-      <h2>21 stops door de binnenstad</h2>
-      <p class="section-sub">Van een eeuwenoud standbeeld tot een molen die ooit afbrandde — een greep uit de route.</p>
+      <span class="eyebrow" data-i18n="eyebrowHoogtepunten">Hoogtepunten</span>
+      <h2 data-i18n="stopsTitle">21 stops door de binnenstad</h2>
+      <p class="section-sub" data-i18n="stopsSub">Van een eeuwenoud standbeeld tot een molen die ooit afbrandde — een greep uit de route.</p>
 
       <div class="stop-grid">
         <div class="stop-card">
@@ -110,15 +112,15 @@
           <div class="stop-card-body">
             <span class="stop-index">1</span>
             <h3>Standbeeld Laurens Janszoon Coster</h3>
-            <p>Een bronzen Haarlemmer die — volgens de legende — de boekdrukkunst uitvond, nog vóór Gutenberg.</p>
+            <p data-i18n="card1Text">Een bronzen Haarlemmer die — volgens de legende — de boekdrukkunst uitvond, nog vóór Gutenberg.</p>
           </div>
         </div>
         <div class="stop-card">
           <div class="stop-photo"><img src="photos/home-bavokerk.jpg" alt="De Sint-Bavokerk (Grote Kerk)" loading="lazy" style="object-position: center 20%;"></div>
           <div class="stop-card-body">
             <span class="stop-index">2</span>
-            <h3>De Sint-Bavokerk</h3>
-            <p>De Grote Kerk torent al eeuwen boven de Grote Markt uit, met het beroemde Müller-orgel binnen.</p>
+            <h3 data-i18n="card2Title">De Sint-Bavokerk</h3>
+            <p data-i18n="card2Text">De Grote Kerk torent al eeuwen boven de Grote Markt uit, met het beroemde Müller-orgel binnen.</p>
           </div>
         </div>
         <div class="stop-card">
@@ -126,7 +128,7 @@
           <div class="stop-card-body">
             <span class="stop-index">4</span>
             <h3>Teylers Museum</h3>
-            <p>Het oudste museum van Nederland: een tijdscapsule vol fossielen, elektriseermachines en oude tekeningen.</p>
+            <p data-i18n="card3Text">Het oudste museum van Nederland: een tijdscapsule vol fossielen, elektriseermachines en oude tekeningen.</p>
           </div>
         </div>
         <div class="stop-card">
@@ -134,7 +136,7 @@
           <div class="stop-card-body">
             <span class="stop-index">6</span>
             <h3>Molen De Adriaan</h3>
-            <p>Een iconische molen aan het Spaarne, ooit tot de grond toe afgebrand en daarna helemaal herbouwd.</p>
+            <p data-i18n="card4Text">Een iconische molen aan het Spaarne, ooit tot de grond toe afgebrand en daarna helemaal herbouwd.</p>
           </div>
         </div>
         <div class="stop-card">
@@ -142,7 +144,7 @@
           <div class="stop-card-body">
             <span class="stop-index">8</span>
             <h3>Amsterdamse Poort</h3>
-            <p>De laatste overgebleven stadspoort van Haarlem — ooit één van meer dan twintig.</p>
+            <p data-i18n="card5Text">De laatste overgebleven stadspoort van Haarlem — ooit één van meer dan twintig.</p>
           </div>
         </div>
         <div class="stop-card">
@@ -150,7 +152,7 @@
           <div class="stop-card-body">
             <span class="stop-index">20</span>
             <h3>Frans Hals Museum</h3>
-            <p>Ooit een oudemannenhuis, nu de plek waar het werk van Haarlems beroemdste schilder hangt.</p>
+            <p data-i18n="card6Text">Ooit een oudemannenhuis, nu de plek waar het werk van Haarlems beroemdste schilder hangt.</p>
           </div>
         </div>
         <div class="stop-card">
@@ -158,12 +160,12 @@
           <div class="stop-card-body">
             <span class="stop-index">21</span>
             <h3>Stadhuis Haarlem</h3>
-            <p>Al eeuwenlang het bestuurlijke hart van de stad, met een gevel vol geschiedenis.</p>
+            <p data-i18n="card7Text">Al eeuwenlang het bestuurlijke hart van de stad, met een gevel vol geschiedenis.</p>
           </div>
         </div>
       </div>
 
-      <p class="stop-grid-note">En nog 14 andere stops — die ontdek je onderweg.</p>
+      <p class="stop-grid-note" data-i18n="stopGridNote">En nog 14 andere stops — die ontdek je onderweg.</p>
     </div>
   </section>
 
@@ -171,43 +173,43 @@
     <div class="container points-container">
       <div class="points-visual">
         <div class="points-visual-card">
-          <span class="hint-label-demo">Voorbeeld</span>
+          <span class="hint-label-demo" data-i18n="pointsVisualLabel">Voorbeeld</span>
           <div class="points-visual-row">
-            <span>Stop opgelost</span>
+            <span data-i18n="pvRow1">Stop opgelost</span>
             <span class="points-plus">+20</span>
           </div>
           <div class="points-visual-row">
-            <span>Extra hint gebruikt</span>
+            <span data-i18n="pvRow2">Extra hint gebruikt</span>
             <span class="points-minus">-10</span>
           </div>
           <div class="points-visual-row">
-            <span>Antwoord onthuld</span>
+            <span data-i18n="pvRow3">Antwoord onthuld</span>
             <span class="points-minus">-20</span>
           </div>
         </div>
       </div>
       <div class="points-text">
-        <span class="eyebrow">Punten &amp; scorebord</span>
-        <h2>Hoe goed ken jij Haarlem écht?</h2>
-        <p>Elke opgeloste stop levert punten op. Kom je er zelf niet uit, dan kan je een extra hint opvragen of het antwoord laten zien — dat kost wel wat punten, dus bewaar ze voor als je ze nodig hebt.</p>
-        <p>Aan het eind van de tour zie je je score, je tijd en hoeveel hints je gebruikte — en kan je 'm delen op een scorebord met andere deelnemers.</p>
+        <span class="eyebrow" data-i18n="eyebrowPunten">Punten &amp; scorebord</span>
+        <h2 data-i18n="pointsTitle">Hoe goed ken jij Haarlem écht?</h2>
+        <p data-i18n="pointsText1">Elke opgeloste stop levert punten op. Kom je er zelf niet uit, dan kan je een extra hint opvragen of het antwoord laten zien — dat kost wel wat punten, dus bewaar ze voor als je ze nodig hebt.</p>
+        <p data-i18n="pointsText2">Aan het eind van de tour zie je je score, je tijd en hoeveel hints je gebruikte — en kan je 'm delen op een scorebord met andere deelnemers.</p>
       </div>
     </div>
   </section>
 
   <section id="start" class="section cta-section">
     <div class="container cta-box">
-      <h2>Klaar om Haarlem te ontdekken?</h2>
-      <p>Start de digitale speurtocht en wandel op jouw tempo langs de mooiste — en meest verrassende — plekken van de stad.</p>
-      <a href="tour.html" class="btn-primary large">Start de tour nu</a>
+      <h2 data-i18n="ctaTitle">Klaar om Haarlem te ontdekken?</h2>
+      <p data-i18n="ctaText">Start de digitale speurtocht en wandel op jouw tempo langs de mooiste — en meest verrassende — plekken van de stad.</p>
+      <a href="tour.html" class="btn-primary large" data-i18n="ctaButton">Start de tour nu</a>
     </div>
   </section>
 
   <section id="over" class="section about">
     <div class="container">
-      <span class="eyebrow">Over deze tour</span>
-      <h2>Gemaakt om Haarlem te leren kennen als een local</h2>
-      <p>Geen haastige groepen, geen vaste tijden — gewoon jij, je telefoon en de verhalen van een stad die al eeuwenlang mensen weet te verrassen. Alles werkt gewoon in je browser, geen app nodig.</p>
+      <span class="eyebrow" data-i18n="eyebrowOver">Over deze tour</span>
+      <h2 data-i18n="aboutTitle">Gemaakt om Haarlem te leren kennen als een local</h2>
+      <p data-i18n="aboutText">Geen haastige groepen, geen vaste tijden — gewoon jij, je telefoon en de verhalen van een stad die al eeuwenlang mensen weet te verrassen. Alles werkt gewoon in je browser, geen app nodig.</p>
     </div>
   </section>
 
@@ -215,12 +217,12 @@
 
 <div class="install-banner hidden" id="installBanner">
   <div class="install-banner-text">
-    <strong>Installeer Ontdek Haarlem</strong>
-    <span>Zet de tour op je beginscherm voor snelle toegang, ook zonder browser.</span>
+    <strong data-i18n="installTitle">Installeer Ontdek Haarlem</strong>
+    <span data-i18n="installText">Zet de tour op je beginscherm voor snelle toegang, ook zonder browser.</span>
   </div>
   <div class="install-banner-actions">
-    <button class="btn-primary" id="btnInstallApp">Installeren</button>
-    <button class="install-dismiss" id="btnDismissInstall" aria-label="Sluiten">✕</button>
+    <button class="btn-primary" id="btnInstallApp" data-i18n="installButton">Installeren</button>
+    <button class="install-dismiss" id="btnDismissInstall" data-i18n-aria-label="sluitenAria" aria-label="Sluiten">✕</button>
   </div>
 </div>
 
@@ -228,21 +230,21 @@
      deze banner legt de handmatige stappen uit i.p.v. een knop die niks doet. -->
 <div class="install-banner hidden" id="iosInstallBanner">
   <div class="install-banner-text">
-    <strong>Installeer Ontdek Haarlem</strong>
+    <strong data-i18n="installTitle">Installeer Ontdek Haarlem</strong>
     <span>
-      Tik onderin op
+      <span data-i18n="iosInstallBefore">Tik onderin op</span>
       <svg class="ios-share-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4"/><path d="M7 8l5-5 5 5"/><rect x="4" y="12" width="16" height="8" rx="2"/></svg>
-      en dan op <strong>"Zet op beginscherm"</strong>.
+      <span data-i18n="iosInstallAfter">en dan op</span> <strong data-i18n="iosInstallStep">"Zet op beginscherm"</strong>.
     </span>
   </div>
   <div class="install-banner-actions">
-    <button class="install-dismiss" id="btnDismissIosInstall" aria-label="Sluiten">✕</button>
+    <button class="install-dismiss" id="btnDismissIosInstall" data-i18n-aria-label="sluitenAria" aria-label="Sluiten">✕</button>
   </div>
 </div>
 
 <footer class="footer">
   <div class="container">
-    <p>&copy; 2026 Ontdek Haarlem — Digitale Wandeltour</p>
+    <p data-i18n="footerCopyright">&copy; 2026 Ontdek Haarlem — Digitale Wandeltour</p>
     <p class="photo-credits">
       Foto's: Milliped ·
       Steven Lek ·

@@ -1,9 +1,25 @@
-.DS_Store
-33DC6DE7-A8EE-45CD-82B8-8D3227937A89 (1).jpeg
-33DC6DE7-A8EE-45CD-82B8-8D3227937A89.jpeg
-Voorgevel_Teylers_Museum.jpg
-panorama-test.html
-panorama-walk-test.html
-IMG_*.PNG
-IMG_*.jpeg
-IMG_*.jpg
+# Deze map wordt ook gebruikt voor losse documenten/screenshots die niets met
+# de site te maken hebben (CV's, schoolwerk, zip-bestanden, screenshots) — die
+# belanden hier soms per ongeluk. In plaats van each keer een nieuw bestand aan
+# een blacklist toe te voegen (foutgevoelig), negeren we hier standaard ALLES
+# en zetten we alleen de echte site-bestanden expliciet weer aan ("allowlist").
+*
+
+!.gitignore
+!index.html
+!tour.html
+!style.css
+!tour.css
+!tour.js
+!i18n.js
+!sw.js
+!manifest.json
+!favicon.ico
+!apple-touch-icon.png
+!icon-192.png
+!icon-512.png
+
+!photos/
+!photos/**
+!audio/
+!audio/**
