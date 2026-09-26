@@ -351,6 +351,7 @@ const ROMAN_NUMERALS_INFO_OVERLAY_EN = {
 
 const EN_OVERRIDES = [
   {
+    audio: "audio/en/01-standbeeld-laurens-janszoon-coster.mp3",
     title: "Standbeeld Laurens Janszoon Coster",
     hint: "For centuries, a bronze man on the Grote Markt has held up the letter that taught the world to read.",
     extraHint: "",
@@ -358,6 +359,7 @@ const EN_OVERRIDES = [
     type: "photo"
   },
   {
+    audio: "audio/en/02-achterzijde-van-de-kerk.mp3",
     title: "De St. Bavokerk",
     hint: "Past the church, the city grows quieter, until you reach the place where justice is spoken.",
     extraHint: "Look for the stone gate with a lion's head above it.",
@@ -367,6 +369,7 @@ const EN_OVERRIDES = [
     type: "quiz"
   },
   {
+    audio: "audio/en/03-taverne-de-waag.mp3",
     title: "Taverne De Waag",
     hint: "On the facade of the old weigh house, red shutters are waiting for you to count them.",
     extraHint: "Count carefully: there are more than seventeen but fewer than twenty-six — look both upstairs and downstairs, across the whole facade.",
@@ -375,6 +378,7 @@ const EN_OVERRIDES = [
     type: "quiz"
   },
   {
+    audio: "audio/en/04-teylers-museum.mp3",
     title: "Teylers Museum",
     hint: "High above the facade, a weathered company keeps watch, green with age.",
     extraHint: "A winged figure raises two laurel wreaths, while her companions look on in silence.",
@@ -382,6 +386,7 @@ const EN_OVERRIDES = [
     type: "photo"
   },
   {
+    audio: "audio/en/05-teylers-hofje.mp3",
     title: "Teylers Hofje",
     hint: "Stone columns carry a secret, carved in Latin.",
     extraHint: "The year is after 1781, but before 1794.",
@@ -391,6 +396,7 @@ const EN_OVERRIDES = [
     type: "quiz"
   },
   {
+    audio: "audio/en/06-molen-de-adriaan.mp3",
     title: "Molen De Adriaan",
     hint: "By the water, a giant with waving arms has been turning for centuries.",
     extraHint: "It's a real windmill with wooden sails, right next to the water where boats are moored.",
@@ -399,6 +405,7 @@ const EN_OVERRIDES = [
     type: "photo"
   },
   {
+    audio: "audio/en/07-de-koepel.mp3",
     title: "De Koepel",
     hint: "Go inside, where a round giant once guarded hundreds of souls behind numbered doors.",
     extraHint: "Look up carefully — the numbers increase the higher you look in the dome, until you find the highest number on the top floor.",
@@ -407,6 +414,7 @@ const EN_OVERRIDES = [
     type: "quiz"
   },
   {
+    audio: "audio/en/08-amsterdamse-poort.mp3",
     title: "Amsterdamse Poort",
     hint: "High in the brick wall of the gate, three silent emblems hide, built into the stone through the centuries.",
     extraHint: "Look for the row of three diamond-shaped emblems above the passage, with a woven knot in the middle.",
@@ -414,6 +422,7 @@ const EN_OVERRIDES = [
     type: "photo"
   },
   {
+    audio: "audio/en/09-gravestenenbrug.mp3",
     title: "Gravestenenbrug",
     hint: "Over the water arches a bridge you must climb, step by step.",
     extraHint: "It's a trick question — take a good look before you start counting.",
@@ -422,6 +431,7 @@ const EN_OVERRIDES = [
     type: "quiz"
   },
   {
+    audio: "audio/en/10-waalse-kerk.mp3",
     title: "Waalse Kerk",
     hint: "Not everyone at the church stands in the pulpit. Somewhere nearby, a bronze woman sits quietly reading, her back against the brick wall.",
     extraHint: "She sits on a stack of pages, one hand against her head. Find the small bronze statue on its pedestal and photograph it up close.",
@@ -429,6 +439,7 @@ const EN_OVERRIDES = [
     type: "photo"
   },
   {
+    audio: "audio/en/11-huis-barnaart.mp3",
     title: "Huis Barnaart",
     hint: "A stately house on the canal looks back at you with a great many eyes on its facade.",
     extraHint: "Count all the windows you see on the front of the house, from left to right.",
@@ -437,6 +448,7 @@ const EN_OVERRIDES = [
     type: "quiz"
   },
   {
+    audio: "audio/en/12-monument-kenau-simonsdochter.mp3",
     title: "Monument Kenau Simonsdochter",
     hint: "Two heroes turned to bronze still guard the city they once defended.",
     extraHint: "",
@@ -444,6 +456,7 @@ const EN_OVERRIDES = [
     type: "photo"
   },
   {
+    audio: "audio/en/13-vrouw-in-het-verzet-monument.mp3",
     title: "Vrouw in het Verzet monument",
     hint: "A young resistance fighter was given a place here in bronze, surrounded by greenery.",
     extraHint: "Beneath her feet, carved in stone, her real name is hidden.",
@@ -452,6 +465,7 @@ const EN_OVERRIDES = [
     type: "quiz"
   },
   {
+    audio: "audio/en/14-hofje-van-oorschot.mp3",
     title: "Hofje van Oorschot",
     hint: "Behind a simple gate lies a hofje where women once found a safe home.",
     extraHint: "The year is carved above the gate — somewhere in the 1760s or 1770s.",
@@ -460,6 +474,7 @@ const EN_OVERRIDES = [
     type: "quiz"
   },
   {
+    audio: "audio/en/15-ten-boom-museum.mp3",
     title: "Ten Boom Museum",
     hint: "On the side wall of this house there's something to discover, if you look closely.",
     extraHint: "It's a map of her travels around the world — you'll find the year on it.",
@@ -468,6 +483,7 @@ const EN_OVERRIDES = [
     type: "quiz"
   },
   {
+    audio: "audio/en/16-prinsenhof.mp3",
     title: "Prinsenhof",
     hint: "In a quiet, green garden stands a familiar face you've already met before.",
     extraHint: "The same man who holds up the letter on the Grote Markt stands here too — his name is carved beneath his feet.",
@@ -477,6 +493,7 @@ const EN_OVERRIDES = [
     type: "quiz"
   },
   {
+    audio: "audio/en/17-lutherse-hofje.mp3",
     title: "Lutherse Hofje",
     hint: "Every Sunday, a church bell still rings here, right on time for the service.",
     extraHint: "You don't need to go inside — a sign by the gate gives away the secret.",
@@ -486,6 +503,7 @@ const EN_OVERRIDES = [
     type: "quiz"
   },
   {
+    audio: "audio/en/18-jopen.mp3",
     title: "Jopen",
     hint: "A church without services, but with a very different kind of salvation within its walls.",
     extraHint: "What was once sacred here has now been replaced by hops and barley.",
@@ -495,6 +513,7 @@ const EN_OVERRIDES = [
     type: "quiz"
   },
   {
+    audio: "audio/en/19-nieuwe-kerk.mp3",
     title: "Nieuwe Kerk",
     hint: "On a quiet little square, not far from the center, stands a church that — despite its name — hasn't been new for a very long time.",
     extraHint: "Walk to the east side of the building — the year is carved there in Roman numerals.",
@@ -504,6 +523,7 @@ const EN_OVERRIDES = [
     type: "quiz"
   },
   {
+    audio: "audio/en/20-frans-hals-museum.mp3",
     title: "Frans Hals Museum",
     hint: "Not the door, but the top of the facade hides two stone guardians.",
     extraHint: "Between them stands a coat of arms with a year that begins with 19.",
@@ -511,6 +531,7 @@ const EN_OVERRIDES = [
     type: "photo"
   },
   {
+    audio: "audio/en/21-stadhuis-haarlem.mp3",
     title: "Stadhuis Haarlem",
     hint: "Above the entrance, a facade has been speaking for centuries in an old, forgotten language.",
     extraHint: "Golden letters on a dark background — a Latin inscription above the door.",
