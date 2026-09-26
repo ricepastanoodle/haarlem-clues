@@ -1,11 +1,11 @@
 {
-  "name": "Ontdek Haarlem — Digitale Wandeltour",
-  "short_name": "Ontdek Haarlem",
+  "name": "Haarlem Clues — Digitale Wandeltour",
+  "short_name": "Haarlem Clues",
   "description": "Een digitale speurtocht door Haarlem met audioverhalen, hints en foto-opdrachten.",
   "start_url": "index.html",
   "scope": ".",
   "display": "standalone",
-  "background_color": "#faf3e8",
+  "background_color": "#f6f1e8",
   "theme_color": "#a0522d",
   "lang": "nl",
   "icons": [

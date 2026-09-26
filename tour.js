@@ -950,7 +950,7 @@ function initMapIfNeeded() {
     attribution: t("osmAttribution")
   }).addTo(leafletMap);
 
-  routeLineUnlocked = L.polyline([], { color: "#c08a3e", weight: 5 }).addTo(leafletMap);
+  routeLineUnlocked = L.polyline([], { color: "#d1a349", weight: 5 }).addTo(leafletMap);
   // Het laatste stukje — van je vorige stop naar de stop die je nu moet vinden —
   // krijgt een eigen kleur, zodat meteen duidelijk is welk stuk je nu moet lopen.
   routeLineCurrentLeg = L.polyline([], { color: "#a0522d", weight: 6 }).addTo(leafletMap);
@@ -989,9 +989,9 @@ function showHintMap(center, radius) {
     }).addTo(hintMap);
     hintMapCircle = L.circle(center, {
       radius,
-      color: "#c08a3e",
+      color: "#d1a349",
       weight: 3,
-      fillColor: "#c08a3e",
+      fillColor: "#d1a349",
       fillOpacity: 0.25
     }).addTo(hintMap);
     updateUserLocationMarker(hintMap, "hint", lastKnownLatLng);
@@ -1165,9 +1165,9 @@ function updateMapProgress(legs) {
       // Het middelpunt van de cirkel wijkt bewust af van de echte locatie.
       searchCircle = L.circle(circleCenter, {
         radius: circleRadius,
-        color: "#c08a3e",
+        color: "#d1a349",
         weight: 3,
-        fillColor: "#c08a3e",
+        fillColor: "#d1a349",
         fillOpacity: 0.25
       }).addTo(leafletMap);
       continue;
@@ -1625,7 +1625,7 @@ async function shareScore() {
   const url = buildShareUrl();
   if (navigator.share) {
     try {
-      await navigator.share({ title: "Ontdek Haarlem", text, url });
+      await navigator.share({ title: "Haarlem Clues", text, url });
     } catch (err) {
       // Gebruiker annuleerde het deelvenster — geen actie nodig.
     }

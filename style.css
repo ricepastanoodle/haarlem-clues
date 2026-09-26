@@ -1,24 +1,25 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  --brick: #a0522d;
+  /* Haarlem Clues — huisstijl v1.0 (sept. 2026) */
+  --brick: #a0522d;   /* Sienna — beeldmerk, knoppen, accenten */
   --brick-dark: #7a3a1f;
-  --cream: #faf3e8;
-  --cream-dark: #f0e4d0;
-  --ink: #2b241c;
-  --ink-soft: #55493a;
-  --gold: #c08a3e;
+  --cream: #f6f1e8;   /* Crème — standaard achtergrond */
+  --cream-dark: #ece2d0;
+  --ink: #241a15;     /* Inkt — tekst, donkere vlakken */
+  --ink-soft: #4e3f33;
+  --gold: #d1a349;    /* Goud — sluitsteen, gevonden clues, op donker */
 }
 
 body {
-  font-family: 'Lora', serif;
+  font-family: 'IBM Plex Mono', monospace;
   color: var(--ink);
   background: var(--cream);
   line-height: 1.6;
 }
 
 h1, h2, h3, .logo {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Instrument Serif', serif;
 }
 
 .container {
@@ -38,9 +39,35 @@ h1, h2, h3, .logo {
 }
 
 .logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-mark {
+  display: block;
+  border-radius: 22%;
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.05;
+}
+
+.logo-name {
+  font-family: 'Instrument Serif', serif;
   font-size: 1.4rem;
-  font-weight: 700;
   color: var(--cream);
+}
+
+.logo-tagline {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
 }
 
 .nav-links {
@@ -74,7 +101,7 @@ h1, h2, h3, .logo {
   color: var(--cream);
   padding: 7px 14px;
   border-radius: 4px;
-  font-family: 'Lora', serif;
+  font-family: 'IBM Plex Mono', monospace;
   font-size: 0.85rem;
   font-weight: 500;
   letter-spacing: 0.03em;
@@ -129,7 +156,7 @@ h1, h2, h3, .logo {
 .hero-sub {
   font-size: 1.1rem;
   max-width: 560px;
-  color: #f0e4d0;
+  color: #ece2d0;
   margin-bottom: 36px;
 }
 
@@ -147,7 +174,7 @@ h1, h2, h3, .logo {
 }
 
 .btn-primary:hover {
-  background: #d4a054;
+  background: #e5b95f;
   transform: translateY(-2px);
 }
 
@@ -169,7 +196,7 @@ h1, h2, h3, .logo {
 
 .hero-meta strong {
   color: var(--gold);
-  font-family: 'Playfair Display', serif;
+  font-family: 'Instrument Serif', serif;
 }
 
 .hero-meta-divider {
@@ -298,7 +325,7 @@ h1, h2, h3, .logo {
   background: var(--brick);
   color: var(--cream);
   border-radius: 50%;
-  font-family: 'Playfair Display', serif;
+  font-family: 'Instrument Serif', serif;
   font-weight: 700;
   font-size: 0.95rem;
   position: absolute;
@@ -379,13 +406,13 @@ h1, h2, h3, .logo {
 }
 
 .points-plus {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Instrument Serif', serif;
   font-weight: 700;
   color: #3d6b3d;
 }
 
 .points-minus {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Instrument Serif', serif;
   font-weight: 700;
   color: var(--brick);
 }
@@ -403,7 +430,7 @@ h1, h2, h3, .logo {
 .cta-box p {
   max-width: 480px;
   margin: 0 auto 36px;
-  color: #f0e4d0;
+  color: #ece2d0;
 }
 
 /* About */
@@ -476,7 +503,7 @@ h1, h2, h3, .logo {
 }
 
 .install-banner-text strong {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Instrument Serif', serif;
   font-size: 1rem;
 }
 
