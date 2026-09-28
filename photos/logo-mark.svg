@@ -1,15 +1,5 @@
-<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-  <!-- Linkertoren (linkerstok van de H) -->
-  <path d="M4 88 V34 L18 14 L32 34 V88 Z" fill="#A0522D"/>
-  <!-- Rechtertoren (rechterstok van de H) -->
-  <path d="M68 88 V34 L82 14 L96 34 V88 Z" fill="#A0522D"/>
-  <!-- Poortbrug (dwarsbalk) — smal, laat de ruimte eronder bewust open zodat
-       het silhouet echt als een H leest, niet als een gesloten poort. -->
-  <rect x="32" y="42" width="36" height="13" fill="#A0522D"/>
-  <!-- Sluitsteen, half over de dwarsbalk -->
-  <rect x="45.5" y="39.5" width="9" height="9" fill="#D1A349" transform="rotate(45 50 48.5)"/>
-  <!-- Doorgang: dunne poortboog-omlijning met het vraagteken erin, vrij
-       zwevend in de open ruimte onder de dwarsbalk (geen gevulde muur). -->
-  <path d="M41 88 V66 A9 9 0 0 1 59 66 V88" fill="none" stroke="#A0522D" stroke-width="2.6"/>
-  <text x="50" y="83" font-family="Georgia, 'Times New Roman', serif" font-size="18" font-weight="700" fill="#A0522D" text-anchor="middle">?</text>
+<svg viewBox="0 0 92 96" xmlns="http://www.w3.org/2000/svg">
+  <path d="M2 32h26v64H2zM64 32h26v64H64zM15 6l15 26H0zM77 6l15 26H62zM28 38h36v18H28zM28 56h9a9 9 0 0 0-9 9zM64 56h-9a9 9 0 0 1 9 9z" fill="#A0522D"/>
+  <rect x="46" y="41" width="9" height="9" transform="rotate(45 46 41)" fill="#D1A349"/>
+  <text x="46" y="90" text-anchor="middle" font-family="Georgia, serif" font-weight="700" font-size="30" fill="#A0522D">?</text>
 </svg>
