@@ -200,9 +200,9 @@ const STOPS_NL = [
     answerPhoto: "photos/21-stadhuis-haarlem.jpg",
     hint: "Boven de ingang spreekt een gevel al eeuwen in een oude, vergeten taal.",
     extraHint: "Gouden letters op een donkere ondergrond — een Latijnse tekst boven de deur.",
-    answer: "De gevelsteen boven de ingang, met het opschrift 'S.P.Q.H.' en het jaartal 1650.",
+    answer: "De gevelsteen boven de ingang, met het opschrift 'S.P.Q.H.' en het jaartal 1630.",
     type: "photo",
-    description: "a stone gable above the entrance with a Latin inscription reading SPQH and HANC SACRAM THEMIDIS DOMUM SENATUS SEDEM NE TEMERATO CIVIS UNQUAM, carved in gold letters on a dark background, with 'ANNO 1650' inscribed below it"
+    description: "a stone gable above the entrance with a Latin inscription reading SPQH and HANC SACRAM THEMIDIS DOMUM SENATUS SEDEM NE TEMERATO CIVIS UNQUAM, carved in gold letters on a dark background, with 'ANNO 1630' inscribed below it"
   }
 ];
 
@@ -535,7 +535,7 @@ const EN_OVERRIDES = [
     title: "Stadhuis Haarlem",
     hint: "Above the entrance, a facade has been speaking for centuries in an old, forgotten language.",
     extraHint: "Golden letters on a dark background — a Latin inscription above the door.",
-    answer: "The gable stone above the entrance, inscribed 'S.P.Q.H.' with the year 1650.",
+    answer: "The gable stone above the entrance, inscribed 'S.P.Q.H.' with the year 1630.",
     type: "photo"
   }
 ];
