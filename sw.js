@@ -6,7 +6,7 @@
 // Belangrijk bij een deploy: verhoog CACHE_VERSION als je iets in
 // PRECACHE_URLS verandert (nieuw stopfoto, nieuw audiobestand) zodat oude
 // caches worden opgeruimd en de nieuwe inhoud alsnog gedownload wordt.
-const CACHE_VERSION = "v6";
+const CACHE_VERSION = "v7";
 const SHELL_CACHE = `haarlem-shell-${CACHE_VERSION}`;
 const CONTENT_CACHE = `haarlem-content-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `haarlem-runtime-${CACHE_VERSION}`;
@@ -22,14 +22,14 @@ const PRECACHE_URLS = [
   "icon-512.png",
   "manifest.json",
   "photos/demo-eiffeltoren.jpg",
-  "photos/01-standbeeld-laurens-janszoon-coster.png",
+  "photos/01-standbeeld-laurens-janszoon-coster.jpg",
   "photos/04-teylers-museum.jpg",
   "photos/06-molen-de-adriaan.jpg",
   "photos/08-amsterdamse-poort.jpg",
   "photos/10-waalse-kerk.jpg",
   "photos/12-monument-kenau-simonsdochter.jpg",
   "photos/20-frans-hals-museum.png",
-  "photos/21-stadhuis-haarlem.png",
+  "photos/21-stadhuis-haarlem.jpg",
   "audio/01-standbeeld-laurens-janszoon-coster.mp3",
   "audio/02-achterzijde-van-de-kerk.mp3",
   "audio/03-taverne-de-waag.mp3",

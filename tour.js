@@ -7,7 +7,7 @@ const STOPS_NL = [
   {
     title: "Standbeeld Laurens Janszoon Coster",
     audio: "audio/01-standbeeld-laurens-janszoon-coster.mp3",
-    answerPhoto: "photos/01-standbeeld-laurens-janszoon-coster.png",
+    answerPhoto: "photos/01-standbeeld-laurens-janszoon-coster.jpg",
     hint: "Al eeuwen houdt een bronzen man op de Grote Markt de letter omhoog die de wereld leerde lezen.",
     extraHint: "",
     answer: "Het groen uitgeslagen bronzen standbeeld van Laurens Janszoon Coster op zijn sokkel, met zijn hand omhoog en de toren van de Grote Kerk op de achtergrond.",
@@ -197,7 +197,7 @@ const STOPS_NL = [
   {
     title: "Stadhuis Haarlem",
     audio: "audio/21-stadhuis-haarlem.mp3",
-    answerPhoto: "photos/21-stadhuis-haarlem.png",
+    answerPhoto: "photos/21-stadhuis-haarlem.jpg",
     hint: "Boven de ingang spreekt een gevel al eeuwen in een oude, vergeten taal.",
     extraHint: "Gouden letters op een donkere ondergrond — een Latijnse tekst boven de deur.",
     answer: "De gevelsteen boven de ingang, met het opschrift 'S.P.Q.H.' en het jaartal 1650.",
