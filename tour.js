@@ -94,7 +94,7 @@ const STOPS_NL = [
     title: "Waalse Kerk",
     audio: "audio/10-waalse-kerk.mp3",
     answerPhoto: "photos/10-waalse-kerk.jpg",
-    hint: "Niet iedereen bij de kerk staat op de preekstoel. Ergens dichtbij zit een bronzen vrouw stil te lezen, met haar rug tegen de bakstenen muur.",
+    hint: "Niet iedereen bij de kerk staat op de preekstoel. Ergens dichtbij zit een bronzen vrouw in gedachten verzonken, met haar rug naar de bakstenen muur.",
     extraHint: "Ze zit op een stapel bladzijden, met haar hand tegen haar hoofd. Zoek het kleine bronzen beeldje op haar sokkel en fotografeer het van dichtbij.",
     answer: "Het bronzen beeldje 'Kort Jakje', een zittende vrouw op een stapel bladzijden, bij de Waalse Kerk.",
     type: "photo",
@@ -192,7 +192,7 @@ const STOPS_NL = [
     extraHint: "Tussen hen in staat een wapenschild met een jaartal dat begint met 19.",
     answer: "De geveltop met het jaartal 1912, twee beelden op de hoeken en een klein beeld boven in de top.",
     type: "photo",
-    description: "a decorative stone gable at the top of a building with statues and a coat of arms"
+    description: "a stone gable at a roof's peak with two statues and a round carved coat of arms dated 1912"
   },
   {
     title: "Stadhuis Haarlem",
@@ -202,7 +202,7 @@ const STOPS_NL = [
     extraHint: "Gouden letters op een donkere ondergrond — een Latijnse tekst boven de deur.",
     answer: "De gevelsteen boven de ingang, met het opschrift 'S.P.Q.H.' en het jaartal 1630.",
     type: "photo",
-    description: "a stone gable above the entrance with a Latin inscription reading SPQH and HANC SACRAM THEMIDIS DOMUM SENATUS SEDEM NE TEMERATO CIVIS UNQUAM, carved in gold letters on a dark background, with 'ANNO 1630' inscribed below it"
+    description: "an ornate carved stone gable with gold lettering above a wooden arched door, with a stone balcony above it"
   }
 ];
 
@@ -433,7 +433,7 @@ const EN_OVERRIDES = [
   {
     audio: "audio/en/10-waalse-kerk.mp3",
     title: "Waalse Kerk",
-    hint: "Not everyone at the church stands in the pulpit. Somewhere nearby, a bronze woman sits quietly reading, her back against the brick wall.",
+    hint: "Not everyone at the church stands in the pulpit. Somewhere nearby sits a bronze woman lost in thought, her back to the brick wall.",
     extraHint: "She sits on a stack of pages, one hand against her head. Find the small bronze statue on its pedestal and photograph it up close.",
     answer: "The small bronze statue 'Kort Jakje,' a seated woman on a stack of pages, near the Waalse Kerk.",
     type: "photo"
