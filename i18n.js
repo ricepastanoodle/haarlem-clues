@@ -103,6 +103,15 @@ const STRINGS = {
     stepLabel: "Stap {done} / {total}",
     pointsLabelText: "{points} punten",
 
+    // Routekeuzescherm
+    routeChoiceKicker: "Voor je begint",
+    routeChoiceTitle: "Hoeveel tijd heb je?",
+    routeShortTitle: "Korte route",
+    routeShortDesc: "9 stops, ± 2 km, ± 1 à 1,5 uur",
+    routeFullTitle: "Volledige route",
+    routeFullDesc: "21 stops, ± 7 km, ± 3 uur",
+    btnChooseRoute: "Kies deze route",
+
     // Introscherm
     introKicker: "De tour begint",
     introTitle: "Klaar om Haarlem te ontdekken?",
@@ -182,6 +191,11 @@ const STRINGS = {
     finishKicker: "Gefeliciteerd",
     finishTitle: "Je hebt de tour voltooid!",
     finishText: "Je hebt alle stops gevonden en Haarlem ontdekt zoals maar weinig bezoekers dat doen. Bedankt voor het meelopen.",
+    finishTitleShort: "Je hebt de korte route voltooid!",
+    finishTextShort: "Je hebt de korte route gelopen en alvast een stukje Haarlem ontdekt. Zin om de rest van de stad ook te zien?",
+    btnContinueFullRoute: "Ga verder met de volledige route",
+    leaderboardTabShort: "Kort",
+    leaderboardTabFull: "Volledig",
     finishStatTime: "Tijd",
     finishStatPoints: "Punten",
     finishStatHints: "Hints gebruikt",
@@ -324,6 +338,15 @@ const STRINGS = {
     stepLabel: "Step {done} / {total}",
     pointsLabelText: "{points} points",
 
+    // Route choice screen
+    routeChoiceKicker: "Before you begin",
+    routeChoiceTitle: "How much time do you have?",
+    routeShortTitle: "Short route",
+    routeShortDesc: "9 stops, ± 2 km, ± 1 to 1.5 hours",
+    routeFullTitle: "Full route",
+    routeFullDesc: "21 stops, ± 7 km, ± 3 hours",
+    btnChooseRoute: "Choose this route",
+
     introKicker: "The tour begins",
     introTitle: "Ready to discover Haarlem?",
     introText: "Starting from the Grote Markt, you'll follow hints to special spots around the city. Solve challenges along the way: a question, a photo, a short search, and collect points until you've completed the whole route. Stuck? You can always trade an extra hint or the answer for a few points.",
@@ -394,6 +417,11 @@ const STRINGS = {
     finishKicker: "Congratulations",
     finishTitle: "You've completed the tour!",
     finishText: "You've found every stop and discovered Haarlem the way few visitors do. Thanks for joining.",
+    finishTitleShort: "You've completed the short route!",
+    finishTextShort: "You've walked the short route and discovered a piece of Haarlem. Fancy seeing the rest of the city too?",
+    btnContinueFullRoute: "Continue with the full route",
+    leaderboardTabShort: "Short",
+    leaderboardTabFull: "Full",
     finishStatTime: "Time",
     finishStatPoints: "Points",
     finishStatHints: "Hints used",

@@ -194,6 +194,46 @@ body.has-floating-nav .tour-main {
   color: var(--gold);
 }
 
+/* Routekeuzescherm */
+.route-options {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 28px 0;
+}
+
+.route-option {
+  display: block;
+  width: 100%;
+  background: var(--cream-dark);
+  border: 2px solid var(--gold);
+  border-radius: 10px;
+  padding: 20px 22px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+  font-family: inherit;
+  color: inherit;
+}
+
+.route-option:hover {
+  background: #f0e0d0;
+  transform: translateY(-1px);
+}
+
+.route-option-title {
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.3rem;
+  color: var(--brick);
+  margin-bottom: 4px;
+}
+
+.route-option-desc {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+
 /* Mini-kaartje bij een extra hint — wijst precies naar de echte locatie. */
 .hint-map {
   height: 160px;
@@ -819,6 +859,34 @@ body.has-floating-nav .tour-main {
 .leaderboard-box {
   text-align: left;
   margin-bottom: 28px;
+}
+
+.leaderboard-tabs {
+  display: flex;
+  gap: 8px;
+  margin: 8px 0 4px;
+}
+
+.leaderboard-tab {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.8rem;
+  font-weight: 500;
+  background: transparent;
+  border: 1px solid var(--gold);
+  color: var(--ink-soft);
+  border-radius: 20px;
+  padding: 6px 16px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.leaderboard-tab:hover {
+  background: var(--cream-dark);
+}
+
+.leaderboard-tab.active {
+  background: var(--gold);
+  color: var(--ink);
 }
 
 .leaderboard-loading {

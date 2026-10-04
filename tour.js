@@ -542,9 +542,40 @@ const EN_OVERRIDES = [
 
 const STOPS_EN = STOPS_NL.map((stop, i) => ({ ...stop, ...EN_OVERRIDES[i] }));
 
-// Eén schakelpunt voor de taal — alle ~20 plekken verderop die STOPS[...]
-// gebruiken blijven ongewijzigd werken, ongeacht welke taal actief is.
-let STOPS = getLang() === "en" ? STOPS_EN : STOPS_NL;
+// Indices (0-based, in STOPS_NL/STOPS_EN) van de 9 stops die de korte route vormen,
+// in loopvolgorde. De hints/audio/foto's/vragen zelf staan nergens dubbel — de korte
+// route hergebruikt gewoon de bestaande stopdata via deze lijst.
+const SHORT_ROUTE_INDICES = [0, 1, 2, 3, 5, 9, 14, 15, 20];
+
+function getFullStopsForLang() {
+  return getLang() === "en" ? STOPS_EN : STOPS_NL;
+}
+
+// Bouwt de actieve STOPS-array voor een gekozen route. Elke stop krijgt een
+// "originalIndex" mee (0-20, positie in de volledige route) — nodig om later de
+// juiste coördinaten (ROUTE_COORDS/STOP_TO_ROUTE_INDEX) terug te vinden, want de
+// positie binnen de actieve route (state.currentStep) komt bij de korte route niet
+// meer overeen met de positie in de volledige route.
+function buildActiveStops(routeType) {
+  const full = getFullStopsForLang();
+  const indices = routeType === "short" ? SHORT_ROUTE_INDICES : full.map((_, i) => i);
+  return indices.map((origIdx) => ({ ...full[origIdx], originalIndex: origIdx }));
+}
+
+// Bouwt de resterende stops van de volledige route (alles wat niet in de korte
+// route zat), in de oorspronkelijke volgorde — gebruikt door "Ga verder met de
+// volledige route" op het eindscherm van de korte route.
+function buildRemainingFullStops() {
+  const full = getFullStopsForLang();
+  const done = new Set(SHORT_ROUTE_INDICES);
+  return full.map((stop, i) => ({ ...stop, originalIndex: i })).filter((s) => !done.has(s.originalIndex));
+}
+
+// Eén schakelpunt voor de taal/route — alle plekken verderop die STOPS[...]
+// gebruiken blijven ongewijzigd werken, ongeacht welke taal of route actief is.
+// Blijft leeg totdat de speler een route gekozen heeft (zie render()); bij een
+// opgeslagen tour met een routeType wordt 'ie meteen hieronder gevuld.
+let STOPS = [];
 
 const STORAGE_KEY = "haarlemTourProgress";
 
@@ -619,6 +650,10 @@ function loadState() {
       if (!state.hintsUsed) state.hintsUsed = {};
       if (!state.answersRevealed) state.answersRevealed = {};
       if (typeof state.points !== "number") state.points = STARTING_POINTS;
+      // Oudere opgeslagen voortgang kende nog geen routekeuze — die speler was
+      // altijd al op de volledige route bezig, dus die blijft daar gewoon verder gaan.
+      if (!state.routeType) state.routeType = "full";
+      STOPS = buildActiveStops(state.routeType);
     }
   } catch (e) {
     // geen geldige opgeslagen staat, begin gewoon opnieuw
@@ -641,6 +676,7 @@ function saveState() {
   }
 }
 
+const screenRouteChoice = document.getElementById("screen-route-choice");
 const screenIntro = document.getElementById("screen-intro");
 const screenInstructions = document.getElementById("screen-instructions");
 const screenInstructionsHints = document.getElementById("screen-instructions-hints");
@@ -699,11 +735,16 @@ const btnOverride = document.getElementById("btnOverride");
 const btnNext = document.getElementById("btnNext");
 const btnBack = document.getElementById("btnBack");
 const btnHint = document.getElementById("btnHint");
+const btnChooseShortRoute = document.getElementById("btnChooseShortRoute");
+const btnChooseFullRoute = document.getElementById("btnChooseFullRoute");
 const btnStart = document.getElementById("btnStart");
 const btnInstructionsStart = document.getElementById("btnInstructionsStart");
+const finishTitleEl = document.getElementById("finishTitle");
+const finishTextEl = document.getElementById("finishText");
 const finishGallery = document.getElementById("finishGallery");
 const finishStats = document.getElementById("finishStats");
 const finishBadges = document.getElementById("finishBadges");
+const btnContinueFullRoute = document.getElementById("btnContinueFullRoute");
 const btnShareScore = document.getElementById("btnShareScore");
 const linkShareWhatsapp = document.getElementById("linkShareWhatsapp");
 const shareStatus = document.getElementById("shareStatus");
@@ -712,6 +753,8 @@ const leaderboardName = document.getElementById("leaderboardName");
 const btnSubmitScore = document.getElementById("btnSubmitScore");
 const leaderboardSubmitStatus = document.getElementById("leaderboardSubmitStatus");
 const leaderboardList = document.getElementById("leaderboardList");
+const leaderboardTabShortBtn = document.getElementById("leaderboardTabShort");
+const leaderboardTabFullBtn = document.getElementById("leaderboardTabFull");
 
 const photoZone = document.querySelector(".photo-zone");
 const gpsZone = document.getElementById("gpsZone");
@@ -758,6 +801,10 @@ let hintMapCircle = null;
 let revealMap = null;
 let revealMapMarker = null;
 let legsPromise = null;
+// Bepaalt vanaf waar de kaart/looproute getekend wordt: vanaf de Grote Markt (normale
+// gang van zaken), of vanaf de laatste stop van de korte route (na "Ga verder met de
+// volledige route"). Wordt opnieuw opgebouwd zodra die situatie verandert, zie renderMap().
+let currentRouteContext = null;
 let audioBarStopIndex = null; // welke stop de audiobalk nu toont — bij wisselen van stop stopt en verbergt de balk zichzelf
 
 // Onthoudt waar een kaartje oorspronkelijk vandaan kwam, zodat we het bij het
@@ -847,9 +894,9 @@ function truncateAtRadius(legCoords, center, radius) {
 // elke paginabezoek alle etappes opnieuw hoeven op te vragen bij de gratis dienst.
 const LEGS_CACHE_KEY = "haarlemTourRouteLegsCache";
 
-function loadCachedLegs(expectedCount) {
+function loadCachedLegsByKey(key, expectedCount) {
   try {
-    const cached = JSON.parse(localStorage.getItem(LEGS_CACHE_KEY));
+    const cached = JSON.parse(localStorage.getItem(key));
     if (Array.isArray(cached) && cached.length === expectedCount) return cached;
   } catch (e) {
     // geen geldige cache, gewoon opnieuw ophalen
@@ -857,12 +904,29 @@ function loadCachedLegs(expectedCount) {
   return null;
 }
 
-// Haalt per etappe (start->stop1, stop1->stop2, ...) een echte wandelroute op
-// die de straten volgt, via de gratis OSRM-wandelroutedienst (geen API-key nodig).
-// Bij een netwerkfout (of als de gratis dienst tijdelijk overbelast/onbereikbaar is)
-// valt een etappe terug op een rechte lijn. Etappes worden na elkaar opgehaald
-// (niet allemaal tegelijk) om de gratis dienst niet te overbelasten, en het resultaat
-// wordt lokaal gecached zodat een volgend bezoek niet opnieuw alles hoeft op te vragen.
+function loadCachedLegs(expectedCount) {
+  return loadCachedLegsByKey(LEGS_CACHE_KEY, expectedCount);
+}
+
+// Haalt de wandelroute tussen twee punten op bij de gratis OSRM-wandelroutedienst
+// (geen API-key nodig). Bij een netwerkfout (of een tijdelijk overbelaste/onbereikbare
+// dienst) valt het terug op een rechte lijn tussen de twee punten.
+async function fetchSingleLeg([lat1, lng1], [lat2, lng2]) {
+  const straightCoords = [[lat1, lng1], [lat2, lng2]];
+  const url = `https://routing.openstreetmap.de/routed-foot/route/v1/foot/${lng1},${lat1};${lng2},${lat2}?overview=full&geometries=geojson`;
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    return data.routes[0].geometry.coordinates.map(([lng, lat]) => [lat, lng]);
+  } catch (e) {
+    return straightCoords;
+  }
+}
+
+// Haalt per etappe (start->stop1, stop1->stop2, ...) een echte wandelroute op die de
+// straten volgt. Etappes worden na elkaar opgehaald (niet allemaal tegelijk) om de
+// gratis dienst niet te overbelasten, en het resultaat wordt lokaal gecached zodat
+// een volgend bezoek niet opnieuw alles hoeft op te vragen.
 async function fetchRouteLegs() {
   if (legsPromise) return legsPromise;
 
@@ -878,25 +942,13 @@ async function fetchRouteLegs() {
   legsPromise = (async () => {
     const legs = [];
     for (let i = 0; i < legCount; i++) {
-      const [lat1, lng1] = allCoords[i];
-      const [lat2, lng2] = allCoords[i + 1];
-      const straightCoords = [allCoords[i], allCoords[i + 1]];
-
       // De eerste etappe steekt de open Grote Markt over — daar kun je overal rechtdoor
       // lopen, dus een rechte lijn klopt beter dan de looproute-suggestie langs de randen.
       if (i === 0) {
-        legs.push(straightCoords);
+        legs.push([allCoords[0], allCoords[1]]);
         continue;
       }
-
-      const url = `https://routing.openstreetmap.de/routed-foot/route/v1/foot/${lng1},${lat1};${lng2},${lat2}?overview=full&geometries=geojson`;
-      try {
-        const res = await fetch(url);
-        const data = await res.json();
-        legs.push(data.routes[0].geometry.coordinates.map(([lng, lat]) => [lat, lng]));
-      } catch (e) {
-        legs.push(straightCoords);
-      }
+      legs.push(await fetchSingleLeg(allCoords[i], allCoords[i + 1]));
     }
     try {
       localStorage.setItem(LEGS_CACHE_KEY, JSON.stringify(legs));
@@ -907,6 +959,66 @@ async function fetchRouteLegs() {
   })();
 
   return legsPromise;
+}
+
+// Bouwt de "kaartcontext" voor de normale situatie: lopend vanaf de Grote Markt,
+// zowel voor de korte als de volledige route — het verschil zit 'm puur in welke
+// posities een marker/doel krijgen (stops die niet in de actieve route zitten,
+// worden net als het Stadsklooster behandeld: wel een stukje wandelroute, geen pin).
+function buildRouteContextFromStart() {
+  const allCoords = [START_COORD, ...ROUTE_COORDS];
+  const stopIndexAt = new Array(allCoords.length).fill(null);
+  const allCoordsIndexForStop = new Array(STOPS.length).fill(null);
+  for (let i = 1; i < allCoords.length; i++) {
+    const origIdx = ROUTE_STOP_INDEX[i - 1];
+    if (origIdx === null) continue;
+    const activeIdx = STOPS.findIndex((s) => s.originalIndex === origIdx);
+    if (activeIdx === -1) continue; // deze stop zit niet in de actieve route
+    stopIndexAt[i] = activeIdx;
+    allCoordsIndexForStop[activeIdx] = i;
+  }
+  return { allCoords, stopIndexAt, allCoordsIndexForStop, getLegs: fetchRouteLegs };
+}
+
+// Bouwt de kaartcontext voor het vervolg van de korte route: de speler staat niet
+// meer bij de Grote Markt maar bij de laatste stop van de korte route, en moet naar
+// de eerste nog niet gelopen stop van de volledige route. Daarvoor is maar één
+// nieuwe (losse) etappe nodig — de rest van de etappes bestaat al (gecached via
+// fetchRouteLegs) en wordt gewoon hergebruikt.
+function buildRouteContextForContinuation(fromCoord) {
+  const positions = STOPS.map((s) => STOP_TO_ROUTE_INDEX[s.originalIndex]);
+  const firstPos = Math.min(...positions);
+  const lastPos = Math.max(...positions);
+  const sliceCoords = ROUTE_COORDS.slice(firstPos, lastPos + 1);
+  const allCoords = [fromCoord, ...sliceCoords];
+
+  const stopIndexAt = new Array(allCoords.length).fill(null);
+  const allCoordsIndexForStop = new Array(STOPS.length).fill(null);
+  for (let i = 1; i < allCoords.length; i++) {
+    const origIdx = ROUTE_STOP_INDEX[firstPos + i - 1];
+    if (origIdx === null) continue;
+    const activeIdx = STOPS.findIndex((s) => s.originalIndex === origIdx);
+    if (activeIdx === -1) continue;
+    stopIndexAt[i] = activeIdx;
+    allCoordsIndexForStop[activeIdx] = i;
+  }
+
+  const cacheKey = `${LEGS_CACHE_KEY}Continue:${firstPos}:${lastPos}`;
+  async function getLegs() {
+    const cached = loadCachedLegsByKey(cacheKey, allCoords.length - 1);
+    if (cached) return cached;
+    const bridgeLeg = await fetchSingleLeg(fromCoord, sliceCoords[0]);
+    const fullLegs = await fetchRouteLegs(); // al gecached vanaf het begin van de tour
+    const legs = [bridgeLeg, ...fullLegs.slice(firstPos, lastPos)];
+    try {
+      localStorage.setItem(cacheKey, JSON.stringify(legs));
+    } catch (e) {
+      // opslag vol of niet beschikbaar — geen probleem, gewoon niet cachen
+    }
+    return legs;
+  }
+
+  return { allCoords, stopIndexAt, allCoordsIndexForStop, getLegs };
 }
 
 // "Jouw locatie"-stip: een blauw bolletje met een pulserende ring, zoals je van
@@ -975,7 +1087,7 @@ function initMapIfNeeded() {
 // bij de extra hint en het antwoordscherm altijd exact dezelfde cirkel tonen.
 function getStopSearchCircle(stopIndex) {
   const stop = STOPS[stopIndex];
-  const routeIndex = STOP_TO_ROUTE_INDEX[stopIndex];
+  const routeIndex = STOP_TO_ROUTE_INDEX[stop.originalIndex];
   const allCoordsIndex = routeIndex + 1; // +1 want allCoords begint met START_COORD ervoor
   const realCoord = ROUTE_COORDS[routeIndex];
   // Sommige stops hebben een eigen, kleinere cirkel specifiek voor de extra hint
@@ -1125,14 +1237,14 @@ infoOverlay.addEventListener("click", (e) => {
   if (e.target === infoOverlay) closeInfoOverlay();
 });
 
-function updateMapProgress(legs) {
-  const allCoords = [START_COORD, ...ROUTE_COORDS];
+function updateMapProgress(routeContext, legs) {
+  const { allCoords, stopIndexAt, allCoordsIndexForStop } = routeContext;
   // "hasNextTarget" en "targetStop" gaan over STOPS (echte opdrachten), niet over
-  // allCoords — daardoor tellen routepunten zonder eigen stop (bv. het Stadsklooster)
-  // niet mee als "volgende bestemming".
+  // allCoords — daardoor tellen routepunten zonder eigen stop (bv. het Stadsklooster,
+  // of bij de korte route: stops die niet meedoen) niet mee als "volgende bestemming".
   const hasNextTarget = state.currentStep + 1 < STOPS.length;
   const targetIndex = hasNextTarget
-    ? STOP_TO_ROUTE_INDEX[state.currentStep + 1] + 1 // +1 want allCoords begint met START_COORD ervoor
+    ? allCoordsIndexForStop[state.currentStep + 1]
     : allCoords.length - 1; // geen stops meer over -> toon de hele resterende route, incl. routepunten zonder stop
   const targetStop = hasNextTarget ? STOPS[state.currentStep + 1] : null;
   const targetIsPhotoSearch = hasNextTarget && targetStop.type === "photo" && !targetStop.skipCircle;
@@ -1196,8 +1308,8 @@ function updateMapProgress(legs) {
       continue;
     }
 
-    const stopIdx = ROUTE_STOP_INDEX[i - 1];
-    if (stopIdx === null) continue; // routepunt zonder eigen stop (bv. Stadsklooster) — geen marker
+    const stopIdx = stopIndexAt[i];
+    if (stopIdx === null) continue; // routepunt zonder eigen stop in de actieve route — geen marker
 
     const cls = isTarget ? "current" : "unlocked";
     const icon = L.divIcon({
@@ -1238,12 +1350,24 @@ async function renderMap() {
       ? t("mapKickerNext", { n: nextStopNumber, total: STOPS.length })
       : t("mapKickerDone");
   initMapIfNeeded();
+
+  // Net na "Ga verder met de volledige route" staat de speler niet meer bij de Grote
+  // Markt, maar bij de laatste stop van de korte route — de kaart moet dan vanaf dat
+  // punt naar de eerstvolgende (nog niet gelopen) stop wijzen i.p.v. vanaf het begin.
+  const isResumingFromShort = state.currentStep === -1 && !!state.resumingFromShort;
+  const routeContext = isResumingFromShort
+    ? buildRouteContextForContinuation(
+        ROUTE_COORDS[STOP_TO_ROUTE_INDEX[SHORT_ROUTE_INDICES[SHORT_ROUTE_INDICES.length - 1]]]
+      )
+    : buildRouteContextFromStart();
+  currentRouteContext = routeContext;
+
   // Meteen de cirkel/markers tekenen (die hangen niet af van de looproute-data),
   // zodat je nooit een lege kaart ziet terwijl de wandelroutes nog opgehaald worden.
-  updateMapProgress([]);
+  updateMapProgress(routeContext, []);
   setTimeout(() => leafletMap && leafletMap.invalidateSize(), 50);
-  const legs = await fetchRouteLegs();
-  updateMapProgress(legs);
+  const legs = await routeContext.getLegs();
+  updateMapProgress(routeContext, legs);
 }
 
 function updateProgressBar() {
@@ -1275,6 +1399,7 @@ function render() {
     stopAudioBar();
   }
 
+  screenRouteChoice.classList.add("hidden");
   screenIntro.classList.add("hidden");
   screenInstructions.classList.add("hidden");
   screenInstructionsHints.classList.add("hidden");
@@ -1292,7 +1417,9 @@ function render() {
   stopHintsDemo();
   stopPhotoDemo();
 
-  if (state.currentStep < 0 && state.phase === "instructions") {
+  if (!state.routeType) {
+    screenRouteChoice.classList.remove("hidden");
+  } else if (state.currentStep < 0 && state.phase === "instructions") {
     screenInstructions.classList.remove("hidden");
     startQuizDemo();
   } else if (state.currentStep < 0 && state.phase === "instructionsHints") {
@@ -1539,7 +1666,7 @@ function renderReveal() {
     revealMapContainer.classList.remove("hidden");
     // Sommige stops hebben een preciezer punt dan de route-coördinaat zelf (bv. een
     // standbeeldje vlak bij, maar niet exact op, het adres van de stop).
-    showRevealMap(stop.preciseCoord || ROUTE_COORDS[STOP_TO_ROUTE_INDEX[state.currentStep]]);
+    showRevealMap(stop.preciseCoord || ROUTE_COORDS[STOP_TO_ROUTE_INDEX[stop.originalIndex]]);
   }
 
   if (stop.answerPhoto) {
@@ -1569,9 +1696,19 @@ const SUPABASE_KEY = "sb_publishable_r8YaFrA5153Jk-rYu4DnlQ_bvoFFqwD";
 
 let finishStatsData = null;
 
+// Welk scorebord-tabblad nu getoond wordt ("short" of "full") — staat standaard op
+// de route die de speler net gelopen heeft.
+let activeLeaderboardTab = "full";
+
 function renderFinish() {
+  const isShortRoute = state.routeType === "short";
+  finishTitleEl.textContent = t(isShortRoute ? "finishTitleShort" : "finishTitle");
+  finishTextEl.textContent = t(isShortRoute ? "finishTextShort" : "finishText");
+  btnContinueFullRoute.classList.toggle("hidden", !isShortRoute);
+  activeLeaderboardTab = isShortRoute ? "short" : "full";
   renderFinishStats();
   renderFinishGallery();
+  updateLeaderboardTabs();
   loadLeaderboard();
 }
 
@@ -1671,17 +1808,41 @@ async function submitScore(name) {
       name: name.slice(0, 30),
       points: finishStatsData.points,
       duration_seconds: finishStatsData.totalSeconds,
-      hints_used: finishStatsData.hintsUsedCount
+      hints_used: finishStatsData.hintsUsedCount,
+      route: state.routeType
     })
   });
   if (!res.ok) throw new Error("Versturen mislukt");
 }
 
+function updateLeaderboardTabs() {
+  leaderboardTabShortBtn.classList.toggle("active", activeLeaderboardTab === "short");
+  leaderboardTabFullBtn.classList.toggle("active", activeLeaderboardTab === "full");
+}
+
+leaderboardTabShortBtn.addEventListener("click", () => {
+  if (activeLeaderboardTab === "short") return;
+  activeLeaderboardTab = "short";
+  updateLeaderboardTabs();
+  loadLeaderboard();
+});
+
+leaderboardTabFullBtn.addEventListener("click", () => {
+  if (activeLeaderboardTab === "full") return;
+  activeLeaderboardTab = "full";
+  updateLeaderboardTabs();
+  loadLeaderboard();
+});
+
 async function loadLeaderboard() {
   leaderboardList.innerHTML = `<p class="leaderboard-loading">${t("leaderboardLoading")}</p>`;
   try {
+    // Scores van vóór de routekeuze-functie hebben geen "route"-veld (NULL) — die
+    // tellen mee als "Volledig", vandaar de or-filter op dat tabblad.
+    const routeFilter =
+      activeLeaderboardTab === "short" ? "route=eq.short" : "or=(route.eq.full,route.is.null)";
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/leaderboard?select=name,points,duration_seconds,completed_at&order=points.desc,duration_seconds.asc&limit=10`,
+      `${SUPABASE_URL}/rest/v1/leaderboard?select=name,points,duration_seconds,completed_at&${routeFilter}&order=points.desc,duration_seconds.asc&limit=10`,
       { headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` } }
     );
     if (!res.ok) throw new Error("Laden mislukt");
@@ -2180,6 +2341,16 @@ function stopPhotoDemo() {
   photoDemoGen += 1;
 }
 
+function chooseRoute(routeType) {
+  state.routeType = routeType;
+  STOPS = buildActiveStops(routeType);
+  saveState();
+  render();
+}
+
+btnChooseShortRoute.addEventListener("click", () => chooseRoute("short"));
+btnChooseFullRoute.addEventListener("click", () => chooseRoute("full"));
+
 // Eerst de kaart (route + eventueel zoekcirkel) naar stop 1, pas daarna de opdracht zelf
 // Eerst de drie uitlegschermen (vraag, hints, foto-opdracht), pas daarna echt de tour in.
 btnStart.addEventListener("click", () => {
@@ -2451,6 +2622,7 @@ audioBarClose.addEventListener("click", stopAudioBar);
 btnMapContinue.addEventListener("click", () => {
   state.currentStep += 1;
   state.phase = "challenge";
+  delete state.resumingFromShort; // alleen relevant voor de allereerste kaart na de overstap
   saveState();
   render();
   if (state.currentStep >= STOPS.length) {
@@ -2479,6 +2651,25 @@ btnInfoBack.addEventListener("click", () => {
 btnFinishBack.addEventListener("click", () => {
   state.currentStep = STOPS.length - 1;
   state.phase = "map";
+  saveState();
+  render();
+});
+
+// Vanaf het eindscherm van de korte route verder met de 12 stops die nog niet
+// gelopen zijn — met behoud van punten, maar met een schone lei voor de nieuwe
+// (nog niet aangeraakte) stops zelf. Telt straks mee voor het scorebord van de
+// volledige route.
+btnContinueFullRoute.addEventListener("click", () => {
+  STOPS = buildRemainingFullStops();
+  state.routeType = "full";
+  state.currentStep = -1;
+  state.phase = "map";
+  state.completed = {};
+  state.hintsUsed = {};
+  state.answersRevealed = {};
+  state.photos = {};
+  state.scoreSubmitted = false;
+  state.resumingFromShort = true;
   saveState();
   render();
 });
@@ -2513,7 +2704,9 @@ btnRestartTour.addEventListener("click", () => {
     hintsUsed: {},
     answersRevealed: {},
     points: STARTING_POINTS
+    // routeType ontbreekt bewust — render() toont dan weer het keuzescherm.
   };
+  STOPS = [];
   render();
 });
 
