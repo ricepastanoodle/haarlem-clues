@@ -187,7 +187,7 @@ const STOPS_NL = [
   {
     title: "Frans Hals Museum",
     audio: "audio/20-frans-hals-museum.mp3",
-    answerPhoto: "photos/20-frans-hals-museum.png",
+    answerPhoto: "photos/20-frans-hals-museum.jpg",
     hint: "Niet de deur, maar de top van de gevel verbergt twee stenen wachters.",
     extraHint: "Tussen hen in staat een wapenschild met een jaartal dat begint met 19.",
     answer: "De geveltop met het jaartal 1912, twee beelden op de hoeken en een klein beeld boven in de top.",
