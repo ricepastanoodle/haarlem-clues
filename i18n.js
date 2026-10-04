@@ -221,6 +221,8 @@ const STRINGS = {
     linkReviewTripadvisor: "Review op TripAdvisor",
     btnBackHome: "Terug naar home",
     btnReviewBack: "Terug naar het scorebord",
+    btnRestartTour: "Tour opnieuw beginnen",
+    confirmRestartTour: "Weet je zeker dat je opnieuw wilt beginnen? Je voortgang en punten gaan dan verloren.",
 
     // Aria-labels / overlays
     vorigeStapAria: "Vorige stap",
@@ -430,6 +432,8 @@ const STRINGS = {
     linkReviewTripadvisor: "Review on TripAdvisor",
     btnBackHome: "Back to home",
     btnReviewBack: "Back to the leaderboard",
+    btnRestartTour: "Restart the tour",
+    confirmRestartTour: "Are you sure you want to restart? Your progress and points will be lost.",
 
     vorigeStapAria: "Previous step",
     volgendeStapAria: "Next step",

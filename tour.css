@@ -138,7 +138,9 @@ body.has-floating-nav .tour-main {
 }
 
 .tour-card h1 {
-  font-size: 2rem;
+  font-size: clamp(1.4rem, 5.5vw, 2rem);
+  overflow-wrap: break-word;
+  word-break: break-word;
   margin-bottom: 20px;
 }
 
@@ -1312,7 +1314,6 @@ a.btn-secondary {
 
 @media (max-width: 600px) {
   .tour-card { padding: 32px 24px; }
-  .tour-card h1 { font-size: 1.6rem; }
 }
 
 /* Onderste audiobalk — blijft staan tijdens het navigeren binnen dezelfde stop

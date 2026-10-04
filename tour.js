@@ -626,7 +626,19 @@ function loadState() {
 }
 
 function saveState() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (err) {
+    // Opslag zit vol (bv. veel foto's, of weinig ruimte in privénavigatie) —
+    // probeer het opnieuw zonder de foto's, zodat voortgang en punten nooit
+    // verloren gaan en een opslagfout de tour nooit blokkeert.
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...state, photos: {} }));
+    } catch (err2) {
+      // Zelfs dat lukt niet (bv. localStorage volledig uitgeschakeld) — de
+      // voortgang blijft dan alleen in het geheugen bewaard voor deze sessie.
+    }
+  }
 }
 
 const screenIntro = document.getElementById("screen-intro");
@@ -723,6 +735,7 @@ const btnInfoBack = document.getElementById("btnInfoBack");
 const btnFinishBack = document.getElementById("btnFinishBack");
 const btnFinishForward = document.getElementById("btnFinishForward");
 const btnReviewBack = document.getElementById("btnReviewBack");
+const btnRestartTour = document.getElementById("btnRestartTour");
 const feedbackText = document.getElementById("feedbackText");
 const btnSubmitFeedback = document.getElementById("btnSubmitFeedback");
 const feedbackStatus = document.getElementById("feedbackStatus");
@@ -1251,7 +1264,6 @@ function markCompleted(index) {
   if (state.completed[index]) return;
   state.completed[index] = true;
   state.points += COMPLETE_REWARD;
-  saveState();
 }
 
 function render() {
@@ -1774,7 +1786,6 @@ btnSubmitFeedback.addEventListener("click", async () => {
 function acceptPhoto(dataUrl) {
   state.photos[state.currentStep] = dataUrl;
   markCompleted(state.currentStep);
-  saveState();
   photoLabel.classList.add("done");
   photoUploadText.textContent = t("photoUploadTextDone");
   btnNext.disabled = false;
@@ -1782,6 +1793,9 @@ function acceptPhoto(dataUrl) {
   pendingPhotoDataUrl = null;
   updateProgressBar(); // toont het nieuwe puntenaantal meteen
   updateFloatingNav();
+  // Als laatste: zo blokkeert een opslagfout (bv. localStorage vol) nooit de
+  // UI hierboven — saveState() zelf faalt bovendien nooit hard, zie daar.
+  saveState();
 }
 
 // Vaste "tegen"-omschrijvingen waarmee de eigen beschrijving van de stop wordt
@@ -1822,12 +1836,39 @@ async function analyzePhoto(dataUrl) {
   }
 }
 
+// Verkleint een foto naar een kleine JPEG vóór we 'm analyseren en opslaan.
+// Telefoonfoto's zijn vaak 3-5 MB per stuk als volledige base64-dataURL — met
+// een paar foto-stops loopt localStorage (~5 MB, minder in privénavigatie) dan
+// al snel vol. 600px breed / kwaliteit 0.6 is ruim genoeg voor zowel de
+// CLIP-check (die intern toch naar 224x224 herschaalt) als een nette preview.
+function resizeImageDataUrl(dataUrl, maxWidth = 600, quality = 0.6) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const scale = Math.min(1, maxWidth / img.width);
+      const w = Math.round(img.width * scale) || 1;
+      const h = Math.round(img.height * scale) || 1;
+      try {
+        const canvas = document.createElement("canvas");
+        canvas.width = w;
+        canvas.height = h;
+        canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL("image/jpeg", quality));
+      } catch (err) {
+        resolve(dataUrl); // canvas-export lukte niet — val terug op het origineel
+      }
+    };
+    img.onerror = () => resolve(dataUrl);
+    img.src = dataUrl;
+  });
+}
+
 photoInput.addEventListener("change", () => {
   const file = photoInput.files[0];
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = (e) => {
-    const dataUrl = e.target.result;
+  reader.onload = async (e) => {
+    const dataUrl = await resizeImageDataUrl(e.target.result);
     photoPreview.src = dataUrl;
     photoPreview.classList.remove("hidden");
     analyzePhoto(dataUrl);
@@ -2281,11 +2322,11 @@ btnNext.addEventListener("click", () => {
 });
 
 // Extra hint kost punten, en kan zo vaak gevraagd worden als je wilt (elke keer opnieuw kosten).
+// De hint wordt eerst getoond; pas daarna trekken we de punten af en slaan we
+// op — zo verliest een gebruiker nooit punten voor een hint die (door een
+// eventuele fout) niet eens te zien was.
 btnHint.addEventListener("click", () => {
-  state.points -= HINT_COST;
   state.hintsUsed[state.currentStep] = true; // blijft onthouden voor deze stop
-  saveState();
-  updateProgressBar();
   extraHintText.textContent = STOPS[state.currentStep].extraHint;
   extraHintText.classList.toggle("hidden", !STOPS[state.currentStep].extraHint);
   extraHintBox.classList.remove("hidden");
@@ -2303,6 +2344,10 @@ btnHint.addEventListener("click", () => {
   }
   // De infoOverlay-knop (bv. Romeinse cijfers) staat al bij de eerste hint en
   // hoeft hier dus niet meer apart getoond te worden.
+
+  state.points = Math.max(0, state.points - HINT_COST);
+  updateProgressBar();
+  saveState();
 });
 
 // Antwoord onthullen kost eenmalig extra punten. Heeft de stop een referentiefoto,
@@ -2310,8 +2355,8 @@ btnHint.addEventListener("click", () => {
 // antwoord gewoon inline onder de extra hint. Een tweede keer bekijken is gratis.
 btnRevealAnswer.addEventListener("click", () => {
   const stop = STOPS[state.currentStep];
-  if (!state.answersRevealed[state.currentStep]) {
-    state.points -= ANSWER_REVEAL_COST;
+  const firstTime = !state.answersRevealed[state.currentStep];
+  if (firstTime) {
     // Alleen ontgrendelen, geen +20 voltooiingsbonus — anders heft die de -20 kosten op.
     state.completed[state.currentStep] = true;
     state.answersRevealed[state.currentStep] = true; // blijft onthouden voor deze stop
@@ -2319,8 +2364,12 @@ btnRevealAnswer.addEventListener("click", () => {
   if (stop.answerPhoto) {
     state.phase = "reveal";
   }
+  render(); // eerst tonen, pas daarna de punten afschrijven
+  if (firstTime) {
+    state.points = Math.max(0, state.points - ANSWER_REVEAL_COST);
+    updateProgressBar();
+  }
   saveState();
-  render();
 });
 
 btnRevealBack.addEventListener("click", () => {
@@ -2336,6 +2385,7 @@ btnTestComplete.addEventListener("click", () => {
   updateProgressBar();
   renderStep();
   updateFloatingNav();
+  saveState();
 });
 
 btnCheckAnswer.addEventListener("click", () => {
@@ -2353,6 +2403,7 @@ btnCheckAnswer.addEventListener("click", () => {
     btnCheckAnswer.classList.add("hidden");
     btnNext.disabled = false;
     updateFloatingNav();
+    saveState();
   } else {
     setQuizStatus("mismatch", t("quizIncorrect"));
   }
@@ -2443,6 +2494,26 @@ btnFinishForward.addEventListener("click", () => {
 btnReviewBack.addEventListener("click", () => {
   state.phase = "finish";
   saveState();
+  render();
+});
+
+// Wist de opgeslagen voortgang volledig en begint weer bij de intro.
+btnRestartTour.addEventListener("click", () => {
+  if (!window.confirm(t("confirmRestartTour"))) return;
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch (err) {
+    // localStorage niet beschikbaar — de in-memory reset hieronder is dan alsnog genoeg.
+  }
+  state = {
+    currentStep: -1,
+    phase: "challenge",
+    photos: {},
+    completed: {},
+    hintsUsed: {},
+    answersRevealed: {},
+    points: STARTING_POINTS
+  };
   render();
 });
 
