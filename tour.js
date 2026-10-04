@@ -28,7 +28,7 @@ const STOPS_NL = [
     title: "Taverne De Waag",
     audio: "audio/03-taverne-de-waag.mp3",
     hint: "Aan de gevel van de oude waag wachten rode luiken tot jij ze komt tellen.",
-    extraHint: "Tel goed: het zijn er meer dan zeventien, maar minder dan zesentwintig — kijk zowel boven als beneden, aan de hele voorgevel.",
+    extraHint: "Tel goed: het zijn er meer dan zeventien, maar minder dan zesentwintig. Kijk zowel boven als beneden, aan de hele voorgevel.",
     question: "Hoeveel rode luiken zijn er?",
     answer: "20",
     type: "quiz"
@@ -66,7 +66,7 @@ const STOPS_NL = [
     title: "De Koepel",
     audio: "audio/07-de-koepel.mp3",
     hint: "Ga naar binnen, waar een ronde reus ooit honderden zielen bewaakte achter genummerde deuren.",
-    extraHint: "Kijk goed omhoog — de nummers lopen op naarmate je hoger in de koepel kijkt, tot je bij de bovenste verdieping het hoogste nummer vindt.",
+    extraHint: "Kijk goed omhoog: de nummers lopen op naarmate je hoger in de koepel kijkt, tot je bij de bovenste verdieping het hoogste nummer vindt.",
     question: "Wat is het hoogst genummerde gevangeniscel binnen De Koepel?",
     answer: "204",
     type: "quiz"
@@ -85,7 +85,7 @@ const STOPS_NL = [
     title: "Gravestenenbrug",
     audio: "audio/09-gravestenenbrug.mp3",
     hint: "Over het water welft een brug die je moet beklimmen, trede voor trede.",
-    extraHint: "Het is een strikvraag — kijk nog eens goed voor je begint te tellen.",
+    extraHint: "Het is een strikvraag. Kijk nog eens goed voor je begint te tellen.",
     question: "Hoeveel traptreden heeft de Gravestenenbrug?",
     answer: "0",
     type: "quiz"
@@ -132,7 +132,7 @@ const STOPS_NL = [
     title: "Hofje van Oorschot",
     audio: "audio/14-hofje-van-oorschot.mp3",
     hint: "Achter een eenvoudige poort schuilt een hofje waar vrouwen ooit een veilig thuis vonden.",
-    extraHint: "Het jaartal staat gebeiteld boven de poort — ergens in de jaren zestig of zeventig van de achttiende eeuw.",
+    extraHint: "Het jaartal staat gebeiteld boven de poort, ergens in de jaren zestig of zeventig van de achttiende eeuw.",
     question: "In welk jaar is de Begijnhof opgericht?",
     answer: "1769",
     type: "quiz"
@@ -141,7 +141,7 @@ const STOPS_NL = [
     title: "Ten Boom Museum",
     audio: "audio/15-ten-boom-museum.mp3",
     hint: "Op de zijmuur van dit huis valt iets te ontdekken, als je goed om je heen kijkt.",
-    extraHint: "Het is een kaart van haar wereldreizen — daarop vind je het jaartal.",
+    extraHint: "Het is een kaart van haar wereldreizen. Daarop vind je het jaartal.",
     question: "In welk jaar reisde Ten Boom voor het eerst af naar Australië?",
     answer: "1953",
     type: "quiz"
@@ -150,7 +150,7 @@ const STOPS_NL = [
     title: "Prinsenhof",
     audio: "audio/16-prinsenhof.mp3",
     hint: "In een rustige tuin vol groen staat een bekend gezicht dat je al eerder tegenkwam.",
-    extraHint: "Dezelfde man die op de Grote Markt de letter omhooghoudt, staat hier ook — zijn naam staat gebeiteld onder zijn voeten.",
+    extraHint: "Dezelfde man die op de Grote Markt de letter omhooghoudt, staat hier ook. Zijn naam staat gebeiteld onder zijn voeten.",
     question: "Wie is de man die in de Hortus tuin staat?",
     answer: "Laurens Janszoon Coster",
     answers: ["Laurens Janszoon Coster", "Laurens Jz Coster"],
@@ -160,7 +160,7 @@ const STOPS_NL = [
     title: "Lutherse Hofje",
     audio: "audio/17-lutherse-hofje.mp3",
     hint: "Elke zondag klinkt hier nog een kerkklok, precies op tijd voor de dienst.",
-    extraHint: "Je hoeft niet naar binnen — bij het hek hangt een bord dat het geheim verklapt.",
+    extraHint: "Je hoeft niet naar binnen. Bij het hek hangt een bord dat het geheim verklapt.",
     question: "Hoe laat begint de dienst op zondag?",
     answer: "10:30",
     answers: ["10:30", "half elf"],
@@ -179,7 +179,7 @@ const STOPS_NL = [
     title: "Nieuwe Kerk",
     audio: "audio/19-nieuwe-kerk.mp3",
     hint: "Aan een rustig pleintje, niet ver van het centrum, staat een kerk die ondanks haar naam allang niet meer nieuw is.",
-    extraHint: "Loop naar de oostkant van het gebouw — daar staat het jaartal in Romeinse cijfers gebeiteld.",
+    extraHint: "Loop naar de oostkant van het gebouw. Daar staat het jaartal in Romeinse cijfers gebeiteld.",
     question: "In welk jaar is de Nieuwe Kerk opgebouwd?",
     answer: "1649",
     type: "quiz"
@@ -199,7 +199,7 @@ const STOPS_NL = [
     audio: "audio/21-stadhuis-haarlem.mp3",
     answerPhoto: "photos/21-stadhuis-haarlem.jpg",
     hint: "Boven de ingang spreekt een gevel al eeuwen in een oude, vergeten taal.",
-    extraHint: "Gouden letters op een donkere ondergrond — een Latijnse tekst boven de deur.",
+    extraHint: "Gouden letters op een donkere ondergrond, een Latijnse tekst boven de deur.",
     answer: "De gevelsteen boven de ingang, met het opschrift 'S.P.Q.H.' en het jaartal 1630.",
     type: "photo",
     description: "an ornate carved stone gable with gold lettering above a wooden arched door, with a stone balcony above it"
@@ -344,7 +344,7 @@ const ROMAN_NUMERALS_INFO_OVERLAY_EN = {
       <tr><td>M</td><td>1000</td></tr>
     </table>
     <p>When a smaller letter comes before a larger one, you subtract instead of add. So <strong>IV</strong> isn't 6, but 5&nbsp;−&nbsp;1&nbsp;=&nbsp;4. And <strong>IX</strong> is 10&nbsp;−&nbsp;1&nbsp;=&nbsp;9.</p>
-    <p><strong>Example</strong> (a different, random year — not the answer): 1994 becomes <strong>MCMXCIV</strong>.</p>
+    <p><strong>Example</strong> (a different, random year, not the answer): 1994 becomes <strong>MCMXCIV</strong>.</p>
     <p>M = 1000, CM = 900 (1000&nbsp;−&nbsp;100), XC = 90 (100&nbsp;−&nbsp;10), IV = 4 (5&nbsp;−&nbsp;1). Together: 1000 + 900 + 90 + 4 = 1994.</p>
   `
 };
@@ -372,7 +372,7 @@ const EN_OVERRIDES = [
     audio: "audio/en/03-taverne-de-waag.mp3",
     title: "Taverne De Waag",
     hint: "On the facade of the old weigh house, red shutters are waiting for you to count them.",
-    extraHint: "Count carefully: there are more than seventeen but fewer than twenty-six — look both upstairs and downstairs, across the whole facade.",
+    extraHint: "Count carefully: there are more than seventeen but fewer than twenty-six. Look both upstairs and downstairs, across the whole facade.",
     question: "How many red shutters are there?",
     answer: "20",
     type: "quiz"
@@ -408,7 +408,7 @@ const EN_OVERRIDES = [
     audio: "audio/en/07-de-koepel.mp3",
     title: "De Koepel",
     hint: "Go inside, where a round giant once guarded hundreds of souls behind numbered doors.",
-    extraHint: "Look up carefully — the numbers increase the higher you look in the dome, until you find the highest number on the top floor.",
+    extraHint: "Look up carefully: the numbers increase the higher you look in the dome, until you find the highest number on the top floor.",
     question: "What is the highest-numbered prison cell inside De Koepel?",
     answer: "204",
     type: "quiz"
@@ -425,7 +425,7 @@ const EN_OVERRIDES = [
     audio: "audio/en/09-gravestenenbrug.mp3",
     title: "Gravestenenbrug",
     hint: "Over the water arches a bridge you must climb, step by step.",
-    extraHint: "It's a trick question — take a good look before you start counting.",
+    extraHint: "It's a trick question. Take a good look before you start counting.",
     question: "How many steps does the Gravestenenbrug have?",
     answer: "0",
     type: "quiz"
@@ -468,7 +468,7 @@ const EN_OVERRIDES = [
     audio: "audio/en/14-hofje-van-oorschot.mp3",
     title: "Hofje van Oorschot",
     hint: "Behind a simple gate lies a hofje where women once found a safe home.",
-    extraHint: "The year is carved above the gate — somewhere in the 1760s or 1770s.",
+    extraHint: "The year is carved above the gate, somewhere in the 1760s or 1770s.",
     question: "In what year was the Begijnhof founded?",
     answer: "1769",
     type: "quiz"
@@ -477,7 +477,7 @@ const EN_OVERRIDES = [
     audio: "audio/en/15-ten-boom-museum.mp3",
     title: "Ten Boom Museum",
     hint: "On the side wall of this house there's something to discover, if you look closely.",
-    extraHint: "It's a map of her travels around the world — you'll find the year on it.",
+    extraHint: "It's a map of her travels around the world. You'll find the year on it.",
     question: "In what year did Ten Boom first travel to Australia?",
     answer: "1953",
     type: "quiz"
@@ -486,7 +486,7 @@ const EN_OVERRIDES = [
     audio: "audio/en/16-prinsenhof.mp3",
     title: "Prinsenhof",
     hint: "In a quiet, green garden stands a familiar face you've already met before.",
-    extraHint: "The same man who holds up the letter on the Grote Markt stands here too — his name is carved beneath his feet.",
+    extraHint: "The same man who holds up the letter on the Grote Markt stands here too. His name is carved beneath his feet.",
     question: "Who is the man standing in the Hortus garden?",
     answer: "Laurens Janszoon Coster",
     answers: ["Laurens Janszoon Coster", "Laurens Jz Coster"],
@@ -496,7 +496,7 @@ const EN_OVERRIDES = [
     audio: "audio/en/17-lutherse-hofje.mp3",
     title: "Lutherse Hofje",
     hint: "Every Sunday, a church bell still rings here, right on time for the service.",
-    extraHint: "You don't need to go inside — a sign by the gate gives away the secret.",
+    extraHint: "You don't need to go inside. A sign by the gate gives away the secret.",
     question: "What time does the Sunday service start?",
     answer: "10:30",
     answers: ["10:30", "half past ten"],
@@ -515,8 +515,8 @@ const EN_OVERRIDES = [
   {
     audio: "audio/en/19-nieuwe-kerk.mp3",
     title: "Nieuwe Kerk",
-    hint: "On a quiet little square, not far from the center, stands a church that — despite its name — hasn't been new for a very long time.",
-    extraHint: "Walk to the east side of the building — the year is carved there in Roman numerals.",
+    hint: "On a quiet little square, not far from the center, stands a church that, despite its name, hasn't been new for a very long time.",
+    extraHint: "Walk to the east side of the building. The year is carved there in Roman numerals.",
     question: "In what year was the Nieuwe Kerk built?",
     answer: "1649",
     infoOverlay: ROMAN_NUMERALS_INFO_OVERLAY_EN,
@@ -534,7 +534,7 @@ const EN_OVERRIDES = [
     audio: "audio/en/21-stadhuis-haarlem.mp3",
     title: "Stadhuis Haarlem",
     hint: "Above the entrance, a facade has been speaking for centuries in an old, forgotten language.",
-    extraHint: "Golden letters on a dark background — a Latin inscription above the door.",
+    extraHint: "Golden letters on a dark background, a Latin inscription above the door.",
     answer: "The gable stone above the entrance, inscribed 'S.P.Q.H.' with the year 1630.",
     type: "photo"
   }
