@@ -1,6 +1,6 @@
 {
-  "name": "Haarlem Clues — Digitale Wandeltour",
-  "short_name": "Haarlem Clues",
+  "name": "Haarlem Walk — Digitale Wandeltour",
+  "short_name": "Haarlem Walk",
   "description": "Een digitale speurtocht door Haarlem met audioverhalen, hints en foto-opdrachten.",
   "start_url": "index.html",
   "scope": ".",

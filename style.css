@@ -1,7 +1,7 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  /* Haarlem Clues — huisstijl v1.0 (sept. 2026) */
+  /* Haarlem Walk — huisstijl v1.0 (sept. 2026) */
   --brick: #a0522d;   /* Sienna — beeldmerk, knoppen, accenten */
   --brick-dark: #7a3a1f;
   --cream: #f6f1e8;   /* Crème — standaard achtergrond */
@@ -151,6 +151,15 @@ h1, h2, h3, .logo {
   line-height: 1.2;
   max-width: 780px;
   margin-bottom: 24px;
+}
+
+.hero-tagline {
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
+  font-size: 1.3rem;
+  color: var(--gold);
+  max-width: 560px;
+  margin-bottom: 16px;
 }
 
 .hero-sub {

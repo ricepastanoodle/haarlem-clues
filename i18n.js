@@ -29,6 +29,7 @@ const STRINGS = {
     // Hero (index.html)
     heroLabel: "Een digitale speurtocht door",
     heroTitle: "Haarlem, zoals je het nog nooit hebt gezien",
+    heroTagline: "De gratis speurtocht langs de verborgen verhalen van Haarlem",
     heroSub: "21 stops door de binnenstad, met een audioverhaal bij elke plek. Volg poëtische hints, los onderweg vragen en foto-opdrachten op, en verzamel punten tot je de hele route hebt afgelegd.",
     heroBegin: "Begin je tour",
     heroMetaStops: "stops",
@@ -86,10 +87,10 @@ const STRINGS = {
     aboutText: "Geen haastige groepen, geen vaste tijden — gewoon jij, je telefoon en de verhalen van een stad die al eeuwenlang mensen weet te verrassen. Alles werkt gewoon in je browser, geen app nodig.",
 
     // Footer (index.html)
-    footerCopyright: "© 2026 Haarlem Clues — Digitale Wandeltour",
+    footerCopyright: "© 2026 Haarlem Walk — Digitale Wandeltour",
 
     // Installatiebanners (index.html)
-    installTitle: "Installeer Haarlem Clues",
+    installTitle: "Installeer Haarlem Walk",
     installText: "Zet de tour op je beginscherm voor snelle toegang, ook zonder browser.",
     installButton: "Installeren",
     iosInstallBefore: "Tik onderin op",
@@ -97,7 +98,7 @@ const STRINGS = {
     iosInstallStep: "Zet op beginscherm",
 
     // Topbar / algemeen (tour.html)
-    tourLogo: "Haarlem Clues",
+    tourLogo: "Haarlem Walk",
     btnHelpAria: "Uitleg opnieuw bekijken",
     stepLabel: "Stap {done} / {total}",
     pointsLabelText: "{points} punten",
@@ -191,7 +192,7 @@ const STRINGS = {
     btnShareScore: "Deel je resultaat",
     linkShareWhatsapp: "Via WhatsApp",
     shareCopied: "Gekopieerd naar klembord!",
-    shareText: "Ik heb de Haarlem Clues speurtocht voltooid met {points} punten in {minutes} minuten! 🏆",
+    shareText: "Ik heb de Haarlem Walk speurtocht voltooid met {points} punten in {minutes} minuten! 🏆",
     leaderboardNamePlaceholder: "Jouw naam",
     btnSubmitScore: "Zet op het scorebord",
     leaderboardTitle: "Scorebord",
@@ -255,6 +256,7 @@ const STRINGS = {
 
     heroLabel: "A digital scavenger hunt through",
     heroTitle: "Haarlem, like you've never seen it before",
+    heroTagline: "The free puzzle walk through Haarlem's hidden stories",
     heroSub: "21 stops through the city center, with an audio story at every spot. Follow poetic hints, solve questions and photo challenges along the way, and collect points until you've completed the whole route.",
     heroBegin: "Begin your tour",
     heroMetaStops: "stops",
@@ -306,16 +308,16 @@ const STRINGS = {
     aboutTitle: "Made to get to know Haarlem like a local",
     aboutText: "No rushed groups, no fixed schedules — just you, your phone, and the stories of a city that has been surprising people for centuries. Everything just works in your browser, no app needed.",
 
-    footerCopyright: "© 2026 Haarlem Clues — Digital Walking Tour",
+    footerCopyright: "© 2026 Haarlem Walk — Digital Walking Tour",
 
-    installTitle: "Install Haarlem Clues",
+    installTitle: "Install Haarlem Walk",
     installText: "Add the tour to your home screen for quick access, even without a browser.",
     installButton: "Install",
     iosInstallBefore: "Tap",
     iosInstallAfter: "at the bottom, then tap",
     iosInstallStep: "Add to Home Screen",
 
-    tourLogo: "Haarlem Clues",
+    tourLogo: "Haarlem Walk",
     btnHelpAria: "View instructions again",
     stepLabel: "Step {done} / {total}",
     pointsLabelText: "{points} points",
@@ -400,7 +402,7 @@ const STRINGS = {
     btnShareScore: "Share your result",
     linkShareWhatsapp: "Via WhatsApp",
     shareCopied: "Copied to clipboard!",
-    shareText: "I completed the Haarlem Clues scavenger hunt with {points} points in {minutes} minutes! 🏆",
+    shareText: "I completed the Haarlem Walk scavenger hunt with {points} points in {minutes} minutes! 🏆",
     leaderboardNamePlaceholder: "Your name",
     btnSubmitScore: "Add to leaderboard",
     leaderboardTitle: "Leaderboard",

@@ -1,4 +1,4 @@
-// Service worker voor Haarlem Clues — maakt de tour bruikbaar met wisselend
+// Service worker voor Haarlem Walk — maakt de tour bruikbaar met wisselend
 // of geen bereik onderweg. Cachet de app zelf + alle audio/foto's die de tour
 // nodig heeft; laat externe diensten (Supabase, Umami, het CLIP-model) met
 // rust zodat die altijd hun eigen, actuele gedrag houden.
@@ -6,7 +6,7 @@
 // Belangrijk bij een deploy: verhoog CACHE_VERSION als je iets in
 // PRECACHE_URLS verandert (nieuw stopfoto, nieuw audiobestand) zodat oude
 // caches worden opgeruimd en de nieuwe inhoud alsnog gedownload wordt.
-const CACHE_VERSION = "v8";
+const CACHE_VERSION = "v9";
 const SHELL_CACHE = `haarlem-shell-${CACHE_VERSION}`;
 const CONTENT_CACHE = `haarlem-content-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `haarlem-runtime-${CACHE_VERSION}`;

@@ -1625,7 +1625,7 @@ async function shareScore() {
   const url = buildShareUrl();
   if (navigator.share) {
     try {
-      await navigator.share({ title: "Haarlem Clues", text, url });
+      await navigator.share({ title: "Haarlem Walk", text, url });
     } catch (err) {
       // Gebruiker annuleerde het deelvenster — geen actie nodig.
     }
