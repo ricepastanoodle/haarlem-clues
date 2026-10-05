@@ -551,15 +551,23 @@ function getFullStopsForLang() {
   return getLang() === "en" ? STOPS_EN : STOPS_NL;
 }
 
-// Bouwt de actieve STOPS-array voor een gekozen route. Elke stop krijgt een
-// "originalIndex" mee (0-20, positie in de volledige route) — nodig om later de
-// juiste coördinaten (ROUTE_COORDS/STOP_TO_ROUTE_INDEX) terug te vinden, want de
-// positie binnen de actieve route (state.currentStep) komt bij de korte route niet
-// meer overeen met de positie in de volledige route.
+// Bouwt STOPS op uit een vaste lijst originalIndex-waarden (0-20) — de ene centrale
+// plek die alle andere "welke stops doen mee"-functies hieronder gebruiken. Elke stop
+// krijgt die originalIndex ook zelf mee, nodig om later de juiste coördinaten
+// (ROUTE_COORDS/STOP_TO_ROUTE_INDEX) terug te vinden, want de positie binnen de
+// actieve route (state.currentStep) komt bij een gefilterde route niet meer overeen
+// met de positie in de volledige route.
+function buildStopsFromOriginalIndices(indices) {
+  const full = getFullStopsForLang();
+  return indices.map((origIdx) => ({ ...full[origIdx], originalIndex: origIdx }));
+}
+
+// Bouwt de actieve STOPS-array voor een gekozen route (bij het begin: korte of
+// volledige route).
 function buildActiveStops(routeType) {
   const full = getFullStopsForLang();
   const indices = routeType === "short" ? SHORT_ROUTE_INDICES : full.map((_, i) => i);
-  return indices.map((origIdx) => ({ ...full[origIdx], originalIndex: origIdx }));
+  return buildStopsFromOriginalIndices(indices);
 }
 
 // Bouwt de resterende stops van de volledige route (alles wat niet in de korte
@@ -568,7 +576,17 @@ function buildActiveStops(routeType) {
 function buildRemainingFullStops() {
   const full = getFullStopsForLang();
   const done = new Set(SHORT_ROUTE_INDICES);
-  return full.map((stop, i) => ({ ...stop, originalIndex: i })).filter((s) => !done.has(s.originalIndex));
+  const indices = full.map((_, i) => i).filter((i) => !done.has(i));
+  return buildStopsFromOriginalIndices(indices);
+}
+
+// Onthoudt in state welke originalIndex-waarden de huidige STOPS-array precies vormt
+// — nodig zodat loadState() na een page-reload (bv. halverwege het vervolg op de
+// volledige route) exact dezelfde, al gefilterde set weer opbouwt i.p.v. terug te
+// vallen op "alle stops van deze routeType", wat de al-voltooide korte-route-stops
+// zou laten herverschijnen.
+function rememberActiveStops() {
+  state.activeOriginalIndices = STOPS.map((s) => s.originalIndex);
 }
 
 // Eén schakelpunt voor de taal/route — alle plekken verderop die STOPS[...]
@@ -584,7 +602,8 @@ const STARTING_POINTS = 100;
 const HINT_COST = 10;
 const ANSWER_REVEAL_COST = 20;
 const COMPLETE_REWARD = 20;
-const FAST_TOUR_SECONDS = 90 * 60; // grens voor de "Snelle wandelaar"-badge
+const FAST_TOUR_SECONDS = 90 * 60; // grens voor de "Snelle wandelaar"-badge (volledige route)
+const FAST_SHORT_TOUR_SECONDS = 45 * 60; // zelfde badge, maar dan voor de korte route
 
 // Kleine wrapper om Umami-events te versturen — faalt stil als het script
 // geblokkeerd is (adblocker) of nog niet geladen is.
@@ -653,7 +672,13 @@ function loadState() {
       // Oudere opgeslagen voortgang kende nog geen routekeuze — die speler was
       // altijd al op de volledige route bezig, dus die blijft daar gewoon verder gaan.
       if (!state.routeType) state.routeType = "full";
-      STOPS = buildActiveStops(state.routeType);
+      // Een opgeslagen, exacte stopselectie (bv. na "Ga verder met de volledige
+      // route") heeft voorrang — anders zou een reload de al-voltooide korte-route-
+      // stops weer laten terugkomen. Ontbreekt die (oudere voortgang, of gewoon de
+      // korte/volledige route vanaf het begin), dan volstaat de routeType.
+      STOPS = Array.isArray(state.activeOriginalIndices)
+        ? buildStopsFromOriginalIndices(state.activeOriginalIndices)
+        : buildActiveStops(state.routeType);
     }
   } catch (e) {
     // geen geldige opgeslagen staat, begin gewoon opnieuw
@@ -965,19 +990,67 @@ async function fetchRouteLegs() {
 // zowel voor de korte als de volledige route — het verschil zit 'm puur in welke
 // posities een marker/doel krijgen (stops die niet in de actieve route zitten,
 // worden net als het Stadsklooster behandeld: wel een stukje wandelroute, geen pin).
+function isFullRoute() {
+  return STOPS.length === getFullStopsForLang().length;
+}
+
 function buildRouteContextFromStart() {
-  const allCoords = [START_COORD, ...ROUTE_COORDS];
+  // Bij de volledige route zijn alle 21 stops actief — dan kunnen we gewoon de
+  // bestaande, van meet af aan gecachete 22-etappes-looproute hergebruiken.
+  if (isFullRoute()) {
+    const allCoords = [START_COORD, ...ROUTE_COORDS];
+    const stopIndexAt = new Array(allCoords.length).fill(null);
+    const allCoordsIndexForStop = new Array(STOPS.length).fill(null);
+    for (let i = 1; i < allCoords.length; i++) {
+      const origIdx = ROUTE_STOP_INDEX[i - 1];
+      if (origIdx === null) continue;
+      stopIndexAt[i] = origIdx;
+      allCoordsIndexForStop[origIdx] = i;
+    }
+    return { allCoords, stopIndexAt, allCoordsIndexForStop, getLegs: fetchRouteLegs };
+  }
+  // Bij een gefilterde route (bv. de korte route) zou hergebruik van diezelfde
+  // etappes via alle overgeslagen tussenstops lopen — dat kan een flinke omweg zijn.
+  // In plaats daarvan halen we directe etappes op tussen de opeenvolgende stops die
+  // wél in de actieve route zitten.
+  return buildDirectRouteContext();
+}
+
+// Haalt (en cachet, per unieke combinatie van stops) directe wandeletappes op tussen
+// opeenvolgende stops van de actieve route — gebruikt voor elke route die niet alle
+// 21 stops bevat, zodat de kaart niet via overgeslagen tussenstops omloopt.
+function buildDirectRouteContext() {
+  const allCoords = [START_COORD, ...STOPS.map((s) => ROUTE_COORDS[STOP_TO_ROUTE_INDEX[s.originalIndex]])];
   const stopIndexAt = new Array(allCoords.length).fill(null);
   const allCoordsIndexForStop = new Array(STOPS.length).fill(null);
   for (let i = 1; i < allCoords.length; i++) {
-    const origIdx = ROUTE_STOP_INDEX[i - 1];
-    if (origIdx === null) continue;
-    const activeIdx = STOPS.findIndex((s) => s.originalIndex === origIdx);
-    if (activeIdx === -1) continue; // deze stop zit niet in de actieve route
-    stopIndexAt[i] = activeIdx;
-    allCoordsIndexForStop[activeIdx] = i;
+    stopIndexAt[i] = i - 1; // elk punt hier is zelf een actieve stop, 1-op-1
+    allCoordsIndexForStop[i - 1] = i;
   }
-  return { allCoords, stopIndexAt, allCoordsIndexForStop, getLegs: fetchRouteLegs };
+
+  const cacheKey = `${LEGS_CACHE_KEY}Direct:${STOPS.map((s) => s.originalIndex).join(",")}`;
+  async function getLegs() {
+    const legCount = allCoords.length - 1;
+    const cached = loadCachedLegsByKey(cacheKey, legCount);
+    if (cached) return cached;
+    const legs = [];
+    for (let i = 0; i < legCount; i++) {
+      // Eerste etappe steekt de open Grote Markt over, net als bij de volledige route.
+      if (i === 0) {
+        legs.push([allCoords[0], allCoords[1]]);
+        continue;
+      }
+      legs.push(await fetchSingleLeg(allCoords[i], allCoords[i + 1]));
+    }
+    try {
+      localStorage.setItem(cacheKey, JSON.stringify(legs));
+    } catch (e) {
+      // opslag vol of niet beschikbaar — geen probleem, gewoon niet cachen
+    }
+    return legs;
+  }
+
+  return { allCoords, stopIndexAt, allCoordsIndexForStop, getLegs };
 }
 
 // Bouwt de kaartcontext voor het vervolg van de korte route: de speler staat niet
@@ -1347,7 +1420,7 @@ async function renderMap() {
   const nextStopNumber = state.currentStep + 2; // 1-based nummer van de volgende, nog op te lossen stop
   mapKicker.textContent =
     nextStopNumber <= STOPS.length
-      ? t("mapKickerNext", { n: nextStopNumber, total: STOPS.length })
+      ? t("mapKickerNext", { n: nextStopNumber + (state.displayOffset || 0), total: displayStopTotal() })
       : t("mapKickerDone");
   initMapIfNeeded();
 
@@ -1370,9 +1443,20 @@ async function renderMap() {
   updateMapProgress(routeContext, legs);
 }
 
+// Na "Ga verder met de volledige route" telt de stopteller door vanaf waar de korte
+// route ophield (bv. "Stop 10 van 21" i.p.v. "Stop 1 van 12") — STOPS zelf bevat dan
+// wel alleen de resterende stops, maar deze twee functies tonen het grotere geheel.
+function displayStopNumber() {
+  return state.currentStep + 1 + (state.displayOffset || 0);
+}
+
+function displayStopTotal() {
+  return state.displayTotal || STOPS.length;
+}
+
 function updateProgressBar() {
-  const total = STOPS.length;
-  const done = Math.min(Math.max(state.currentStep, 0), total);
+  const total = displayStopTotal();
+  const done = Math.min(Math.max(state.currentStep, 0) + (state.displayOffset || 0), total);
   progressFill.style.width = `${(done / total) * 100}%`;
   progressLabel.textContent = t("stepLabel", { done, total });
   pointsLabel.textContent = t("pointsLabelText", { points: state.points });
@@ -1515,7 +1599,7 @@ btnFloatingForward.addEventListener("click", () => {
 
 function renderInfo() {
   const stop = STOPS[state.currentStep];
-  infoKicker.textContent = t("stopKicker", { n: state.currentStep + 1, total: STOPS.length });
+  infoKicker.textContent = t("stopKicker", { n: displayStopNumber(), total: displayStopTotal() });
   infoTitle.textContent = stop.title;
 }
 
@@ -1533,7 +1617,7 @@ function setQuizStatus(kind, text) {
 
 function renderStep() {
   const stop = STOPS[state.currentStep];
-  stepKicker.textContent = t("stopKicker", { n: state.currentStep + 1, total: STOPS.length });
+  stepKicker.textContent = t("stopKicker", { n: displayStopNumber(), total: displayStopTotal() });
   stepTitle.textContent = stop.title;
   stepHint.textContent = stop.hint;
   stepTip.textContent = stop.tip || "";
@@ -1645,7 +1729,7 @@ function renderStep() {
 // foto-stops) en, indien aanwezig, een referentiefoto van wat je moet vinden.
 function renderReveal() {
   const stop = STOPS[state.currentStep];
-  revealKicker.textContent = t("stopKicker", { n: state.currentStep + 1, total: STOPS.length });
+  revealKicker.textContent = t("stopKicker", { n: displayStopNumber(), total: displayStopTotal() });
   revealTitle.textContent = stop.title;
 
   // De tekst is alleen nog een terugvaloptie voor stops zonder eigen referentiefoto —
@@ -1717,8 +1801,13 @@ function renderFinishStats() {
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
   const timeLabel = minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`;
-  const hintsUsedCount = Object.values(state.hintsUsed || {}).filter(Boolean).length;
-  const answersRevealedCount = Object.values(state.answersRevealed || {}).filter(Boolean).length;
+  // Bij "Ga verder met de volledige route" worden hintsUsed/answersRevealed gereset
+  // (die staan immers op de nieuwe, resterende stops) — priorHintsUsedCount/
+  // priorAnswersRevealedCount bewaren wat er al van de korte route meetelde.
+  const hintsUsedCount =
+    Object.values(state.hintsUsed || {}).filter(Boolean).length + (state.priorHintsUsedCount || 0);
+  const answersRevealedCount =
+    Object.values(state.answersRevealed || {}).filter(Boolean).length + (state.priorAnswersRevealedCount || 0);
 
   finishStatsData = { totalSeconds, hintsUsedCount, points: state.points };
 
@@ -1743,7 +1832,10 @@ function renderFinishBadges({ totalSeconds, hintsUsedCount, answersRevealedCount
   if (hintsUsedCount === 0 && answersRevealedCount === 0) {
     badges.push({ emoji: "🏆", label: t("badgePerfect"), earned: true });
   }
-  if (totalSeconds > 0 && totalSeconds < FAST_TOUR_SECONDS) {
+  // Bij "Ga verder met de volledige route" staat routeType alweer op "full" — de
+  // snellere grens geldt dus alleen zolang de speler echt alleen de korte route liep.
+  const fastThreshold = state.routeType === "short" ? FAST_SHORT_TOUR_SECONDS : FAST_TOUR_SECONDS;
+  if (totalSeconds > 0 && totalSeconds < fastThreshold) {
     badges.push({ emoji: "⚡", label: t("badgeFast"), earned: true });
   }
   finishBadges.innerHTML = badges
@@ -2344,6 +2436,7 @@ function stopPhotoDemo() {
 function chooseRoute(routeType) {
   state.routeType = routeType;
   STOPS = buildActiveStops(routeType);
+  rememberActiveStops();
   saveState();
   render();
 }
@@ -2660,7 +2753,19 @@ btnFinishBack.addEventListener("click", () => {
 // (nog niet aangeraakte) stops zelf. Telt straks mee voor het scorebord van de
 // volledige route.
 btnContinueFullRoute.addEventListener("click", () => {
+  // Hints/onthulde antwoorden van de korte route blijven meetellen op het
+  // uiteindelijke eindscherm, ook al worden de trackingobjecten zelf gereset
+  // (die staan straks op de nieuwe, resterende stops).
+  state.priorHintsUsedCount =
+    (state.priorHintsUsedCount || 0) + Object.values(state.hintsUsed || {}).filter(Boolean).length;
+  state.priorAnswersRevealedCount =
+    (state.priorAnswersRevealedCount || 0) + Object.values(state.answersRevealed || {}).filter(Boolean).length;
+  // De stopteller loopt door: "Stop 10 van 21" i.p.v. "Stop 1 van 12".
+  state.displayOffset = STOPS.length;
+  state.displayTotal = getFullStopsForLang().length;
+
   STOPS = buildRemainingFullStops();
+  rememberActiveStops();
   state.routeType = "full";
   state.currentStep = -1;
   state.phase = "map";
