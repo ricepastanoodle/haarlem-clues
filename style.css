@@ -166,6 +166,14 @@ h1, h2, h3, .logo {
   font-size: 1.1rem;
   max-width: 560px;
   color: #ece2d0;
+  margin-bottom: 14px;
+}
+
+.hero-start-end {
+  font-size: 0.85rem;
+  max-width: 560px;
+  color: #c9b093;
+  letter-spacing: 0.01em;
   margin-bottom: 36px;
 }
 

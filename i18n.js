@@ -31,6 +31,7 @@ const STRINGS = {
     heroTitle: "Haarlem, zoals je het nog nooit hebt gezien",
     heroTagline: "De gratis speurtocht langs de verborgen verhalen van Haarlem",
     heroSub: "21 stops door de binnenstad, of de korte route van 9 stops in ± 1 uur, met een audioverhaal bij elke plek. Volg poëtische hints, los onderweg vragen en foto-opdrachten op, en verzamel punten tot je de hele route hebt afgelegd.",
+    heroStartEnd: "Start: standbeeld Laurens Coster, Grote Markt · Einde: Stadhuis Haarlem, Grote Markt",
     heroBegin: "Begin je tour",
     heroMetaStops: "stops",
     heroMetaAudio: "Audiotour",
@@ -110,6 +111,7 @@ const STRINGS = {
     routeShortDesc: "9 stops, ± 2,5 km, ± 1 à 1,5 uur",
     routeFullTitle: "Volledige route",
     routeFullDesc: "21 stops, ± 7 km, ± 3 uur",
+    routeStartEnd: "Start: Standbeeld Laurens Coster · Eind: Stadhuis Haarlem (beide op de Grote Markt)",
     btnChooseRoute: "Kies deze route",
 
     // Introscherm
@@ -186,6 +188,7 @@ const STRINGS = {
     mapText: "Het gouden pad laat zien welk stuk je al hebt afgelegd. De rest van de route ontgrendelt naarmate je verder komt.",
     btnMapBack: "Vorige stap",
     btnMapContinue: "Verder naar de volgende stop",
+    btnRecenterMap: "Toon mij en de volgende stop",
 
     // Eindscherm
     finishKicker: "Gefeliciteerd",
@@ -194,6 +197,7 @@ const STRINGS = {
     finishTitleShort: "Je hebt de korte route voltooid!",
     finishTextShort: "Je hebt de korte route gelopen en alvast een stukje Haarlem ontdekt. Zin om de rest van de stad ook te zien?",
     btnContinueFullRoute: "Ga verder met de volledige route",
+    continueFullRouteEndpointText: "Dat vervolg eindigt bij: {title}",
     leaderboardTabShort: "Kort",
     leaderboardTabFull: "Volledig",
     finishStatTime: "Tijd",
@@ -274,6 +278,7 @@ const STRINGS = {
     heroTitle: "Haarlem, like you've never seen it before",
     heroTagline: "The free puzzle walk through Haarlem's hidden stories",
     heroSub: "21 stops through the city center, or the short route of 9 stops in about 1 hour, with an audio story at every spot. Follow poetic hints, solve questions and photo challenges along the way, and collect points until you've completed the whole route.",
+    heroStartEnd: "Start: statue of Laurens Coster, Grote Markt · Finish: Stadhuis Haarlem, Grote Markt",
     heroBegin: "Begin your tour",
     heroMetaStops: "stops",
     heroMetaAudio: "Audio tour",
@@ -345,6 +350,7 @@ const STRINGS = {
     routeShortDesc: "9 stops, ± 2.5 km, ± 1 to 1.5 hours",
     routeFullTitle: "Full route",
     routeFullDesc: "21 stops, ± 7 km, ± 3 hours",
+    routeStartEnd: "Start: Laurens Coster statue · Finish: Stadhuis Haarlem (both on the Grote Markt)",
     btnChooseRoute: "Choose this route",
 
     introKicker: "The tour begins",
@@ -413,6 +419,7 @@ const STRINGS = {
     mapText: "The golden path shows how far you've come. The rest of the route unlocks as you progress.",
     btnMapBack: "Previous step",
     btnMapContinue: "Continue to the next stop",
+    btnRecenterMap: "Show me and the next stop",
 
     finishKicker: "Congratulations",
     finishTitle: "You've completed the tour!",
@@ -420,6 +427,7 @@ const STRINGS = {
     finishTitleShort: "You've completed the short route!",
     finishTextShort: "You've walked the short route and discovered a piece of Haarlem. Fancy seeing the rest of the city too?",
     btnContinueFullRoute: "Continue with the full route",
+    continueFullRouteEndpointText: "That continuation ends at: {title}",
     leaderboardTabShort: "Short",
     leaderboardTabFull: "Full",
     finishStatTime: "Time",

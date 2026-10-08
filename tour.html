@@ -10,15 +10,15 @@
 <link rel="manifest" href="manifest.json">
 <!-- Analytics (Umami — privacyvriendelijk, geen cookiebanner nodig) -->
 <script defer src="https://cloud.umami.is/script.js" data-website-id="fadc39ba-d7ef-467a-b2f1-259b749d3144"></script>
-<link rel="stylesheet" href="style.css?v=8">
-<link rel="stylesheet" href="tour.css?v=42">
+<link rel="stylesheet" href="style.css?v=9">
+<link rel="stylesheet" href="tour.css?v=43">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <!-- CLIP-model (via transformers.js) wordt dynamisch geladen in tour.js zodra de eerste foto wordt geanalyseerd. -->
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="i18n.js?v=7"></script>
+<script src="i18n.js?v=8"></script>
 </head>
 <body class="tour-body">
 
@@ -46,10 +46,12 @@
         <button class="route-option" id="btnChooseShortRoute">
           <div class="route-option-title" data-i18n="routeShortTitle">Korte route</div>
           <div class="route-option-desc" data-i18n="routeShortDesc">9 stops, ± 2,5 km, ± 1 à 1,5 uur</div>
+          <div class="route-option-meta" data-i18n="routeStartEnd">Start: Standbeeld Laurens Coster · Eind: Stadhuis Haarlem (beide op de Grote Markt)</div>
         </button>
         <button class="route-option" id="btnChooseFullRoute">
           <div class="route-option-title" data-i18n="routeFullTitle">Volledige route</div>
           <div class="route-option-desc" data-i18n="routeFullDesc">21 stops, ± 7 km, ± 3 uur</div>
+          <div class="route-option-meta" data-i18n="routeStartEnd">Start: Standbeeld Laurens Coster · Eind: Stadhuis Haarlem (beide op de Grote Markt)</div>
         </button>
       </div>
     </div>
@@ -300,6 +302,7 @@
       <div class="map-wrap">
         <div class="map-container" id="mapContainer"></div>
         <button class="map-expand-btn" data-expand-target="mapContainer" data-i18n-aria-label="mapExpandAria" aria-label="Kaart vergroten"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H4v5"/><path d="M4 4l6 6"/><path d="M15 4h5v5"/><path d="M20 4l-6 6"/><path d="M9 20H4v-5"/><path d="M4 20l6-6"/><path d="M15 20h5v-5"/><path d="M20 20l-6-6"/></svg></button>
+        <button class="btn-recenter hidden" id="btnRecenterMap" data-i18n="btnRecenterMap">Toon mij en de volgende stop</button>
       </div>
 
       <div class="step-actions">
@@ -322,6 +325,7 @@
 
       <div class="finish-gallery" id="finishGallery"></div>
 
+      <p class="continue-endpoint hidden" id="continueFullRouteEndpoint"></p>
       <button class="btn-primary large hidden" id="btnContinueFullRoute" data-i18n="btnContinueFullRoute">Ga verder met de volledige route</button>
 
       <div class="share-row">
@@ -422,6 +426,6 @@
   <div class="help-overlay-inner" id="helpOverlayInner"></div>
 </div>
 
-<script src="tour.js?v=106"></script>
+<script src="tour.js?v=107"></script>
 </body>
 </html>

@@ -797,6 +797,8 @@ const btnContinue = document.getElementById("btnContinue");
 const btnAudio = document.getElementById("btnAudio");
 
 const mapKicker = document.getElementById("mapKicker");
+const btnRecenterMap = document.getElementById("btnRecenterMap");
+const continueFullRouteEndpoint = document.getElementById("continueFullRouteEndpoint");
 const btnMapContinue = document.getElementById("btnMapContinue");
 const btnMapBack = document.getElementById("btnMapBack");
 const btnInfoBack = document.getElementById("btnInfoBack");
@@ -831,6 +833,18 @@ let legsPromise = null;
 // volledige route"). Wordt opnieuw opgebouwd zodra die situatie verandert, zie renderMap().
 let currentRouteContext = null;
 let audioBarStopIndex = null; // welke stop de audiobalk nu toont — bij wisselen van stop stopt en verbergt de balk zichzelf
+
+// Zolang mapAutoFollow true is, centreert/zoomt de kaart zichzelf steeds opnieuw
+// op "jou + de volgende stop" (zie applyAutoMapView). Zodra de speler zelf aan
+// de kaart zit (zoomen/slepen), gaat dit uit en verschijnt in plaats daarvan de
+// knop "Toon mij en de volgende stop" — anders zou de kaart steeds terugspringen.
+let mapAutoFollow = true;
+// Voorkomt dat onze eigen (automatische) fitBounds/setView-aanroepen zelf weer
+// als "de speler heeft aan de kaart gezeten" geteld worden, zie initMapIfNeeded().
+let suppressFollowEvents = false;
+// Bewaart alles wat nodig is om de automatische camera-weergave (opnieuw) toe
+// te passen: bij een nieuwe locatie-update, of via de recenter-knop hierboven.
+let mapViewState = null;
 
 // Onthoudt waar een kaartje oorspronkelijk vandaan kwam, zodat we het bij het
 // sluiten van het overlay weer exact op zijn oude plek kunnen terugzetten.
@@ -1128,6 +1142,10 @@ function startLocationTracking() {
       updateUserLocationMarker(leafletMap, "main", lastKnownLatLng);
       updateUserLocationMarker(hintMap, "hint", lastKnownLatLng);
       updateUserLocationMarker(revealMap, "reveal", lastKnownLatLng);
+      // Een nieuwe locatie (bv. de allereerste fix, die er bij het openen van de
+      // kaart nog niet was) mag de kaart opnieuw op "jou + volgende stop" zetten —
+      // maar alleen als de speler zelf nog niet aan de kaart heeft gezeten.
+      if (state.phase === "map") applyAutoMapView();
     },
     (err) => {
       // Geen toestemming, geen GPS-signaal, etc. — de kaarten werken dan gewoon door,
@@ -1153,6 +1171,16 @@ function initMapIfNeeded() {
   // krijgt een eigen kleur, zodat meteen duidelijk is welk stuk je nu moet lopen.
   routeLineCurrentLeg = L.polyline([], { color: "#a0522d", weight: 6 }).addTo(leafletMap);
   updateUserLocationMarker(leafletMap, "main", lastKnownLatLng);
+
+  // Zodra de speler zelf zoomt of sleept, stopt de automatische "jou + volgende
+  // stop"-weergave (anders springt de kaart steeds terug) — de dragstart/
+  // zoomstart hieronder vuurt ook bij onze eigen fitBounds/setView-aanroepen,
+  // vandaar de suppressFollowEvents-vlag (zie autoFitBounds()).
+  leafletMap.on("dragstart zoomstart", () => {
+    if (suppressFollowEvents || !mapAutoFollow) return;
+    mapAutoFollow = false;
+    btnRecenterMap.classList.remove("hidden");
+  });
 }
 
 // Dezelfde zoekcirkel-berekening als updateMapProgress hieronder, maar dan voor een
@@ -1372,9 +1400,11 @@ function updateMapProgress(routeContext, legs) {
     }
 
     if (i === 0) {
+      // Startpunt: altijd een eigen, herkenbare kleur/letter — los van de
+      // normale stop-pins, en los van unlocked/current.
       const icon = L.divIcon({
         className: "",
-        html: `<div class="stop-marker unlocked">S</div>`,
+        html: `<div class="stop-marker start">S</div>`,
         iconSize: [30, 30]
       });
       routeMarkers.push(L.marker(allCoords[i], { icon }).addTo(leafletMap));
@@ -1384,36 +1414,79 @@ function updateMapProgress(routeContext, legs) {
     const stopIdx = stopIndexAt[i];
     if (stopIdx === null) continue; // routepunt zonder eigen stop in de actieve route — geen marker
 
+    // Het eindpunt van de huidige (actieve) route krijgt een vlagicoon i.p.v.
+    // een nummer — ongeacht of hij nog "current" of al "unlocked" is, zie de
+    // .stop-marker.finish-regel in tour.css (die wint van .current/.unlocked).
+    const isFinishStop = stopIdx === STOPS.length - 1;
     const cls = isTarget ? "current" : "unlocked";
+    const finishCls = isFinishStop ? " finish" : "";
+    const label = isFinishStop ? "🏁" : String(stopIdx + 1);
     const icon = L.divIcon({
       className: "",
-      html: `<div class="stop-marker ${cls}">${stopIdx + 1}</div>`,
+      html: `<div class="stop-marker ${cls}${finishCls}">${label}</div>`,
       iconSize: [30, 30]
     });
     routeMarkers.push(L.marker(allCoords[i], { icon }).addTo(leafletMap));
   }
 
-  // De kaart zoomt bewust in op de nieuwste (eerstvolgende) stop, i.p.v. op de
-  // hele tot dusver afgelegde route — anders zoomt hij naarmate je verder komt
-  // steeds verder uit en wordt hij juist minder bruikbaar om de weg te vinden.
-  // Is je eigen locatie bekend, dan tonen we die er ook meteen bij (allebei in
-  // beeld), zodat je in één oogopslag ziet hoe ver je nog moet lopen.
-  if (hasNextTarget && lastKnownLatLng) {
-    const targetBoundsPoints = searchCircle
-      ? [searchCircle.getBounds().getNorthEast(), searchCircle.getBounds().getSouthWest()]
-      : [allCoords[targetIndex]];
-    leafletMap.fitBounds(L.latLngBounds([lastKnownLatLng, ...targetBoundsPoints]), { padding: [40, 40] });
-  } else if (searchCircle) {
-    leafletMap.fitBounds(searchCircle.getBounds(), { padding: [40, 40] });
-  } else if (hasNextTarget) {
-    leafletMap.setView(allCoords[targetIndex], 17);
-  } else if (combined.length > 0) {
+  // Bewaart alles wat nodig is om de automatische camera-weergave toe te passen
+  // — hieronder meteen, maar ook later (nieuwe locatie-update, of de "Toon mij
+  // en de volgende stop"-knop na handmatig in-/uitzoomen).
+  mapViewState = { allCoords, hasNextTarget, targetIndex, searchCircle, currentLegCoords, combined };
+  applyAutoMapView();
+}
+
+// Zoomt/centreert de kaart zo dat je eigen locatie (indien bekend) en de
+// eerstvolgende bestemming allebei in beeld zijn — inclusief het stukje
+// looproute ertussen, met ruime padding en een maxZoom zodat het nooit absurd
+// ver inzoomt als je al vlakbij bent. Is je locatie (nog) niet bekend, dan
+// zoomt hij in plaats daarvan op de huidige stop + de volgende stop.
+// Doet niets zolang mapAutoFollow uit staat (de speler zit zelf aan de kaart).
+function applyAutoMapView() {
+  if (!leafletMap || !mapViewState || !mapAutoFollow) return;
+  const { allCoords, hasNextTarget, targetIndex, searchCircle: circle, currentLegCoords, combined } = mapViewState;
+  const viewOptions = { padding: [50, 50], maxZoom: 18 };
+
+  if (!hasNextTarget) {
     // Geen volgende stop meer (tour voltooid) — dan juist wel de hele
     // resterende route in beeld, er is toch geen "nieuwste stop" meer.
-    leafletMap.fitBounds(L.latLngBounds(combined), { padding: [30, 30] });
-  } else {
-    leafletMap.setView(allCoords[0], 17);
+    if (combined.length > 0) {
+      autoFitBounds(leafletMap, combined, viewOptions);
+    } else {
+      autoFitBounds(leafletMap, [allCoords[0]], { maxZoom: 17 });
+    }
+    return;
   }
+
+  const targetPoints = circle
+    ? [circle.getBounds().getNorthEast(), circle.getBounds().getSouthWest()]
+    : [allCoords[targetIndex]];
+  const routePoints = currentLegCoords && currentLegCoords.length ? currentLegCoords : [];
+  // Zonder bekende locatie geldt de vorige (al bereikte) stop als "waar je bent".
+  const anchorPoint = lastKnownLatLng || allCoords[Math.max(targetIndex - 1, 0)];
+
+  autoFitBounds(leafletMap, [anchorPoint, ...targetPoints, ...routePoints], viewOptions);
+}
+
+// Wrapper om fitBounds/setView die de dragstart/zoomstart-listener (zie
+// initMapIfNeeded) even laat weten dat deze camerabeweging van onszelf komt,
+// niet van de speler — anders zou elke automatische update de "Toon mij en de
+// volgende stop"-knop meteen weer tevoorschijn halen.
+function autoFitBounds(map, points, options) {
+  if (!points.length) return;
+  // Geen animatie: dit moet altijd meteen en betrouwbaar het juiste gebied tonen
+  // (ook als het scherm net weer actief wordt, waar een geanimeerde pan/zoom-
+  // overgang kan haperen) — en zo verloopt de hele view-update + de bijbehorende
+  // zoomstart/moveend-events synchroon, binnen deze functieaanroep. Daardoor kan
+  // suppressFollowEvents hier gewoon rond de aanroep heen staan, zonder
+  // afhankelijk te zijn van een latere (en dus racegevoelige) "moveend" of timeout.
+  suppressFollowEvents = true;
+  if (points.length === 1) {
+    map.setView(points[0], options.maxZoom || 17, { animate: false });
+  } else {
+    map.fitBounds(L.latLngBounds(points), { ...options, animate: false });
+  }
+  suppressFollowEvents = false;
 }
 
 async function renderMap() {
@@ -1423,6 +1496,12 @@ async function renderMap() {
       ? t("mapKickerNext", { n: nextStopNumber + (state.displayOffset || 0), total: displayStopTotal() })
       : t("mapKickerDone");
   initMapIfNeeded();
+
+  // Elke keer dat de kaart (opnieuw) geopend wordt — ook na een paginaherlaad of
+  // na "Ga verder met de volledige route" — begint de automatische weergave
+  // weer vers, ongeacht of de speler bij de vórige stop zelf aan de kaart zat.
+  mapAutoFollow = true;
+  btnRecenterMap.classList.add("hidden");
 
   // Net na "Ga verder met de volledige route" staat de speler niet meer bij de Grote
   // Markt, maar bij de laatste stop van de korte route — de kaart moet dan vanaf dat
@@ -1789,6 +1868,16 @@ function renderFinish() {
   finishTitleEl.textContent = t(isShortRoute ? "finishTitleShort" : "finishTitle");
   finishTextEl.textContent = t(isShortRoute ? "finishTextShort" : "finishText");
   btnContinueFullRoute.classList.toggle("hidden", !isShortRoute);
+  if (isShortRoute) {
+    // Het eindpunt van dat vervolg ligt niet meer bij het Stadhuis (dat zat al
+    // in de korte route) maar bij de laatste van de 12 resterende stops.
+    const remaining = buildRemainingFullStops();
+    const endpointTitle = remaining[remaining.length - 1].title;
+    continueFullRouteEndpoint.textContent = t("continueFullRouteEndpointText", { title: endpointTitle });
+    continueFullRouteEndpoint.classList.remove("hidden");
+  } else {
+    continueFullRouteEndpoint.classList.add("hidden");
+  }
   activeLeaderboardTab = isShortRoute ? "short" : "full";
   renderFinishStats();
   renderFinishGallery();
@@ -2710,6 +2799,14 @@ btnAudio.addEventListener("click", () => {
 });
 
 audioBarClose.addEventListener("click", stopAudioBar);
+
+// Herstelt de automatische "jou + volgende stop"-weergave nadat de speler zelf
+// aan de kaart heeft gezeten (zie de dragstart/zoomstart-listener hierboven).
+btnRecenterMap.addEventListener("click", () => {
+  mapAutoFollow = true;
+  btnRecenterMap.classList.add("hidden");
+  applyAutoMapView();
+});
 
 // Vanaf de kaart ga je pas echt door naar de volgende stop
 btnMapContinue.addEventListener("click", () => {
