@@ -432,10 +432,10 @@ const EN_OVERRIDES = [
   },
   {
     audio: "audio/en/10-waalse-kerk.mp3",
-    title: "Walloon Church",
+    title: "Waalse Kerk",
     hint: "Not everyone at the church stands in the pulpit. Somewhere nearby sits a bronze woman lost in thought, her back to the brick wall.",
     extraHint: "She sits on a stack of pages, one hand against her head. Find the small bronze statue on its pedestal and photograph it up close.",
-    answer: "The small bronze statue 'Kort Jakje,' a seated woman on a stack of pages, near the Walloon Church.",
+    answer: "The small bronze statue 'Kort Jakje,' a seated woman on a stack of pages, near the Waalse Kerk.",
     type: "photo"
   },
   {
@@ -494,7 +494,7 @@ const EN_OVERRIDES = [
   },
   {
     audio: "audio/en/17-lutherse-hofje.mp3",
-    title: "Lutheran Almshouse",
+    title: "Lutherse Hofje",
     hint: "Every Sunday, a church bell still rings here, right on time for the service.",
     extraHint: "You don't need to go inside. A sign by the gate gives away the secret.",
     question: "What time does the Sunday service start?",
@@ -514,10 +514,10 @@ const EN_OVERRIDES = [
   },
   {
     audio: "audio/en/19-nieuwe-kerk.mp3",
-    title: "New Church",
+    title: "Nieuwe Kerk",
     hint: "On a quiet little square, not far from the center, stands a church that, despite its name, hasn't been new for a very long time.",
     extraHint: "Walk to the east side of the building. The year is carved there in Roman numerals.",
-    question: "In what year was the New Church built?",
+    question: "In what year was the Nieuwe Kerk built?",
     answer: "1649",
     infoOverlay: ROMAN_NUMERALS_INFO_OVERLAY_EN,
     type: "quiz"
