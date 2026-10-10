@@ -1761,6 +1761,18 @@ function renderStep() {
     quizZone.classList.remove("hidden");
     quizQuestion.textContent = stop.question;
 
+    // Alleen een numeriek toetsenbord forceren als álle geldige antwoorden puur
+    // cijfers zijn (bv. "20") — bij een antwoord als "10:30" of "De Appelaar"
+    // moet gewoon het normale toetsenbord verschijnen, anders is dat op veel
+    // telefoons niet (makkelijk) te typen.
+    const acceptableAnswers = stop.answers || [stop.answer];
+    const isNumericAnswer = acceptableAnswers.every((a) => /^\d+$/.test(String(a).trim()));
+    if (isNumericAnswer) {
+      quizInput.setAttribute("inputmode", "numeric");
+    } else {
+      quizInput.removeAttribute("inputmode");
+    }
+
     const solved = !!state.completed[state.currentStep];
     quizInput.value = solved ? stop.answer : "";
     quizInput.disabled = solved;
