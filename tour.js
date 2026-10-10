@@ -352,7 +352,7 @@ const ROMAN_NUMERALS_INFO_OVERLAY_EN = {
 const EN_OVERRIDES = [
   {
     audio: "audio/en/01-standbeeld-laurens-janszoon-coster.mp3",
-    title: "Standbeeld Laurens Janszoon Coster",
+    title: "Statue of Laurens Janszoon Coster",
     hint: "For centuries, a bronze man on the Grote Markt has held up the letter that taught the world to read.",
     extraHint: "",
     answer: "The weathered green bronze statue of Laurens Janszoon Coster on his pedestal, hand raised, with the tower of the Grote Kerk in the background.",
@@ -360,7 +360,7 @@ const EN_OVERRIDES = [
   },
   {
     audio: "audio/en/02-achterzijde-van-de-kerk.mp3",
-    title: "De St. Bavokerk",
+    title: "St. Bavo's Church",
     hint: "Past the church, the city grows quieter, until you reach the place where justice is spoken.",
     extraHint: "Look for the stone gate with a lion's head above it.",
     question: "What is Haarlem's courthouse called?",
@@ -370,7 +370,7 @@ const EN_OVERRIDES = [
   },
   {
     audio: "audio/en/03-taverne-de-waag.mp3",
-    title: "Taverne De Waag",
+    title: "De Waag Tavern",
     hint: "On the facade of the old weigh house, red shutters are waiting for you to count them.",
     extraHint: "Count carefully: there are more than seventeen but fewer than twenty-six. Look both upstairs and downstairs, across the whole facade.",
     question: "How many red shutters are there?",
@@ -387,69 +387,69 @@ const EN_OVERRIDES = [
   },
   {
     audio: "audio/en/05-teylers-hofje.mp3",
-    title: "Teylers Hofje",
+    title: "Teylers Almshouse",
     hint: "Stone columns carry a secret, carved in Latin.",
     extraHint: "The year is after 1781, but before 1794.",
-    question: "In what year was the Teylers Hofje founded?",
+    question: "In what year was the Teylers Almshouse founded?",
     answer: "1785",
     infoOverlay: ROMAN_NUMERALS_INFO_OVERLAY_EN,
     type: "quiz"
   },
   {
     audio: "audio/en/06-molen-de-adriaan.mp3",
-    title: "Molen De Adriaan",
+    title: "Windmill De Adriaan",
     hint: "By the water, a giant with waving arms has been turning for centuries.",
     extraHint: "It's a real windmill with wooden sails, right next to the water where boats are moored.",
-    answer: "Molen De Adriaan, the wooden polder windmill on the Spaarne river.",
+    answer: "Windmill De Adriaan, the wooden polder windmill on the Spaarne river.",
     tip: "Tip: take the photo from a distance.",
     type: "photo"
   },
   {
     audio: "audio/en/07-de-koepel.mp3",
-    title: "De Koepel",
+    title: "The Koepel",
     hint: "Go inside, where a round giant once guarded hundreds of souls behind numbered doors.",
     extraHint: "Look up carefully: the numbers increase the higher you look in the dome, until you find the highest number on the top floor.",
-    question: "What is the highest-numbered prison cell inside De Koepel?",
+    question: "What is the highest-numbered prison cell inside the Koepel?",
     answer: "204",
     type: "quiz"
   },
   {
     audio: "audio/en/08-amsterdamse-poort.mp3",
-    title: "Amsterdamse Poort",
+    title: "Amsterdam Gate",
     hint: "High in the brick wall of the gate, three silent emblems hide, built into the stone through the centuries.",
     extraHint: "Look for the row of three diamond-shaped emblems above the passage, with a woven knot in the middle.",
-    answer: "The three diamond-shaped emblems built into the wall of the Amsterdamse Poort, with a woven knot in the middle.",
+    answer: "The three diamond-shaped emblems built into the wall of the Amsterdam Gate, with a woven knot in the middle.",
     type: "photo"
   },
   {
     audio: "audio/en/09-gravestenenbrug.mp3",
-    title: "Gravestenenbrug",
+    title: "Gravestenen Bridge",
     hint: "Over the water arches a bridge you must climb, step by step.",
     extraHint: "It's a trick question. Take a good look before you start counting.",
-    question: "How many steps does the Gravestenenbrug have?",
+    question: "How many steps does the Gravestenen Bridge have?",
     answer: "0",
     type: "quiz"
   },
   {
     audio: "audio/en/10-waalse-kerk.mp3",
-    title: "Waalse Kerk",
+    title: "Walloon Church",
     hint: "Not everyone at the church stands in the pulpit. Somewhere nearby sits a bronze woman lost in thought, her back to the brick wall.",
     extraHint: "She sits on a stack of pages, one hand against her head. Find the small bronze statue on its pedestal and photograph it up close.",
-    answer: "The small bronze statue 'Kort Jakje,' a seated woman on a stack of pages, near the Waalse Kerk.",
+    answer: "The small bronze statue 'Kort Jakje,' a seated woman on a stack of pages, near the Walloon Church.",
     type: "photo"
   },
   {
     audio: "audio/en/11-huis-barnaart.mp3",
-    title: "Huis Barnaart",
+    title: "Barnaart House",
     hint: "A stately house on the canal looks back at you with a great many eyes on its facade.",
     extraHint: "Count all the windows you see on the front of the house, from left to right.",
-    question: "How many windows are on the front of Huis Barnaart?",
+    question: "How many windows are on the front of Barnaart House?",
     answer: "26",
     type: "quiz"
   },
   {
     audio: "audio/en/12-monument-kenau-simonsdochter.mp3",
-    title: "Monument Kenau Simonsdochter",
+    title: "Kenau Simonsdochter Monument",
     hint: "Two heroes turned to bronze still guard the city they once defended.",
     extraHint: "",
     answer: "The bronze statue of Kenau Simonsdochter Hasselaer and Wigbolt Ripperda, standing together on one pedestal.",
@@ -457,7 +457,7 @@ const EN_OVERRIDES = [
   },
   {
     audio: "audio/en/13-vrouw-in-het-verzet-monument.mp3",
-    title: "Vrouw in het Verzet monument",
+    title: "Woman in the Resistance Monument",
     hint: "A young resistance fighter was given a place here in bronze, surrounded by greenery.",
     extraHint: "Beneath her feet, carved in stone, her real name is hidden.",
     question: "What was the name of the resistance fighter honored with a statue here?",
@@ -466,7 +466,7 @@ const EN_OVERRIDES = [
   },
   {
     audio: "audio/en/14-hofje-van-oorschot.mp3",
-    title: "Hofje van Oorschot",
+    title: "Van Oorschot Almshouse",
     hint: "Behind a simple gate lies a hofje where women once found a safe home.",
     extraHint: "The year is carved above the gate, somewhere in the 1760s or 1770s.",
     question: "In what year was the Begijnhof founded?",
@@ -494,7 +494,7 @@ const EN_OVERRIDES = [
   },
   {
     audio: "audio/en/17-lutherse-hofje.mp3",
-    title: "Lutherse Hofje",
+    title: "Lutheran Almshouse",
     hint: "Every Sunday, a church bell still rings here, right on time for the service.",
     extraHint: "You don't need to go inside. A sign by the gate gives away the secret.",
     question: "What time does the Sunday service start?",
@@ -514,10 +514,10 @@ const EN_OVERRIDES = [
   },
   {
     audio: "audio/en/19-nieuwe-kerk.mp3",
-    title: "Nieuwe Kerk",
+    title: "New Church",
     hint: "On a quiet little square, not far from the center, stands a church that, despite its name, hasn't been new for a very long time.",
     extraHint: "Walk to the east side of the building. The year is carved there in Roman numerals.",
-    question: "In what year was the Nieuwe Kerk built?",
+    question: "In what year was the New Church built?",
     answer: "1649",
     infoOverlay: ROMAN_NUMERALS_INFO_OVERLAY_EN,
     type: "quiz"
@@ -532,7 +532,7 @@ const EN_OVERRIDES = [
   },
   {
     audio: "audio/en/21-stadhuis-haarlem.mp3",
-    title: "Stadhuis Haarlem",
+    title: "Haarlem City Hall",
     hint: "Above the entrance, a facade has been speaking for centuries in an old, forgotten language.",
     extraHint: "Golden letters on a dark background, a Latin inscription above the door.",
     answer: "The gable stone above the entrance, inscribed 'S.P.Q.H.' with the year 1630.",

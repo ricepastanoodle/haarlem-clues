@@ -6,7 +6,7 @@
 // Belangrijk bij een deploy: verhoog CACHE_VERSION als je iets in
 // PRECACHE_URLS verandert (nieuw stopfoto, nieuw audiobestand) zodat oude
 // caches worden opgeruimd en de nieuwe inhoud alsnog gedownload wordt.
-const CACHE_VERSION = "v18";
+const CACHE_VERSION = "v19";
 const SHELL_CACHE = `haarlem-shell-${CACHE_VERSION}`;
 const CONTENT_CACHE = `haarlem-content-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `haarlem-runtime-${CACHE_VERSION}`;
