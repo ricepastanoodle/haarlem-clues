@@ -11,7 +11,7 @@
 <!-- Analytics (Umami — privacyvriendelijk, geen cookiebanner nodig) -->
 <script defer src="https://cloud.umami.is/script.js" data-website-id="fadc39ba-d7ef-467a-b2f1-259b749d3144"></script>
 <link rel="stylesheet" href="style.css?v=9">
-<link rel="stylesheet" href="tour.css?v=46">
+<link rel="stylesheet" href="tour.css?v=47">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <!-- CLIP-model (via transformers.js) wordt dynamisch geladen in tour.js zodra de eerste foto wordt geanalyseerd. -->
@@ -300,8 +300,20 @@
       <p data-i18n="mapText">Het gouden pad laat zien welk stuk je al hebt afgelegd. De rest van de route ontgrendelt naarmate je verder komt.</p>
 
       <div class="map-wrap">
-        <div class="map-container" id="mapContainer"></div>
+        <div class="map-viewport">
+          <div class="map-rotate-wrapper" id="mapRotateWrapper">
+            <div class="map-container" id="mapContainer"></div>
+          </div>
+        </div>
         <button class="map-expand-btn" data-expand-target="mapContainer" data-i18n-aria-label="mapExpandAria" aria-label="Kaart vergroten"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H4v5"/><path d="M4 4l6 6"/><path d="M15 4h5v5"/><path d="M20 4l-6 6"/><path d="M9 20H4v-5"/><path d="M4 20l6-6"/><path d="M15 20h5v-5"/><path d="M20 20l-6-6"/></svg></button>
+        <button class="map-rotate-btn" id="btnToggleRotate" data-i18n-aria-label="btnToggleRotateAria" aria-label="Kaart meedraaien met kijkrichting">
+          <svg viewBox="0 0 24 24" width="20" height="20">
+            <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/>
+            <g id="rotateNorthArrow">
+              <path d="M12 4.5 L15 12 L12 10 L9 12 Z" fill="currentColor"/>
+            </g>
+          </svg>
+        </button>
         <button class="btn-recenter hidden" id="btnRecenterMap" data-i18n="btnRecenterMap">Toon mij en de volgende stop</button>
         <button class="btn-enable-location hidden" id="btnEnableLocation" data-i18n="btnEnableLocation">📍 Mijn locatie aanzetten</button>
       </div>
@@ -427,6 +439,6 @@
   <div class="help-overlay-inner" id="helpOverlayInner"></div>
 </div>
 
-<script src="tour.js?v=117"></script>
+<script src="tour.js?v=118"></script>
 </body>
 </html>

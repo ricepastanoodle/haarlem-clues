@@ -826,6 +826,9 @@ const btnAudio = document.getElementById("btnAudio");
 const mapKicker = document.getElementById("mapKicker");
 const btnRecenterMap = document.getElementById("btnRecenterMap");
 const btnEnableLocation = document.getElementById("btnEnableLocation");
+const btnToggleRotate = document.getElementById("btnToggleRotate");
+const mapRotateWrapper = document.getElementById("mapRotateWrapper");
+const rotateNorthArrow = document.getElementById("rotateNorthArrow");
 const continueFullRouteEndpoint = document.getElementById("continueFullRouteEndpoint");
 const btnMapContinue = document.getElementById("btnMapContinue");
 const btnMapBack = document.getElementById("btnMapBack");
@@ -1333,7 +1336,10 @@ function smoothHeading(rawHeading) {
 }
 
 // Tekent de kegel alleen op de hoofdkaart (de navigatiekaart) — de kleine hint-/
-// antwoordkaartjes hebben geen kijkrichting nodig.
+// antwoordkaartjes hebben geen kijkrichting nodig. De kegel staat t.o.v. de kaart
+// zelf getekend: staat de kaart (nog) niet gedraaid (mapRotationDeg = 0), dan is
+// dit gewoon de kompasrichting; draait de kaart mee met je kijkrichting (zie
+// hieronder), dan wijst de kegel vanzelf altijd recht omhoog.
 function updateHeadingCone(heading) {
   const marker = userLocationMarkers.main;
   if (!marker) return;
@@ -1341,7 +1347,8 @@ function updateHeadingCone(heading) {
   if (!el) return;
   const cone = el.querySelector(".user-location-cone");
   if (!cone) return;
-  cone.style.transform = `translateX(-50%) rotate(${heading}deg)`;
+  const relativeAngle = heading - mapRotationDeg;
+  cone.style.transform = `translateX(-50%) rotate(${relativeAngle}deg)`;
   cone.classList.add("visible");
 }
 
@@ -1356,7 +1363,56 @@ function handleOrientationEvent(e) {
     heading = (360 - e.alpha) % 360;
   }
   if (heading === null) return;
-  updateHeadingCone(smoothHeading(heading));
+  const smoothed = smoothHeading(heading);
+  if (headingUpActive) setMapRotation(smoothed);
+  updateHeadingCone(smoothed);
+}
+
+// ---- Kaart meedraaien (heading-up, zoals de kompasmodus in Google Maps) ----
+let mapRotationDeg = 0; // huidige rotatie van de kaartinhoud zelf (0 = noorden boven)
+let headingUpActive = false;
+
+// Draait alleen de kaartinhoud (tegels + routelijnen + markers) — niet het venster
+// eromheen (rand/ronde hoeken) en niet onze eigen knoppen erbovenop, die staan
+// buiten .map-rotate-wrapper. Markers krijgen een tegengestelde rotatie zodat hun
+// tekst (nummers, "S", de vlag) altijd gewoon rechtop leesbaar blijft.
+function setMapRotation(deg) {
+  mapRotationDeg = deg;
+  if (mapRotateWrapper) mapRotateWrapper.style.transform = `rotate(${-deg}deg)`;
+  applyMarkerCounterRotation();
+  if (rotateNorthArrow) rotateNorthArrow.style.transform = `rotate(${-deg}deg)`;
+  if (smoothedHeading !== null) updateHeadingCone(smoothedHeading);
+}
+
+function applyMarkerCounterRotation() {
+  routeMarkers.forEach((m) => {
+    const el = m.getElement();
+    const inner = el && el.querySelector(".stop-marker");
+    if (inner) inner.style.transform = `rotate(${-mapRotationDeg}deg)`;
+  });
+}
+
+// De compasknop zelf: aan -> kompastoegang vragen (nodig op iOS) en de kaart laten
+// meedraaien met de kijkrichting, met slepen/pinch-zoom uit (die gaan ervan uit dat
+// de kaart niet gedraaid is, en zouden anders de verkeerde kant op reageren). Uit ->
+// terug naar noorden boven, en slepen/zoomen weer gewoon aan.
+async function toggleHeadingUp() {
+  if (!leafletMap) return;
+  if (headingUpActive) {
+    headingUpActive = false;
+    setMapRotation(0);
+    leafletMap.dragging.enable();
+    leafletMap.touchZoom.enable();
+    btnToggleRotate.classList.remove("active");
+    return;
+  }
+  await requestCompassAccess();
+  if (!compassListenerAttached) return; // geen kompas beschikbaar, of geweigerd
+  headingUpActive = true;
+  leafletMap.dragging.disable();
+  leafletMap.touchZoom.disable();
+  btnToggleRotate.classList.add("active");
+  if (smoothedHeading !== null) setMapRotation(smoothedHeading);
 }
 
 function startCompassTracking() {
@@ -1658,6 +1714,10 @@ function updateMapProgress(routeContext, legs) {
     });
     routeMarkers.push(L.marker(allCoords[i], { icon }).addTo(leafletMap));
   }
+  // Markers worden hierboven helemaal opnieuw opgebouwd — meteen de huidige
+  // kaartrotatie (indien actief) erop toepassen, anders staan ze eventjes
+  // (tot de volgende kompasmeting) weer rechtop i.p.v. tegengedraaid.
+  applyMarkerCounterRotation();
 
   // Bewaart alles wat nodig is om de automatische camera-weergave toe te passen
   // — hieronder meteen, maar ook later (nieuwe locatie-update, of de "Toon mij
@@ -3113,6 +3173,7 @@ btnRecenterMap.addEventListener("click", () => {
 });
 
 btnEnableLocation.addEventListener("click", requestLocationAccess);
+btnToggleRotate.addEventListener("click", toggleHeadingUp);
 
 // Vanaf de kaart ga je pas echt door naar de volgende stop
 btnMapContinue.addEventListener("click", () => {

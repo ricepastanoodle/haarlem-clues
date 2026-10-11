@@ -396,12 +396,35 @@ body.has-floating-nav .tour-main {
   max-width: 640px;
 }
 
-.map-container {
+/* Het vaste "venster" waarin de kaart getoond wordt — rand, ronde hoeken en
+   overflow:hidden zitten hier (i.p.v. op .map-container zelf), omdat de kaart
+   nu bij het meedraaien (zie .map-rotate-wrapper) groter is dan dit venster. */
+.map-viewport {
   width: 100%;
   height: 240px;
   border-radius: 8px;
   border: 3px solid var(--gold);
   overflow: hidden;
+  position: relative;
+}
+
+/* Groter dan het venster (en gecentreerd eroverheen), zodat een gedraaide hoek
+   nooit een lege rand laat zien — zie setMapRotation() in tour.js. Alleen déze
+   laag draait; de rand/ronde hoeken van .map-viewport en alle knoppen eromheen
+   staan hierbuiten en blijven dus altijd rechtop. */
+.map-rotate-wrapper {
+  position: absolute;
+  top: -30%;
+  left: -30%;
+  width: 160%;
+  height: 160%;
+  transform-origin: 50% 50%;
+  transition: transform 0.15s linear;
+}
+
+.map-container {
+  width: 100%;
+  height: 100%;
   /* Leaflet geeft zijn eigen binnenlagen (tegels, cirkels) een hoge interne
      z-index. Zonder eigen stacking-context hier "lekt" dat naar buiten en komt
      de vergroot-knop er per ongeluk onder te liggen — vandaar deze regel. */
@@ -448,6 +471,41 @@ body.has-floating-nav .tour-main {
 .map-expand-btn:hover {
   background: var(--brick);
   transform: scale(1.06);
+}
+
+/* Compasknop ("kaart meedraaien") — direct onder de vergroot-knop, rechtsboven.
+   De pijl erin wijst altijd naar het echte noorden (zie setMapRotation() in
+   tour.js), ook als de kaart zelf gedraaid staat. */
+.map-rotate-btn {
+  position: absolute;
+  top: 58px;
+  right: 10px;
+  z-index: 10;
+  width: 38px;
+  height: 38px;
+  border-radius: 6px;
+  border: 2px solid #fff;
+  background: var(--cream);
+  color: var(--ink);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 10px rgba(43, 36, 28, 0.45);
+  transition: background 0.2s, transform 0.2s;
+}
+
+.map-rotate-btn:hover {
+  transform: scale(1.06);
+}
+
+.map-rotate-btn.active {
+  background: var(--gold);
+  color: #fff;
+}
+
+#rotateNorthArrow {
+  transform-origin: 12px 12px;
 }
 
 /* Knop "Toon mij en de volgende stop" — verschijnt alleen zodra de speler zelf
