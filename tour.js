@@ -962,7 +962,7 @@ function truncateAtRadius(legCoords, center, radius) {
 // hierboven), moet een al-gecachete looproute in de browser van een eerdere bezoeker
 // verdwijnen i.p.v. de oude (nu foute) route te blijven tonen. Simpelweg deze key
 // ophogen forceert dat voor alle varianten (volledige route, korte route, vervolg).
-const LEGS_CACHE_KEY = "haarlemTourRouteLegsCacheV2";
+const LEGS_CACHE_KEY = "haarlemTourRouteLegsCacheV3";
 
 function loadCachedLegsByKey(key, expectedCount) {
   try {
@@ -981,17 +981,39 @@ function loadCachedLegs(expectedCount) {
 // Haalt de wandelroute tussen twee punten op bij de gratis OSRM-wandelroutedienst
 // (geen API-key nodig). Bij een netwerkfout (of een tijdelijk overbelaste/onbereikbare
 // dienst) valt het terug op een rechte lijn tussen de twee punten.
-async function fetchSingleLeg([lat1, lng1], [lat2, lng2]) {
-  const straightCoords = [[lat1, lng1], [lat2, lng2]];
-  const url = `https://routing.openstreetmap.de/routed-foot/route/v1/foot/${lng1},${lat1};${lng2},${lat2}?overview=full&geometries=geojson`;
+// points: 2 of meer [lat,lng]-paren — bij meer dan 2 dwingen de tussenliggende
+// punten (via-punten) de echte OSRM-wandelroute om daarlangs te lopen, zonder dat
+// dit een rechte lijn wordt: elk stuk ertussen is nog steeds een eigen, over
+// bestaande straten berekende etappe (OSRM retourneert de hele aaneengesloten route
+// in één geometrie).
+async function fetchRouteBetween(points) {
+  const coordStr = points.map(([lat, lng]) => `${lng},${lat}`).join(";");
+  const url = `https://routing.openstreetmap.de/routed-foot/route/v1/foot/${coordStr}?overview=full&geometries=geojson`;
   try {
     const res = await fetch(url);
     const data = await res.json();
     return data.routes[0].geometry.coordinates.map(([lng, lat]) => [lat, lng]);
   } catch (e) {
-    return straightCoords;
+    return points;
   }
 }
+
+async function fetchSingleLeg(from, to) {
+  return fetchRouteBetween([from, to]);
+}
+
+// Sommige opeenvolgende stop-paren in een gefilterde route (bv. de korte route) geeft
+// OSRM een kortste-route die vrijwel exact de heenweg terugloopt, omdat dat nu eenmaal
+// de kortste verbinding is. Voor die specifieke gevallen forceren we een tussenpunt,
+// zodat de looproute een ander (nog steeds echt, over straten berekend) stuk gebruikt.
+// Sleutel: "<originalIndex-van>:<originalIndex-naar>".
+const FORCED_ROUTE_VIA_POINTS = {
+  // Molen De Adriaan (bij de Zandersbrug) -> Waalse Kerk: zonder dit tussenpunt loopt
+  // de korte route terug via Bakenessergracht/Zakstraat, hetzelfde stuk als de heenweg
+  // vanaf Teylers Museum. Met dit punt op Jansstraat loopt hij noordelijker, via
+  // Zakstraat -> Jansstraat -> Begijnesteeg -> Begijnhof (±530m i.p.v. ±437m direct).
+  "5:9": [52.3835, 4.6385]
+};
 
 // Haalt per etappe (start->stop1, stop1->stop2, ...) een echte wandelroute op die de
 // straten volgt. Etappes worden na elkaar opgehaald (niet allemaal tegelijk) om de
@@ -1085,7 +1107,14 @@ function buildDirectRouteContext() {
         legs.push([allCoords[0], allCoords[1]]);
         continue;
       }
-      legs.push(await fetchSingleLeg(allCoords[i], allCoords[i + 1]));
+      const fromStop = STOPS[i - 1];
+      const toStop = STOPS[i];
+      const viaPoint = FORCED_ROUTE_VIA_POINTS[`${fromStop.originalIndex}:${toStop.originalIndex}`];
+      legs.push(
+        viaPoint
+          ? await fetchRouteBetween([allCoords[i], viaPoint, allCoords[i + 1]])
+          : await fetchSingleLeg(allCoords[i], allCoords[i + 1])
+      );
     }
     try {
       localStorage.setItem(cacheKey, JSON.stringify(legs));
