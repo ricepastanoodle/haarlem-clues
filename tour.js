@@ -825,6 +825,7 @@ const btnAudio = document.getElementById("btnAudio");
 
 const mapKicker = document.getElementById("mapKicker");
 const btnRecenterMap = document.getElementById("btnRecenterMap");
+const btnEnableLocation = document.getElementById("btnEnableLocation");
 const continueFullRouteEndpoint = document.getElementById("continueFullRouteEndpoint");
 const btnMapContinue = document.getElementById("btnMapContinue");
 const btnMapBack = document.getElementById("btnMapBack");
@@ -1211,13 +1212,99 @@ function startLocationTracking() {
       // kaart nog niet was) mag de kaart opnieuw op "jou + volgende stop" zetten —
       // maar alleen als de speler zelf nog niet aan de kaart heeft gezeten.
       if (state.phase === "map") applyAutoMapView();
+      updateEnableLocationButton();
     },
     (err) => {
       // Geen toestemming, geen GPS-signaal, etc. — de kaarten werken dan gewoon door,
-      // alleen zonder de locatiestip.
+      // alleen zonder de locatiestip. Bij een permissie-weigering stopt de browser
+      // vanzelf met opnieuw proberen; geoWatchId resetten zodat een latere, bewuste
+      // klik op "Mijn locatie aanzetten" (zie requestLocationAccess) het alsnog
+      // opnieuw kan proberen, bv. nadat de gebruiker de site-instelling heeft aangepast.
       console.warn("Locatie niet beschikbaar:", err.message);
+      if (err.code === err.PERMISSION_DENIED) {
+        navigator.geolocation.clearWatch(geoWatchId);
+        geoWatchId = null;
+      }
+      updateEnableLocationButton();
     },
     { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 }
+  );
+}
+
+// Platform-detectie, puur om de juiste "zo zet je locatie weer aan"-uitleg te tonen.
+function detectPlatform() {
+  const ua = navigator.userAgent || "";
+  if (/iPad|iPhone|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)) {
+    return "ios";
+  }
+  if (/Android/.test(ua)) return "android";
+  return "other";
+}
+
+function showLocationDeniedHelp() {
+  const platform = detectPlatform();
+  const bodyKey =
+    platform === "ios" ? "locationDeniedIOS" : platform === "android" ? "locationDeniedAndroid" : "locationDeniedOther";
+  openInfoOverlay(t("locationDeniedTitle"), `<p>${escapeHtml(t(bodyKey))}</p>`);
+}
+
+// Toont/verbergt de "Mijn locatie aanzetten"-knop onder de kaart — alleen zichtbaar
+// zolang we nog geen locatie hebben (ongeacht de reden: nooit gevraagd, geweigerd,
+// of gewoon nog geen GPS-fix).
+function updateEnableLocationButton() {
+  if (!btnEnableLocation) return;
+  btnEnableLocation.classList.toggle("hidden", !!lastKnownLatLng);
+}
+
+// Expliciete, door de speler zelf gestarte poging om locatie alsnog aan te zetten
+// (de "Mijn locatie aanzetten"-knop). Gebruikt getCurrentPosition (i.p.v. de
+// doorlopende watchPosition hierboven) zodat we één duidelijk succes/fout-moment
+// hebben om op te reageren — bij een definitieve weigering tonen we platform-
+// specifieke uitleg, in plaats van alleen in de console te loggen.
+async function requestLocationAccess() {
+  if (!navigator.geolocation) return;
+
+  // Op platforms die de Permissions API voor 'geolocation' ondersteunen (vooral
+  // Android Chrome; Safari op iOS doet dit niet betrouwbaar) weten we meteen of
+  // opnieuw vragen zinloos is — de browser laat dan toch geen nieuwe prompt zien.
+  if (navigator.permissions && navigator.permissions.query) {
+    try {
+      const status = await navigator.permissions.query({ name: "geolocation" });
+      if (status.state === "denied") {
+        showLocationDeniedHelp();
+        return;
+      }
+    } catch (e) {
+      // Niet ondersteund voor 'geolocation' op dit platform — gewoon doorgaan
+      // en het via getCurrentPosition hieronder proberen.
+    }
+  }
+
+  if (geoWatchId !== null) {
+    navigator.geolocation.clearWatch(geoWatchId);
+    geoWatchId = null;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      lastKnownLatLng = [pos.coords.latitude, pos.coords.longitude];
+      updateUserLocationMarker(leafletMap, "main", lastKnownLatLng);
+      updateUserLocationMarker(hintMap, "hint", lastKnownLatLng);
+      updateUserLocationMarker(revealMap, "reveal", lastKnownLatLng);
+      if (state.phase === "map") applyAutoMapView();
+      updateEnableLocationButton();
+      startLocationTracking(); // vanaf hier ook weer doorlopend volgen
+    },
+    (err) => {
+      if (err.code === err.PERMISSION_DENIED) {
+        showLocationDeniedHelp();
+      } else {
+        // Tijdelijk geen GPS-signaal of timeout — geen platform-uitleg nodig,
+        // gewoon een korte melding dat het (nu) niet lukte.
+        openInfoOverlay(t("locationDeniedTitle"), `<p>${escapeHtml(t("locationUnavailable"))}</p>`);
+      }
+    },
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
   );
 }
 
@@ -1567,6 +1654,7 @@ async function renderMap() {
   // weer vers, ongeacht of de speler bij de vórige stop zelf aan de kaart zat.
   mapAutoFollow = true;
   btnRecenterMap.classList.add("hidden");
+  updateEnableLocationButton();
 
   // Net na "Ga verder met de volledige route" staat de speler niet meer bij de Grote
   // Markt, maar bij de laatste stop van de korte route — de kaart moet dan vanaf dat
@@ -2944,6 +3032,8 @@ btnRecenterMap.addEventListener("click", () => {
   btnRecenterMap.classList.add("hidden");
   applyAutoMapView();
 });
+
+btnEnableLocation.addEventListener("click", requestLocationAccess);
 
 // Vanaf de kaart ga je pas echt door naar de volgende stop
 btnMapContinue.addEventListener("click", () => {

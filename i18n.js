@@ -193,6 +193,12 @@ const STRINGS = {
     btnMapBack: "Vorige stap",
     btnMapContinue: "Verder naar de volgende stop",
     btnRecenterMap: "Toon mij en de volgende stop",
+    btnEnableLocation: "📍 Mijn locatie aanzetten",
+    locationDeniedTitle: "Locatie staat uit",
+    locationDeniedIOS: "Ga naar Instellingen → Safari → Locatie (of Instellingen → Privacy en beveiliging → Locatievoorzieningen → Safari websites) en zet dit op \"Vraag\" of \"Sta toe\". Laad deze pagina daarna opnieuw.",
+    locationDeniedAndroid: "Tik op het slotje 🔒 naast de adresbalk → Site-instellingen → Locatie, en zet dit op \"Toestaan\". Laad deze pagina daarna opnieuw.",
+    locationDeniedOther: "Sta locatietoegang toe via de instellingen van je browser voor deze site, en laad de pagina daarna opnieuw.",
+    locationUnavailable: "Je locatie kon niet bepaald worden. Probeer het later nog eens, bijvoorbeeld buiten met een beter GPS-signaal.",
 
     // Eindscherm
     finishKicker: "Gefeliciteerd",
@@ -428,6 +434,12 @@ const STRINGS = {
     btnMapBack: "Previous step",
     btnMapContinue: "Continue to the next stop",
     btnRecenterMap: "Show me and the next stop",
+    btnEnableLocation: "📍 Turn on my location",
+    locationDeniedTitle: "Location is turned off",
+    locationDeniedIOS: "Go to Settings → Safari → Location (or Settings → Privacy & Security → Location Services → Safari Websites) and set it to \"Ask\" or \"Allow\". Then reload this page.",
+    locationDeniedAndroid: "Tap the lock icon 🔒 next to the address bar → Site settings → Location, and set it to \"Allow\". Then reload this page.",
+    locationDeniedOther: "Allow location access for this site in your browser settings, then reload the page.",
+    locationUnavailable: "We couldn't determine your location. Try again later, for example outside with a better GPS signal.",
 
     finishKicker: "Congratulations",
     finishTitle: "You've completed the tour!",
