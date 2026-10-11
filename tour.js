@@ -21,7 +21,7 @@ const STOPS_NL = [
     extraHint: "Zoek de stenen poort met een leeuwenkop erboven.",
     question: "Hoe heet de rechtbank van Haarlem?",
     answer: "De Appelaar",
-    answers: ["De Appelaar", "Appelaar"],
+    answers: ["De Appelaar", "Appelaar", "Gerechtsgebouw"],
     type: "quiz"
   },
   {
@@ -153,7 +153,21 @@ const STOPS_NL = [
     extraHint: "Dezelfde man die op de Grote Markt de letter omhooghoudt, staat hier ook. Zijn naam staat gebeiteld onder zijn voeten.",
     question: "Wie is de man die in de Hortus tuin staat?",
     answer: "Laurens Janszoon Coster",
-    answers: ["Laurens Janszoon Coster", "Laurens Jz Coster"],
+    // Ruime lijst geaccepteerde varianten van dezelfde naam — samen met de fuzzy-match
+    // in isAnswerCorrect() (zie verderop in dit bestand) worden ook kleine tikfouten
+    // op elk van deze varianten nog goedgerekend. Dezelfde lijst geldt voor de Engelse
+    // tour (EN_OVERRIDES voor deze stop laat "answers" bewust leeg zodat 'ie hiervan erft).
+    answers: [
+      "Laurens Janszoon Coster",
+      "Laurens Jansz Coster",
+      "Laurens Jz Coster",
+      "Laurens Coster",
+      "Laurens Janszoon",
+      "L.J. Coster",
+      "Lourens Coster",
+      "Coster",
+      "Koster"
+    ],
     type: "quiz"
   },
   {
@@ -365,7 +379,7 @@ const EN_OVERRIDES = [
     extraHint: "Look for the stone gate with a lion's head above it.",
     question: "What is Haarlem's courthouse called?",
     answer: "De Appelaar",
-    answers: ["De Appelaar", "Appelaar"],
+    answers: ["De Appelaar", "Appelaar", "Gerechtsgebouw", "Courthouse"],
     type: "quiz"
   },
   {
@@ -488,8 +502,8 @@ const EN_OVERRIDES = [
     hint: "In a quiet, green garden stands a familiar face you've already met before.",
     extraHint: "The same man who holds up the letter on the Grote Markt stands here too. His name is carved beneath his feet.",
     question: "Who is the man standing in the Hortus garden?",
-    answer: "Laurens Janszoon Coster",
-    answers: ["Laurens Janszoon Coster", "Laurens Jz Coster"],
+    // Geen eigen answer/answers hier — de naam wordt niet vertaald, dus deze stop
+    // erft gewoon de (ruimere) lijst van STOPS_NL via de spread in STOPS_EN hieronder.
     type: "quiz"
   },
   {
@@ -2753,14 +2767,74 @@ btnTestComplete.addEventListener("click", () => {
   saveState();
 });
 
+// Normaliseert een antwoord voor vergelijking: kleine letters, accenten weg, en
+// leestekens (punten, komma's, streepjes, apostrofs) tellen niet mee — zodat
+// "L.J. Coster", "Laurens-Coster" en "laurens  coster" allemaal hetzelfde zijn.
+function normalizeAnswer(str) {
+  return String(str)
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "") // é -> e, etc.
+    .replace(/[.,'’\-_]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+// Levenshtein-afstand: hoeveel invoegingen/verwijderingen/vervangingen zijn nodig
+// om a in b te veranderen. Gebruikt om kleine tikfouten door te laten.
+function levenshteinDistance(a, b) {
+  const m = a.length;
+  const n = b.length;
+  if (m === 0) return n;
+  if (n === 0) return m;
+  let prev = new Array(n + 1);
+  let curr = new Array(n + 1);
+  for (let j = 0; j <= n; j++) prev[j] = j;
+  for (let i = 1; i <= m; i++) {
+    curr[0] = i;
+    for (let j = 1; j <= n; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      curr[j] = Math.min(curr[j - 1] + 1, prev[j] + 1, prev[j - 1] + cost);
+    }
+    [prev, curr] = [curr, prev];
+  }
+  return prev[n];
+}
+
+// Hoeveel tikfouten we door laten, afhankelijk van de lengte van het antwoord — bij
+// een heel kort antwoord zou zelfs 1-2 tikfouten het praktisch een ander woord maken.
+function maxAllowedTypos(len) {
+  if (len <= 3) return 0;
+  if (len <= 6) return 1;
+  return 2;
+}
+
+// Alleen geschikt voor fuzzy-matching als het antwoord puur uit letters/spaties bestaat
+// (na normalisatie) — een cijfer- of tijd-antwoord (bv. "1785", "10:30") moet exact
+// kloppen, want één cijfer verschil is daar een ander antwoord, geen tikfout.
+function isFuzzyEligible(normalizedAnswer) {
+  return /^[a-zà-ÿ ]+$/.test(normalizedAnswer);
+}
+
+// Centrale antwoordcontrole voor alle open vragen: genormaliseerd exact gelijk, of
+// (bij woorden/namen) binnen een kleine tikfout-marge van één van de geaccepteerde
+// varianten in stop.answers (of het enkele stop.answer als die er niet is).
+function isAnswerCorrect(given, stop) {
+  const normGiven = normalizeAnswer(given);
+  if (!normGiven) return false;
+  const acceptable = (stop.answers || [stop.answer]).map(normalizeAnswer);
+  return acceptable.some((acc) => {
+    if (normGiven === acc) return true;
+    if (!isFuzzyEligible(acc)) return false;
+    return levenshteinDistance(normGiven, acc) <= maxAllowedTypos(acc.length);
+  });
+}
+
 btnCheckAnswer.addEventListener("click", () => {
   const stop = STOPS[state.currentStep];
-  const given = quizInput.value.trim().toLowerCase();
-  // Sommige vragen hebben meerdere geldige schrijfwijzen (bv. een afkorting en de volledige naam).
-  // stop.answers (meervoud) is dan een lijstje; anders valt terug op het enkele stop.answer.
-  const acceptable = (stop.answers || [stop.answer]).map((a) => String(a).trim().toLowerCase());
+  const given = quizInput.value.trim();
 
-  if (given && acceptable.includes(given)) {
+  if (isAnswerCorrect(given, stop)) {
     markCompleted(state.currentStep);
     updateProgressBar();
     setQuizStatus("matched", t("quizCorrect"));
