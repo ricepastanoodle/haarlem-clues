@@ -1179,7 +1179,11 @@ function buildRouteContextForContinuation(fromCoord) {
 function createUserLocationIcon() {
   return L.divIcon({
     className: "",
-    html: '<div class="user-location-pulse"></div><div class="user-location-dot"></div>',
+    // De kegel staat er bij elke locatiestip bij (hint/antwoord-kaartjes incluis),
+    // maar blijft onzichtbaar (geen "visible"-klasse) totdat er echt een kompasrichting
+    // bekend is — zie updateHeadingCone(), die 'm alleen voor de hoofdkaart aanstuurt.
+    html:
+      '<div class="user-location-cone"></div><div class="user-location-pulse"></div><div class="user-location-dot"></div>',
     iconSize: [16, 16],
     iconAnchor: [8, 8]
   });
@@ -1264,6 +1268,9 @@ function updateEnableLocationButton() {
 async function requestLocationAccess() {
   if (!navigator.geolocation) return;
 
+  // Dezelfde tik is ook een geldig moment om (op iOS) om kompastoegang te vragen.
+  requestCompassAccess();
+
   // Op platforms die de Permissions API voor 'geolocation' ondersteunen (vooral
   // Android Chrome; Safari op iOS doet dit niet betrouwbaar) weten we meteen of
   // opnieuw vragen zinloos is — de browser laat dan toch geen nieuwe prompt zien.
@@ -1306,6 +1313,77 @@ async function requestLocationAccess() {
     },
     { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
   );
+}
+
+// ---- Kijkrichting (kompaskegel bij de locatiestip, zoals Google Maps) ----
+let compassRequested = false; // voorkomt dat we iOS' requestPermission() dubbel aanroepen
+let compassListenerAttached = false;
+let smoothedHeading = null; // afgevlakte richting (graden, 0 = noord), null = nog geen data
+
+// Rondt een nieuwe meting af tegen de vorige afgevlakte waarde — via het kortste pad
+// over de 0°/360°-grens heen, anders "springt" de kegel bij het noorden.
+function smoothHeading(rawHeading) {
+  if (smoothedHeading === null) {
+    smoothedHeading = rawHeading;
+  } else {
+    const diff = ((rawHeading - smoothedHeading + 540) % 360) - 180;
+    smoothedHeading = (smoothedHeading + diff * 0.2 + 360) % 360;
+  }
+  return smoothedHeading;
+}
+
+// Tekent de kegel alleen op de hoofdkaart (de navigatiekaart) — de kleine hint-/
+// antwoordkaartjes hebben geen kijkrichting nodig.
+function updateHeadingCone(heading) {
+  const marker = userLocationMarkers.main;
+  if (!marker) return;
+  const el = marker.getElement();
+  if (!el) return;
+  const cone = el.querySelector(".user-location-cone");
+  if (!cone) return;
+  cone.style.transform = `translateX(-50%) rotate(${heading}deg)`;
+  cone.classList.add("visible");
+}
+
+function handleOrientationEvent(e) {
+  let heading = null;
+  if (typeof e.webkitCompassHeading === "number") {
+    // iOS: al rechtstreeks een kompasrichting (0 = noord, met de klok mee).
+    heading = e.webkitCompassHeading;
+  } else if (e.absolute && typeof e.alpha === "number") {
+    // Android (deviceorientationabsolute): alpha draait tegen de klok in vanaf het
+    // apparaat zelf — 360-alpha zet dat om naar een kompasrichting.
+    heading = (360 - e.alpha) % 360;
+  }
+  if (heading === null) return;
+  updateHeadingCone(smoothHeading(heading));
+}
+
+function startCompassTracking() {
+  if (compassListenerAttached || typeof DeviceOrientationEvent === "undefined") return;
+  compassListenerAttached = true;
+  const eventName = "ondeviceorientationabsolute" in window ? "deviceorientationabsolute" : "deviceorientation";
+  window.addEventListener(eventName, handleOrientationEvent);
+}
+
+// Gekoppeld aan een bestaande tik (start-knop, of "Mijn locatie aanzetten") — iOS
+// vereist dat DeviceOrientationEvent.requestPermission() vanuit een gebruikersactie
+// wordt aangeroepen. Is er geen kompas, of wordt de permissie geweigerd, dan blijft
+// de kegel gewoon weg, zonder foutmelding.
+async function requestCompassAccess() {
+  if (compassRequested || typeof DeviceOrientationEvent === "undefined") return;
+  compassRequested = true;
+  if (typeof DeviceOrientationEvent.requestPermission === "function") {
+    try {
+      const result = await DeviceOrientationEvent.requestPermission();
+      if (result === "granted") startCompassTracking();
+    } catch (e) {
+      // Geweigerd, of niet beschikbaar in deze context — geen kegel, geen probleem.
+    }
+  } else {
+    // Geen expliciete permissie nodig (Android, desktop) — gewoon proberen te luisteren.
+    startCompassTracking();
+  }
 }
 
 function initMapIfNeeded() {
@@ -2829,6 +2907,7 @@ btnInstructionsStart.addEventListener("click", () => {
   saveState();
   render();
   startLocationTracking();
+  requestCompassAccess();
   trackEvent("tour_started");
 });
 

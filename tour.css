@@ -1623,3 +1623,27 @@ a.btn-secondary {
     opacity: 0;
   }
 }
+
+/* Kijkrichting-kegel, zoals bij Google Maps — punt bij de locatiestip, waaiert uit
+   in de richting waar de telefoon naartoe wijst. Onzichtbaar totdat er een echte
+   kompasmeting binnenkomt (zie startCompassTracking() in tour.js), en alleen op de
+   hoofdkaart aangestuurd (zie updateHeadingCone()) — geen foutmelding als een
+   toestel geen kompas heeft, dan blijft 'ie gewoon weg. */
+.user-location-cone {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  width: 0;
+  height: 0;
+  border-left: 13px solid transparent;
+  border-right: 13px solid transparent;
+  border-top: 26px solid rgba(66, 133, 244, 0.35);
+  transform-origin: 50% 100%;
+  transform: translateX(-50%) rotate(0deg);
+  pointer-events: none;
+  display: none;
+}
+
+.user-location-cone.visible {
+  display: block;
+}
