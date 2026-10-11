@@ -962,7 +962,7 @@ function truncateAtRadius(legCoords, center, radius) {
 // hierboven), moet een al-gecachete looproute in de browser van een eerdere bezoeker
 // verdwijnen i.p.v. de oude (nu foute) route te blijven tonen. Simpelweg deze key
 // ophogen forceert dat voor alle varianten (volledige route, korte route, vervolg).
-const LEGS_CACHE_KEY = "haarlemTourRouteLegsCacheV3";
+const LEGS_CACHE_KEY = "haarlemTourRouteLegsCacheV4";
 
 function loadCachedLegsByKey(key, expectedCount) {
   try {
@@ -1012,7 +1012,12 @@ const FORCED_ROUTE_VIA_POINTS = {
   // de korte route terug via Bakenessergracht/Zakstraat, hetzelfde stuk als de heenweg
   // vanaf Teylers Museum. Met dit punt op Jansstraat loopt hij noordelijker, via
   // Zakstraat -> Jansstraat -> Begijnesteeg -> Begijnhof (±530m i.p.v. ±437m direct).
-  "5:9": [52.3835, 4.6385]
+  "5:9": [52.3835, 4.6385],
+  // Waalse Kerk -> Ten Boom Museum: zonder dit tussenpunt loopt de route via de smalle,
+  // onprettige Noorder Schoolsteeg. Met dit punt op de Grote Markt loopt hij via
+  // Lange Begijnestraat -> Riviervismarkt -> de Grote Markt -> Schoutensteeg
+  // (±429m i.p.v. ±350m direct).
+  "9:14": [52.3812, 4.6372]
 };
 
 // Haalt per etappe (start->stop1, stop1->stop2, ...) een echte wandelroute op die de
