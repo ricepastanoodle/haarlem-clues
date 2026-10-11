@@ -228,7 +228,7 @@ const ROUTE_COORDS = [
   [52.380213, 4.6397552],  // Taverne De Waag
   [52.3803511, 4.6403448], // Teylers Museum
   [52.3820564, 4.6432713], // Teylers Hofje
-  [52.3838047, 4.6426257], // Molen De Adriaan
+  [52.3843392, 4.6417865], // Molen De Adriaan — Zandersbrug, mooi zicht op de molen over het water
   [52.3835597, 4.6455402], // De Koepel
   [52.3805162, 4.6465988], // Amsterdamse Poort
   [52.3802938, 4.6411002], // Gravestenenbrug
@@ -281,7 +281,7 @@ STOPS_NL[3].tip = "Tip: fotografeer alleen het beeldengroepje op het dak, niet h
 // Stop 6 (Molen De Adriaan): geen kaartje bij de extra hint nodig (de hoofdkaart
 // wijst al de weg) — wel een kleine tip onder de eerste hint.
 STOPS_NL[5].skipHintMap = true;
-STOPS_NL[5].tip = "Tip: maak de foto van een afstand.";
+STOPS_NL[5].tip = "Tip: maak de foto vanaf de brug, aan de overkant van het water.";
 
 // Stop 8 (Amsterdamse Poort): geen zoekcirkel, de kaart wijst direct naar de stop —
 // en op de antwoordpagina is alleen de foto nodig, geen kaart.
@@ -425,7 +425,7 @@ const EN_OVERRIDES = [
     hint: "By the water, a giant with waving arms has been turning for centuries.",
     extraHint: "It's a real windmill with wooden sails, right next to the water where boats are moored.",
     answer: "Windmill De Adriaan, the wooden polder windmill on the Spaarne river.",
-    tip: "Tip: take the photo from a distance.",
+    tip: "Tip: take the photo from the bridge, across the water.",
     type: "photo"
   },
   {
@@ -958,7 +958,11 @@ function truncateAtRadius(legCoords, center, radius) {
 
 // Onthoudt eerder opgehaalde looproutes lokaal in de browser, zodat we niet bij
 // elke paginabezoek alle etappes opnieuw hoeven op te vragen bij de gratis dienst.
-const LEGS_CACHE_KEY = "haarlemTourRouteLegsCache";
+// De "V2" hierachter is bewust: zodra een stop-coördinaat wijzigt (zie bv. de Molen
+// hierboven), moet een al-gecachete looproute in de browser van een eerdere bezoeker
+// verdwijnen i.p.v. de oude (nu foute) route te blijven tonen. Simpelweg deze key
+// ophogen forceert dat voor alle varianten (volledige route, korte route, vervolg).
+const LEGS_CACHE_KEY = "haarlemTourRouteLegsCacheV2";
 
 function loadCachedLegsByKey(key, expectedCount) {
   try {
