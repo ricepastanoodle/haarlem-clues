@@ -129,6 +129,16 @@ const STOPS_NL = [
     type: "quiz"
   },
   {
+    title: "Lutherse Hofje",
+    audio: "audio/17-lutherse-hofje.mp3",
+    hint: "Bij de poort van dit rustige hofje zwemmen statige witte vogels in de gracht ernaast.",
+    extraHint: "Kijk eens goed bij de voedselkast.",
+    question: "Hoeveel zwanen kun je bij de ingang vinden?",
+    answer: "8",
+    answers: ["8", "acht"],
+    type: "quiz"
+  },
+  {
     title: "Hofje van Oorschot",
     audio: "audio/14-hofje-van-oorschot.mp3",
     hint: "Achter een eenvoudige poort schuilt een hofje waar vrouwen ooit een veilig thuis vonden.",
@@ -168,16 +178,6 @@ const STOPS_NL = [
       "Coster",
       "Koster"
     ],
-    type: "quiz"
-  },
-  {
-    title: "Lutherse Hofje",
-    audio: "audio/17-lutherse-hofje.mp3",
-    hint: "Bij de poort van dit rustige hofje zwemmen statige witte vogels in de gracht ernaast.",
-    extraHint: "Kijk eens goed bij de voedselkast.",
-    question: "Hoeveel zwanen kun je bij de ingang vinden?",
-    answer: "8",
-    answers: ["8", "acht"],
     type: "quiz"
   },
   {
@@ -236,10 +236,10 @@ const ROUTE_COORDS = [
   [52.3846693, 4.6374257], // Huis Barnaart
   [52.3873225, 4.6369366], // Monument Kenau Simonsdochter
   [52.387054, 4.633841],   // Vrouw in het Verzet monument
+  [52.3840052, 4.6314806], // Lutherse Hofje
   [52.3832175, 4.6349943], // Hofje van Oorschot
   [52.382251, 4.6353127],  // Ten Boom Museum
   [52.3814994, 4.6334517], // Prinsenhof
-  [52.3840052, 4.6314806], // Lutherse Hofje
   [52.3812145, 4.6297315], // Jopen
   [52.37728, 4.6297456],   // Nieuwe Kerk
   [52.3765849, 4.633667],  // Frans Hals Museum
@@ -490,6 +490,16 @@ const EN_OVERRIDES = [
     type: "quiz"
   },
   {
+    audio: "audio/en/17-lutherse-hofje.mp3",
+    title: "Lutherse Hofje",
+    hint: "At the gate of this quiet courtyard, stately white birds glide along the canal nearby.",
+    extraHint: "Take a good look around the food cupboard.",
+    question: "How many swans can you find at the entrance?",
+    answer: "8",
+    answers: ["8", "eight"],
+    type: "quiz"
+  },
+  {
     audio: "audio/en/14-hofje-van-oorschot.mp3",
     title: "Van Oorschot Almshouse",
     hint: "Behind a simple gate lies a hofje where women once found a safe home.",
@@ -515,16 +525,6 @@ const EN_OVERRIDES = [
     question: "Who is the man standing in the Hortus garden?",
     // Geen eigen answer/answers hier — de naam wordt niet vertaald, dus deze stop
     // erft gewoon de (ruimere) lijst van STOPS_NL via de spread in STOPS_EN hieronder.
-    type: "quiz"
-  },
-  {
-    audio: "audio/en/17-lutherse-hofje.mp3",
-    title: "Lutherse Hofje",
-    hint: "At the gate of this quiet courtyard, stately white birds glide along the canal nearby.",
-    extraHint: "Take a good look around the food cupboard.",
-    question: "How many swans can you find at the entrance?",
-    answer: "8",
-    answers: ["8", "eight"],
     type: "quiz"
   },
   {
@@ -572,7 +572,7 @@ const STOPS_EN = STOPS_NL.map((stop, i) => ({ ...stop, ...EN_OVERRIDES[i] }));
 // Indices (0-based, in STOPS_NL/STOPS_EN) van de 9 stops die de korte route vormen,
 // in loopvolgorde. De hints/audio/foto's/vragen zelf staan nergens dubbel — de korte
 // route hergebruikt gewoon de bestaande stopdata via deze lijst.
-const SHORT_ROUTE_INDICES = [0, 1, 2, 3, 5, 9, 14, 15, 20];
+const SHORT_ROUTE_INDICES = [0, 1, 2, 3, 5, 9, 15, 16, 20];
 
 function getFullStopsForLang() {
   return getLang() === "en" ? STOPS_EN : STOPS_NL;
@@ -967,7 +967,7 @@ function truncateAtRadius(legCoords, center, radius) {
 // hierboven), moet een al-gecachete looproute in de browser van een eerdere bezoeker
 // verdwijnen i.p.v. de oude (nu foute) route te blijven tonen. Simpelweg deze key
 // ophogen forceert dat voor alle varianten (volledige route, korte route, vervolg).
-const LEGS_CACHE_KEY = "haarlemTourRouteLegsCacheV5";
+const LEGS_CACHE_KEY = "haarlemTourRouteLegsCacheV6";
 
 function loadCachedLegsByKey(key, expectedCount) {
   try {
@@ -1023,7 +1023,7 @@ const FORCED_ROUTE_VIA_POINTS = {
   // onprettige Noorder Schoolsteeg. Met dit punt op de Grote Markt loopt hij via
   // Lange Begijnestraat -> Riviervismarkt -> de Grote Markt -> Schoutensteeg
   // (±429m i.p.v. ±350m direct).
-  "9:14": [52.3812, 4.6372]
+  "9:15": [52.3812, 4.6372]
 };
 
 // Haalt per etappe (start->stop1, stop1->stop2, ...) een echte wandelroute op die de
