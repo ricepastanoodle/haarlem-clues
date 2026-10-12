@@ -1519,16 +1519,12 @@ async function toggleHeadingUp() {
   if (headingUpActive) {
     headingUpActive = false;
     setMapRotation(0);
-    leafletMap.dragging.enable();
-    leafletMap.touchZoom.enable();
     btnToggleRotate.classList.remove("active");
     return;
   }
   await requestCompassAccess();
   if (!compassListenerAttached) return; // geen kompas beschikbaar, of geweigerd
   headingUpActive = true;
-  leafletMap.dragging.disable();
-  leafletMap.touchZoom.disable();
   btnToggleRotate.classList.add("active");
   if (smoothedHeading !== null) setMapRotation(smoothedHeading);
 }
