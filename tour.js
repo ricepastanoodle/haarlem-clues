@@ -2040,9 +2040,12 @@ function render() {
     renderStep();
   }
 
-  // De "?"-knop (opnieuw uitleg bekijken) is alleen zinvol tijdens een echte
-  // stop — niet op het intro-/uitlegscherm zelf, en niet op het eindscherm.
-  const showHelpButton = state.currentStep >= 0 && state.currentStep < STOPS.length;
+  // De "?"-knop is de enige manier om de uitleg (vraag/hints/foto) nog te
+  // bekijken — dus ook al zichtbaar op de allereerste kaart (stap -1, op weg
+  // naar stop 1), niet pas vanaf de eerste echte stop. Alleen op het route-
+  // keuze-/introscherm en het eindscherm heeft de knop niets om te tonen.
+  const showHelpButton =
+    !!state.routeType && state.currentStep < STOPS.length && !(state.currentStep < 0 && state.phase !== "map");
   btnHelpOverlay.classList.toggle("hidden", !showHelpButton);
 
   updateFloatingNav();
@@ -2974,12 +2977,19 @@ function chooseRoute(routeType) {
 btnChooseShortRoute.addEventListener("click", () => chooseRoute("short"));
 btnChooseFullRoute.addEventListener("click", () => chooseRoute("full"));
 
-// Eerst de kaart (route + eventueel zoekcirkel) naar stop 1, pas daarna de opdracht zelf
-// Eerst de drie uitlegschermen (vraag, hints, foto-opdracht), pas daarna echt de tour in.
+// Start de tour meteen (geen verplichte uitlegschermen meer vooraf — die zijn nu
+// alleen nog te bekijken via de "?"-knop, zie openHelpOverlay() hieronder). Alles
+// wat voorheen pas bij het laatste uitlegscherm gebeurde (locatie, kompas, de
+// "tour_started"-event) gebeurt daarom nu hier.
 btnStart.addEventListener("click", () => {
-  state.phase = "instructions";
+  state.currentStep = -1;
+  state.phase = "map";
+  state.startTime = Date.now();
   saveState();
   render();
+  startLocationTracking();
+  requestCompassAccess();
+  trackEvent("tour_started");
 });
 
 // true zolang de drie uitlegschermen in het "?"-overlay zitten (i.p.v. in hun
@@ -3098,7 +3108,17 @@ document.querySelectorAll(".instructions-dot").forEach((dot) => {
   dot.addEventListener("click", () => goToInstructionsPhase(instructionsDotPhases[index]));
 });
 
+// De uitlegschermen zijn nu alleen nog bereikbaar via de "?"-knop (zie
+// openHelpOverlay) — "Start de tour!" zou daar, als je al middenin de tour zit,
+// ten onrechte je voortgang resetten. Binnen het overlay sluit deze knop dus
+// gewoon het overlay weer (zie ook closeHelpOverlay()). De oude start-logica
+// blijft als vangnet staan voor het geval dit scherm ooit nog ergens anders
+// bereikt wordt.
 btnInstructionsStart.addEventListener("click", () => {
+  if (helpOverlayOpen) {
+    closeHelpOverlay();
+    return;
+  }
   state.currentStep = -1;
   state.phase = "map";
   state.startTime = Date.now();

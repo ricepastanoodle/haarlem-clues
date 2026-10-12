@@ -151,7 +151,7 @@ const STRINGS = {
     demoPhotoHint: "Een ijzeren kantwerk prikt de lucht in, een dame van staal die de hele wereld kent.",
     instr3Note: "Een ingebouwde AI checkt direct of je foto klopt. Er wordt niets opgeslagen of gedeeld, alles gebeurt in je eigen browser.",
     demoPhotoCreditPrefix: "Foto:",
-    btnInstructionsStart: "Start de tour!",
+    btnInstructionsStart: "Sluiten",
 
     // Stap-scherm
     stopKicker: "Stop {n} van {total}",
@@ -397,7 +397,7 @@ const STRINGS = {
     demoPhotoHint: "An iron lattice pierces the sky, a lady of steel known the world over.",
     instr3Note: "A built-in AI instantly checks if your photo is correct. Nothing is stored or shared, everything happens right in your browser.",
     demoPhotoCreditPrefix: "Photo:",
-    btnInstructionsStart: "Start the tour!",
+    btnInstructionsStart: "Close",
 
     stopKicker: "Stop {n} of {total}",
     hintLabel: "Your hint",
