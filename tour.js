@@ -173,11 +173,11 @@ const STOPS_NL = [
   {
     title: "Lutherse Hofje",
     audio: "audio/17-lutherse-hofje.mp3",
-    hint: "Elke zondag klinkt hier nog een kerkklok, precies op tijd voor de dienst.",
-    extraHint: "Je hoeft niet naar binnen. Bij het hek hangt een bord dat het geheim verklapt.",
-    question: "Hoe laat begint de dienst op zondag?",
-    answer: "10:30",
-    answers: ["10:30", "half elf"],
+    hint: "Bij de poort van dit rustige hofje zwemmen statige witte vogels in de gracht ernaast.",
+    extraHint: "Kijk eens goed bij de voedselkast.",
+    question: "Hoeveel zwanen kun je bij de ingang vinden?",
+    answer: "8",
+    answers: ["8", "acht"],
     type: "quiz"
   },
   {
@@ -520,11 +520,11 @@ const EN_OVERRIDES = [
   {
     audio: "audio/en/17-lutherse-hofje.mp3",
     title: "Lutherse Hofje",
-    hint: "Every Sunday, a church bell still rings here, right on time for the service.",
-    extraHint: "You don't need to go inside. A sign by the gate gives away the secret.",
-    question: "What time does the Sunday service start?",
-    answer: "10:30",
-    answers: ["10:30", "half past ten"],
+    hint: "At the gate of this quiet courtyard, stately white birds glide along the canal nearby.",
+    extraHint: "Take a good look around the food cupboard.",
+    question: "How many swans can you find at the entrance?",
+    answer: "8",
+    answers: ["8", "eight"],
     type: "quiz"
   },
   {
