@@ -252,7 +252,13 @@ const ROUTE_COORDS = [
   [52.382251, 4.6353127],  // Ten Boom Museum
   [52.3814994, 4.6334517], // Prinsenhof
   [52.3812145, 4.6297315], // Jopen
+  // Geen eigen opdracht — puur voor de looproute: vanaf de Botermarkt via de
+  // Gierstraat, de Breestraat en de Lange Raamstraat naar de Nieuwe Kerk.
+  [52.3791222, 4.6322415], // Gierstraat
+  [52.3788377, 4.6313452], // Breestraat
+  [52.378365, 4.6300037],  // Lange Raamstraat
   [52.37728, 4.6297456],   // Nieuwe Kerk
+  [52.3768771, 4.6306128], // Korte Houtstraat — geen eigen opdracht, puur voor de looproute naar Frans Hals
   [52.3765849, 4.633667],  // Frans Hals Museum
   [52.3808764, 4.6367228], // Stadsklooster Haarlem — geen eigen stop, puur voor de looproute
   [52.3813779, 4.6350106]  // Stadhuis Haarlem
@@ -267,7 +273,11 @@ const ROUTE_STOP_INDEX = [
   null, null, null, // Kenaupark / Kinderhuisvest / Magdalenastraat
   13, // Lutherse Hofje
   null, null, null, null, // Witte Herenstraat / Zijlstraat / Zoetestraat / Krocht
-  14, 15, 16, 17, 18, 19,
+  14, 15, 16, 17, // t/m Jopen
+  null, null, null, // Gierstraat / Breestraat / Lange Raamstraat
+  18, // Nieuwe Kerk
+  null, // Korte Houtstraat
+  19, // Frans Hals Museum
   null, // Stadsklooster
   20
 ];
@@ -987,7 +997,7 @@ function truncateAtRadius(legCoords, center, radius) {
 // hierboven), moet een al-gecachete looproute in de browser van een eerdere bezoeker
 // verdwijnen i.p.v. de oude (nu foute) route te blijven tonen. Simpelweg deze key
 // ophogen forceert dat voor alle varianten (volledige route, korte route, vervolg).
-const LEGS_CACHE_KEY = "haarlemTourRouteLegsCacheV7";
+const LEGS_CACHE_KEY = "haarlemTourRouteLegsCacheV8";
 
 function loadCachedLegsByKey(key, expectedCount) {
   try {
