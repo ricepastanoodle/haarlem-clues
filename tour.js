@@ -1379,16 +1379,24 @@ async function requestLocationAccess() {
 // ---- Kijkrichting (kompaskegel bij de locatiestip, zoals Google Maps) ----
 let compassRequested = false; // voorkomt dat we iOS' requestPermission() dubbel aanroepen
 let compassListenerAttached = false;
-let smoothedHeading = null; // afgevlakte richting (graden, 0 = noord), null = nog geen data
+// Afgevlakte richting. Bewust NIET teruggewrapt naar 0-360 — zo kan deze waarde
+// bv. doorlopen naar 370 of -10 i.p.v. terug te springen naar 10/350. Rotate()
+// in CSS werkt met elke hoek, dus dat is geen probleem, en voorkomt juist dat de
+// kaart bij het kruisen van het noorden een volle, glitchy rotatie "terugspoelt".
+let smoothedHeading = null; // null = nog geen meting gehad
 
-// Rondt een nieuwe meting af tegen de vorige afgevlakte waarde — via het kortste pad
-// over de 0°/360°-grens heen, anders "springt" de kegel bij het noorden.
+// Rondt een nieuwe meting af tegen de vorige afgevlakte waarde, via het kortste
+// pad (zodat 350° -> 10° via 0° gaat, niet via 180°) — maar telt dat kortste pad
+// gewoon op/af bij de vorige (doorlopende) waarde, zonder die zelf te wrappen.
 function smoothHeading(rawHeading) {
   if (smoothedHeading === null) {
     smoothedHeading = rawHeading;
   } else {
-    const diff = ((rawHeading - smoothedHeading + 540) % 360) - 180;
-    smoothedHeading = (smoothedHeading + diff * 0.2 + 360) % 360;
+    const current = ((smoothedHeading % 360) + 360) % 360;
+    let delta = rawHeading - current;
+    if (delta > 180) delta -= 360;
+    if (delta < -180) delta += 360;
+    smoothedHeading += delta * 0.2;
   }
   return smoothedHeading;
 }
@@ -1410,6 +1418,22 @@ function updateHeadingCone(heading) {
   cone.classList.add("visible");
 }
 
+// Ruwe kompasmetingen kunnen tientallen keren per seconde binnenkomen — veel
+// vaker dan het scherm ververst. Zonder throttling schreef elke meting meteen
+// naar de DOM (kaartrotatie + alle markers + kegel), wat op een telefoon
+// stotterig/glitchy aanvoelde. We onthouden nu alleen de laatste ruwe meting en
+// verwerken die hooguit één keer per animatieframe via requestAnimationFrame.
+let pendingRawHeading = null;
+let headingFrameScheduled = false;
+
+function processHeadingFrame() {
+  headingFrameScheduled = false;
+  if (pendingRawHeading === null) return;
+  const smoothed = smoothHeading(pendingRawHeading);
+  if (headingUpActive) setMapRotation(smoothed);
+  updateHeadingCone(smoothed);
+}
+
 function handleOrientationEvent(e) {
   let heading = null;
   if (typeof e.webkitCompassHeading === "number") {
@@ -1421,9 +1445,11 @@ function handleOrientationEvent(e) {
     heading = (360 - e.alpha) % 360;
   }
   if (heading === null) return;
-  const smoothed = smoothHeading(heading);
-  if (headingUpActive) setMapRotation(smoothed);
-  updateHeadingCone(smoothed);
+  pendingRawHeading = heading;
+  if (!headingFrameScheduled) {
+    headingFrameScheduled = true;
+    requestAnimationFrame(processHeadingFrame);
+  }
 }
 
 // ---- Kaart meedraaien (heading-up, zoals de kompasmodus in Google Maps) ----
@@ -1433,7 +1459,10 @@ let headingUpActive = false;
 // Draait alleen de kaartinhoud (tegels + routelijnen + markers) — niet het venster
 // eromheen (rand/ronde hoeken) en niet onze eigen knoppen erbovenop, die staan
 // buiten .map-rotate-wrapper. Markers krijgen een tegengestelde rotatie zodat hun
-// tekst (nummers, "S", de vlag) altijd gewoon rechtop leesbaar blijft.
+// tekst (nummers, "S", de vlag) altijd gewoon rechtop leesbaar blijft. Geen eigen
+// CSS-transition hier (zie tour.css) — de afvlakking in smoothHeading() zorgt al
+// voor vloeiende beweging, en een CSS-transitie bovenop steeds-verspringende
+// doelwaarden gaf juist de glitchy/haperende beweging die we willen vermijden.
 function setMapRotation(deg) {
   mapRotationDeg = deg;
   if (mapRotateWrapper) mapRotateWrapper.style.transform = `rotate(${-deg}deg)`;

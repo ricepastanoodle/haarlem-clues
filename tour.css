@@ -419,7 +419,9 @@ body.has-floating-nav .tour-main {
   width: 160%;
   height: 160%;
   transform-origin: 50% 50%;
-  transition: transform 0.15s linear;
+  /* Bewust geen CSS-transition: de afvlakking gebeurt al in JS (smoothHeading,
+     via requestAnimationFrame), en een transitie bovenop een doel dat tientallen
+     keren per seconde verspringt gaf juist de hortende/glitchy beweging. */
 }
 
 .map-container {
