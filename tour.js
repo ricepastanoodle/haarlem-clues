@@ -1861,18 +1861,38 @@ function updateMapProgress(routeContext, legs) {
 // is dan wat je echt ziet, en oogt de kaart daardoor onnodig uitgezoomd. Deze
 // functie rekent dat om naar echte pixel-padding, zodat het resultaat past
 // binnen het werkelijk zichtbare venster.
-function getRotationAwarePadding(basePaddingPx) {
-  if (!leafletMap) return [basePaddingPx, basePaddingPx];
+// Padding rond de gefitte punten — met twee correcties:
+// 1) rotatie-compensatie: .map-rotate-wrapper (voor het meedraaien met je
+//    kijkrichting) is altijd 160% van het zichtbare venster, ook als er niet
+//    gedraaid wordt. Leaflet kent alleen die volle (deels onzichtbare)
+//    containergrootte, dus zonder compensatie oogt de kaart onnodig uitgezoomd.
+// 2) knoppen-compensatie: alle vier de hoeken van de kaart hebben een eigen
+//    knop (zoom linksboven, vergroten+kompas rechtsboven, centreren linksonder,
+//    locatie rechtsonder) — extra ruimte zodat jouw locatie of de volgende stop
+//    daar nooit onder wegvalt.
+function getRotationAwarePadding() {
+  if (!leafletMap) {
+    return { paddingTopLeft: [25, 45], paddingBottomRight: [25, 40] };
+  }
   const size = leafletMap.getSize();
-  const hiddenMarginX = size.x * 0.3;
-  const hiddenMarginY = size.y * 0.3;
-  return [hiddenMarginX + basePaddingPx, hiddenMarginY + basePaddingPx];
+  // .map-rotate-wrapper is EXACT 160% van het zichtbare venster, gecentreerd
+  // (zie tour.css: width/height 160%, top/left -30%) — dus Leaflet's eigen
+  // containergrootte is 1.6x groter dan wat je daadwerkelijk ziet. Om fitBounds
+  // toch binnen het écht zichtbare venster te houden is per kant minimaal
+  // containerGrootte * (1 - 1/1.6) / 2 = 18,75% nodig; de rest hieronder is
+  // ruimte voor de knoppen in de hoeken (zoom/vergroten/kompas/centreren/locatie).
+  const rotationMarginX = size.x * 0.1875;
+  const rotationMarginY = size.y * 0.1875;
+  return {
+    paddingTopLeft: [rotationMarginX + 25, rotationMarginY + 45],
+    paddingBottomRight: [rotationMarginX + 25, rotationMarginY + 40]
+  };
 }
 
 function applyAutoMapView() {
   if (!leafletMap || !mapViewState || !mapAutoFollow) return;
   const { allCoords, hasNextTarget, targetIndex, searchCircle: circle, currentLegCoords, combined } = mapViewState;
-  const viewOptions = { padding: getRotationAwarePadding(24), maxZoom: 19 };
+  const viewOptions = { ...getRotationAwarePadding(), maxZoom: 19 };
 
   if (!hasNextTarget) {
     // Geen volgende stop meer (tour voltooid) — dan juist wel de hele
@@ -1888,11 +1908,16 @@ function applyAutoMapView() {
   const targetPoints = circle
     ? [circle.getBounds().getNorthEast(), circle.getBounds().getSouthWest()]
     : [allCoords[targetIndex]];
-  const routePoints = currentLegCoords && currentLegCoords.length ? currentLegCoords : [];
-  // Zonder bekende locatie geldt de vorige (al bereikte) stop als "waar je bent".
-  const anchorPoint = lastKnownLatLng || allCoords[Math.max(targetIndex - 1, 0)];
 
-  autoFitBounds(leafletMap, [anchorPoint, ...targetPoints, ...routePoints], viewOptions);
+  if (!lastKnownLatLng) {
+    // Geen locatie bekend: gewoon de volgende stop zelf centreren/inzoomen,
+    // niet (ook) de vorige stop erbij — die is hier niet relevant.
+    autoFitBounds(leafletMap, targetPoints, viewOptions);
+    return;
+  }
+
+  const routePoints = currentLegCoords && currentLegCoords.length ? currentLegCoords : [];
+  autoFitBounds(leafletMap, [lastKnownLatLng, ...targetPoints, ...routePoints], viewOptions);
 }
 
 // Wrapper om fitBounds/setView die de dragstart/zoomstart-listener (zie
