@@ -228,7 +228,7 @@ const ROUTE_COORDS = [
   [52.380213, 4.6397552],  // Taverne De Waag
   [52.3803511, 4.6403448], // Teylers Museum
   [52.3820564, 4.6432713], // Teylers Hofje
-  [52.3843392, 4.6417865], // Molen De Adriaan — Zandersbrug, mooi zicht op de molen over het water
+  [52.3829127, 4.6429872], // Molen De Adriaan — Catharijnebrug, mooi zicht op de molen over het water
   [52.3835597, 4.6455402], // De Koepel
   [52.3805162, 4.6465988], // Amsterdamse Poort
   [52.3802938, 4.6411002], // Gravestenenbrug
@@ -967,7 +967,7 @@ function truncateAtRadius(legCoords, center, radius) {
 // hierboven), moet een al-gecachete looproute in de browser van een eerdere bezoeker
 // verdwijnen i.p.v. de oude (nu foute) route te blijven tonen. Simpelweg deze key
 // ophogen forceert dat voor alle varianten (volledige route, korte route, vervolg).
-const LEGS_CACHE_KEY = "haarlemTourRouteLegsCacheV4";
+const LEGS_CACHE_KEY = "haarlemTourRouteLegsCacheV5";
 
 function loadCachedLegsByKey(key, expectedCount) {
   try {
@@ -1013,10 +1013,11 @@ async function fetchSingleLeg(from, to) {
 // zodat de looproute een ander (nog steeds echt, over straten berekend) stuk gebruikt.
 // Sleutel: "<originalIndex-van>:<originalIndex-naar>".
 const FORCED_ROUTE_VIA_POINTS = {
-  // Molen De Adriaan (bij de Zandersbrug) -> Waalse Kerk: zonder dit tussenpunt loopt
-  // de korte route terug via Bakenessergracht/Zakstraat, hetzelfde stuk als de heenweg
-  // vanaf Teylers Museum. Met dit punt op Jansstraat loopt hij noordelijker, via
-  // Zakstraat -> Jansstraat -> Begijnesteeg -> Begijnhof (±530m i.p.v. ±437m direct).
+  // Molen De Adriaan (bij de Catharijnebrug) -> Waalse Kerk: zonder dit tussenpunt
+  // loopt de korte route vrijwel exact terug via Koudenhorn/Valkestraat/'t Krom/
+  // Vrouwestraat/Bakenessergracht, hetzelfde stuk als de heenweg vanaf Teylers
+  // Museum. Met dit punt op Jansstraat loopt hij noordelijker, via Koudenhorn ->
+  // Zakstraat -> Jansstraat -> Begijnesteeg -> Begijnhof (±640m i.p.v. ±488m direct).
   "5:9": [52.3835, 4.6385],
   // Waalse Kerk -> Ten Boom Museum: zonder dit tussenpunt loopt de route via de smalle,
   // onprettige Noorder Schoolsteeg. Met dit punt op de Grote Markt loopt hij via
