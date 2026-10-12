@@ -852,6 +852,7 @@ const audioBarClose = document.getElementById("audioBarClose");
 let leafletMap = null;
 let routeLineUnlocked = null;
 let routeLineCurrentLeg = null;
+let gpsTrailLine = null;
 let routeMarkers = [];
 let searchCircle = null;
 let hintMap = null;
@@ -1205,6 +1206,61 @@ function updateUserLocationMarker(map, key, latlng) {
   }
 }
 
+// ---- Echt gelopen GPS-spoor (zoals Google Maps' "afgelegde weg") ----
+const GPS_TRAIL_KEY = "haarlemTourGpsTrail";
+const GPS_TRAIL_MIN_ACCURACY = 30; // meter — slechtere metingen dan dit negeren
+const GPS_TRAIL_MIN_DISTANCE = 7; // meter — pas een nieuw punt opslaan na zoveel verplaatsing
+// (scheelt onnodig veel punten/batterijgebruik bij stilstaan)
+const GPS_TRAIL_MAX_JUMP = 120; // meter — een sprong groter dan dit tussen twee opeenvolgende
+// metingen is vrijwel zeker een GPS-hapering, geen echte verplaatsing, en wordt genegeerd.
+
+let gpsTrail = [];
+
+function loadGpsTrail() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(GPS_TRAIL_KEY));
+    if (Array.isArray(saved)) gpsTrail = saved;
+  } catch (e) {
+    // geen geldig opgeslagen spoor, gewoon leeg beginnen
+  }
+}
+
+function saveGpsTrail() {
+  try {
+    localStorage.setItem(GPS_TRAIL_KEY, JSON.stringify(gpsTrail));
+  } catch (e) {
+    // opslag vol of niet beschikbaar — het spoor blijft dan alleen voor deze sessie
+    // in het geheugen staan, net als elders in de app bij een opslagfout.
+  }
+}
+
+// Begint een vers spoor — bij het kiezen van een route aan het begin van een tour
+// (niet bij "Ga verder met de volledige route": dat is een vervolg, geen nieuwe tour).
+function resetGpsTrail() {
+  gpsTrail = [];
+  try {
+    localStorage.removeItem(GPS_TRAIL_KEY);
+  } catch (e) {
+    // niet beschikbaar — geen probleem, gpsTrail is hierboven toch al leeg
+  }
+  if (gpsTrailLine) gpsTrailLine.setLatLngs([]);
+}
+
+// Voegt een nieuwe GPS-meting toe aan het spoor, met filtering tegen slechte
+// metingen (lage nauwkeurigheid) en onrealistische sprongen.
+function recordGpsPoint(latlng, accuracy) {
+  if (typeof accuracy === "number" && accuracy > GPS_TRAIL_MIN_ACCURACY) return;
+  const last = gpsTrail[gpsTrail.length - 1];
+  if (last) {
+    const dist = haversineMeters(last, latlng);
+    if (dist < GPS_TRAIL_MIN_DISTANCE) return;
+    if (dist > GPS_TRAIL_MAX_JUMP) return;
+  }
+  gpsTrail.push(latlng);
+  saveGpsTrail();
+  if (gpsTrailLine) gpsTrailLine.setLatLngs(gpsTrail);
+}
+
 // Eén enkele, doorlopende locatiewaarneming voor de hele tour (niet per kaartje) —
 // werkt alleen op HTTPS of localhost, zoals bij elke website met Geolocation.
 function startLocationTracking() {
@@ -1215,6 +1271,7 @@ function startLocationTracking() {
       updateUserLocationMarker(leafletMap, "main", lastKnownLatLng);
       updateUserLocationMarker(hintMap, "hint", lastKnownLatLng);
       updateUserLocationMarker(revealMap, "reveal", lastKnownLatLng);
+      recordGpsPoint(lastKnownLatLng, pos.coords.accuracy);
       // Een nieuwe locatie (bv. de allereerste fix, die er bij het openen van de
       // kaart nog niet was) mag de kaart opnieuw op "jou + volgende stop" zetten —
       // maar alleen als de speler zelf nog niet aan de kaart heeft gezeten.
@@ -1301,6 +1358,7 @@ async function requestLocationAccess() {
       updateUserLocationMarker(leafletMap, "main", lastKnownLatLng);
       updateUserLocationMarker(hintMap, "hint", lastKnownLatLng);
       updateUserLocationMarker(revealMap, "reveal", lastKnownLatLng);
+      recordGpsPoint(lastKnownLatLng, pos.coords.accuracy);
       if (state.phase === "map") applyAutoMapView();
       updateEnableLocationButton();
       startLocationTracking(); // vanaf hier ook weer doorlopend volgen
@@ -1456,6 +1514,10 @@ function initMapIfNeeded() {
   // Het laatste stukje — van je vorige stop naar de stop die je nu moet vinden —
   // krijgt een eigen kleur, zodat meteen duidelijk is welk stuk je nu moet lopen.
   routeLineCurrentLeg = L.polyline([], { color: "#a0522d", weight: 6 }).addTo(leafletMap);
+  // Jouw echte, gelopen pad (uit GPS-metingen) — zelfde goudkleur als "afgelegd",
+  // bovenop de geplande route getekend. Begint meteen gevuld als er al een spoor
+  // bewaard was (bv. na een paginaherlaad halverwege de wandeling).
+  gpsTrailLine = L.polyline(gpsTrail, { color: "#d1a349", weight: 4, opacity: 0.9 }).addTo(leafletMap);
   updateUserLocationMarker(leafletMap, "main", lastKnownLatLng);
 
   // Zodra de speler zelf zoomt of sleept, stopt de automatische "jou + volgende
@@ -2829,6 +2891,7 @@ function chooseRoute(routeType) {
   state.routeType = routeType;
   STOPS = buildActiveStops(routeType);
   rememberActiveStops();
+  resetGpsTrail(); // nieuwe tour -> vers spoor (i.t.t. "Ga verder met de volledige route")
   saveState();
   render();
 }
@@ -3276,6 +3339,7 @@ btnRestartTour.addEventListener("click", () => {
     // routeType ontbreekt bewust — render() toont dan weer het keuzescherm.
   };
   STOPS = [];
+  resetGpsTrail();
   render();
 });
 
@@ -3286,6 +3350,7 @@ btnBack.addEventListener("click", () => {
   render();
 });
 
+loadGpsTrail();
 loadState();
 render();
 // Bij een paginaherlaad halverwege de tour (dus na het introscherm) meteen weer
