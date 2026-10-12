@@ -726,6 +726,7 @@ function loadState() {
       if (!state.hintsUsed) state.hintsUsed = {};
       if (!state.answersRevealed) state.answersRevealed = {};
       if (typeof state.points !== "number") state.points = STARTING_POINTS;
+      if (typeof state.currentLegProgress !== "number") state.currentLegProgress = 0;
       // Oudere opgeslagen voortgang kende nog geen routekeuze — die speler was
       // altijd al op de volledige route bezig, dus die blijft daar gewoon verder gaan.
       if (!state.routeType) state.routeType = "full";
@@ -882,8 +883,13 @@ const audioBarClose = document.getElementById("audioBarClose");
 let leafletMap = null;
 let routeLineUnlocked = null;
 let routeLineCurrentLeg = null;
-let gpsTrailLine = null;
+let routeLineLegDone = null; // het al-afgelegde stuk van de HUIDIGE etappe (zelfde goudkleur als routeLineUnlocked)
 let routeMarkers = [];
+// De ruwe coördinaten + cumulatieve afstanden van de huidige etappe, bewaard zodat
+// een binnenkomende GPS-meting (zie updateLegProgress) z'n voortgang erop kan
+// projecteren zonder de hele kaart opnieuw te hoeven opbouwen.
+let currentLegCoordsForProgress = null;
+let currentLegCumForProgress = null;
 let searchCircle = null;
 let hintMap = null;
 let hintMapCircle = null;
@@ -989,6 +995,86 @@ function truncateAtRadius(legCoords, center, radius) {
     }
   }
   return legCoords;
+}
+
+// ---- Afgelegd deel van de huidige etappe (echte voortgang i.p.v. een los GPS-spoor) ----
+// In plaats van je ruwe GPS-posities als eigen lijntje te tekenen (dat liep nogal
+// eens uit de pas met de echte straten), projecteren we je locatie op de geplande
+// routelijn zelf: alles vóór dat punt krijgt de "afgelegd"-kleur, de rest blijft de
+// normale kleur — precies zoals Google Maps dat doet.
+
+// Dichtstbijzijnde punt op lijnstuk a-b t.o.v. punt p, met een eenvoudige platte
+// (lokale) benadering — ruim nauwkeurig genoeg voor afstanden van een paar honderd
+// meter. Geeft het punt zelf terug, plus t (0-1) voor waar op het stuk dat ligt.
+function closestPointOnSegment(a, b, p) {
+  const mPerDegLat = 111320;
+  const mPerDegLng = 111320 * Math.cos((a[0] * Math.PI) / 180);
+  const abx = (b[1] - a[1]) * mPerDegLng;
+  const aby = (b[0] - a[0]) * mPerDegLat;
+  const apx = (p[1] - a[1]) * mPerDegLng;
+  const apy = (p[0] - a[0]) * mPerDegLat;
+  const lenSq = abx * abx + aby * aby;
+  let t = lenSq === 0 ? 0 : (apx * abx + apy * aby) / lenSq;
+  t = Math.max(0, Math.min(1, t));
+  const point = [a[0] + ((b[0] - a[0]) * t), a[1] + ((b[1] - a[1]) * t)];
+  return { point, t };
+}
+
+// Cumulatieve afstand (in meters) per punt van een lijn — legCoords[i] ligt op
+// cum[i] meter vanaf het begin.
+function cumulativeDistances(legCoords) {
+  const cum = [0];
+  for (let i = 1; i < legCoords.length; i++) {
+    cum.push(cum[i - 1] + haversineMeters(legCoords[i - 1], legCoords[i]));
+  }
+  return cum;
+}
+
+// Hoever ben je (in meters vanaf het begin van de etappe) op basis van een nieuwe
+// GPS-meting? Zoekt alleen binnen een venster rond je huidige, al bekende
+// voortgang — niet over de hele etappe — zodat een route die verderop toevallig
+// weer dicht langs dit punt komt je voortgang niet per ongeluk laat "springen".
+// Geeft null terug als er (binnen dat venster) geen punt dicht genoeg bij ligt.
+const LEG_PROGRESS_BACK_WINDOW_M = 60;
+const LEG_PROGRESS_FORWARD_WINDOW_M = 150;
+const LEG_PROGRESS_OFFROUTE_M = 40;
+
+function matchProgressOnLeg(legCoords, cum, gpsLatLng, priorProgressM) {
+  const totalLen = cum[cum.length - 1];
+  const windowStart = Math.max(0, priorProgressM - LEG_PROGRESS_BACK_WINDOW_M);
+  const windowEnd = Math.min(totalLen, priorProgressM + LEG_PROGRESS_FORWARD_WINDOW_M);
+  let best = null;
+  for (let i = 1; i < legCoords.length; i++) {
+    const segStart = cum[i - 1];
+    const segEnd = cum[i];
+    if (segEnd < windowStart || segStart > windowEnd) continue;
+    const { point, t } = closestPointOnSegment(legCoords[i - 1], legCoords[i], gpsLatLng);
+    const progressM = segStart + t * (segEnd - segStart);
+    const distM = haversineMeters(point, gpsLatLng);
+    if (!best || distM < best.distM) best = { distM, progressM };
+  }
+  return best;
+}
+
+// Knipt een lijn in tweeën op een gegeven afstand (meters) vanaf het begin —
+// zelfde interpolatie-aanpak als truncateAtRadius hierboven, maar op afstand
+// i.p.v. op een cirkelrand.
+function splitAtDistance(legCoords, cum, targetDistM) {
+  const total = cum[cum.length - 1];
+  const d = Math.max(0, Math.min(total, targetDistM));
+  for (let i = 1; i < legCoords.length; i++) {
+    if (cum[i] >= d) {
+      const segStart = cum[i - 1];
+      const segEnd = cum[i];
+      const t = segEnd === segStart ? 0 : (d - segStart) / (segEnd - segStart);
+      const boundary = [
+        legCoords[i - 1][0] + (legCoords[i][0] - legCoords[i - 1][0]) * t,
+        legCoords[i - 1][1] + (legCoords[i][1] - legCoords[i - 1][1]) * t
+      ];
+      return { done: [...legCoords.slice(0, i), boundary], remaining: [boundary, ...legCoords.slice(i)] };
+    }
+  }
+  return { done: legCoords, remaining: legCoords.length ? [legCoords[legCoords.length - 1]] : [] };
 }
 
 // Onthoudt eerder opgehaalde looproutes lokaal in de browser, zodat we niet bij
@@ -1237,59 +1323,36 @@ function updateUserLocationMarker(map, key, latlng) {
   }
 }
 
-// ---- Echt gelopen GPS-spoor (zoals Google Maps' "afgelegde weg") ----
-const GPS_TRAIL_KEY = "haarlemTourGpsTrail";
-const GPS_TRAIL_MIN_ACCURACY = 30; // meter — slechtere metingen dan dit negeren
-const GPS_TRAIL_MIN_DISTANCE = 7; // meter — pas een nieuw punt opslaan na zoveel verplaatsing
-// (scheelt onnodig veel punten/batterijgebruik bij stilstaan)
-const GPS_TRAIL_MAX_JUMP = 120; // meter — een sprong groter dan dit tussen twee opeenvolgende
-// metingen is vrijwel zeker een GPS-hapering, geen echte verplaatsing, en wordt genegeerd.
+// ---- Afgelegd deel van de huidige etappe, op basis van je echte GPS-positie ----
+const LEG_PROGRESS_MIN_ACCURACY = 30; // meter — slechtere metingen negeren
 
-let gpsTrail = [];
-
-function loadGpsTrail() {
-  try {
-    const saved = JSON.parse(localStorage.getItem(GPS_TRAIL_KEY));
-    if (Array.isArray(saved)) gpsTrail = saved;
-  } catch (e) {
-    // geen geldig opgeslagen spoor, gewoon leeg beginnen
-  }
+// Begint met een schone lei — bij het kiezen van een route aan het begin van een
+// tour, en bij volledig herstarten (niet bij "Ga verder met de volledige route",
+// dat is een vervolg, geen nieuwe tour — zie updateMapProgress() voor hoe de
+// voortgang daar vanzelf weer bij 0 begint zodra de etappe zelf verandert).
+function resetLegProgress() {
+  state.currentLegProgress = 0;
+  state.currentLegProgressKey = null;
+  if (routeLineLegDone) routeLineLegDone.setLatLngs([]);
 }
 
-function saveGpsTrail() {
-  try {
-    localStorage.setItem(GPS_TRAIL_KEY, JSON.stringify(gpsTrail));
-  } catch (e) {
-    // opslag vol of niet beschikbaar — het spoor blijft dan alleen voor deze sessie
-    // in het geheugen staan, net als elders in de app bij een opslagfout.
-  }
-}
-
-// Begint een vers spoor — bij het kiezen van een route aan het begin van een tour
-// (niet bij "Ga verder met de volledige route": dat is een vervolg, geen nieuwe tour).
-function resetGpsTrail() {
-  gpsTrail = [];
-  try {
-    localStorage.removeItem(GPS_TRAIL_KEY);
-  } catch (e) {
-    // niet beschikbaar — geen probleem, gpsTrail is hierboven toch al leeg
-  }
-  if (gpsTrailLine) gpsTrailLine.setLatLngs([]);
-}
-
-// Voegt een nieuwe GPS-meting toe aan het spoor, met filtering tegen slechte
-// metingen (lage nauwkeurigheid) en onrealistische sprongen.
-function recordGpsPoint(latlng, accuracy) {
-  if (typeof accuracy === "number" && accuracy > GPS_TRAIL_MIN_ACCURACY) return;
-  const last = gpsTrail[gpsTrail.length - 1];
-  if (last) {
-    const dist = haversineMeters(last, latlng);
-    if (dist < GPS_TRAIL_MIN_DISTANCE) return;
-    if (dist > GPS_TRAIL_MAX_JUMP) return;
-  }
-  gpsTrail.push(latlng);
-  saveGpsTrail();
-  if (gpsTrailLine) gpsTrailLine.setLatLngs(gpsTrail);
+// Verwerkt een nieuwe GPS-meting: projecteert 'm op de huidige etappe (zie
+// matchProgressOnLeg hierboven) en werkt zo nodig de voortgang bij. Doet niets
+// als er geen "huidige etappe" bekend is, de meting te onnauwkeurig is, je te
+// ver van de route af bent (±40 m), of de voortgang er niet écht door vooruitgaat.
+function updateLegProgress(gpsLatLng, accuracy) {
+  if (typeof accuracy === "number" && accuracy > LEG_PROGRESS_MIN_ACCURACY) return;
+  if (!currentLegCoordsForProgress || !currentLegCumForProgress) return;
+  const prior = state.currentLegProgress || 0;
+  const match = matchProgressOnLeg(currentLegCoordsForProgress, currentLegCumForProgress, gpsLatLng, prior);
+  if (!match || match.distM > LEG_PROGRESS_OFFROUTE_M) return; // geen (goed genoeg) punt binnen bereik
+  const newProgress = Math.max(prior, match.progressM); // voortgang mag alleen vooruit
+  if (newProgress === prior) return;
+  state.currentLegProgress = newProgress;
+  saveState();
+  const { done, remaining } = splitAtDistance(currentLegCoordsForProgress, currentLegCumForProgress, newProgress);
+  routeLineLegDone.setLatLngs(done);
+  routeLineCurrentLeg.setLatLngs(remaining);
 }
 
 // Eén enkele, doorlopende locatiewaarneming voor de hele tour (niet per kaartje) —
@@ -1302,7 +1365,7 @@ function startLocationTracking() {
       updateUserLocationMarker(leafletMap, "main", lastKnownLatLng);
       updateUserLocationMarker(hintMap, "hint", lastKnownLatLng);
       updateUserLocationMarker(revealMap, "reveal", lastKnownLatLng);
-      recordGpsPoint(lastKnownLatLng, pos.coords.accuracy);
+      updateLegProgress(lastKnownLatLng, pos.coords.accuracy);
       // Een nieuwe locatie (bv. de allereerste fix, die er bij het openen van de
       // kaart nog niet was) mag de kaart opnieuw op "jou + volgende stop" zetten —
       // maar alleen als de speler zelf nog niet aan de kaart heeft gezeten.
@@ -1389,7 +1452,7 @@ async function requestLocationAccess() {
       updateUserLocationMarker(leafletMap, "main", lastKnownLatLng);
       updateUserLocationMarker(hintMap, "hint", lastKnownLatLng);
       updateUserLocationMarker(revealMap, "reveal", lastKnownLatLng);
-      recordGpsPoint(lastKnownLatLng, pos.coords.accuracy);
+      updateLegProgress(lastKnownLatLng, pos.coords.accuracy);
       if (state.phase === "map") applyAutoMapView();
       updateEnableLocationButton();
       startLocationTracking(); // vanaf hier ook weer doorlopend volgen
@@ -1570,10 +1633,10 @@ function initMapIfNeeded() {
   // Het laatste stukje — van je vorige stop naar de stop die je nu moet vinden —
   // krijgt een eigen kleur, zodat meteen duidelijk is welk stuk je nu moet lopen.
   routeLineCurrentLeg = L.polyline([], { color: "#a0522d", weight: 6 }).addTo(leafletMap);
-  // Jouw echte, gelopen pad (uit GPS-metingen) — zelfde goudkleur als "afgelegd",
-  // bovenop de geplande route getekend. Begint meteen gevuld als er al een spoor
-  // bewaard was (bv. na een paginaherlaad halverwege de wandeling).
-  gpsTrailLine = L.polyline(gpsTrail, { color: "#d1a349", weight: 4, opacity: 0.9 }).addTo(leafletMap);
+  // Het al-afgelegde stuk van de HUIDIGE etappe — zelfde goudkleur als
+  // routeLineUnlocked (eerdere etappes), maar los bijgewerkt op basis van je GPS-
+  // voortgang (zie updateLegProgress) i.p.v. pas bij het voltooien van de hele etappe.
+  routeLineLegDone = L.polyline([], { color: "#d1a349", weight: 5 }).addTo(leafletMap);
   updateUserLocationMarker(leafletMap, "main", lastKnownLatLng);
 
   // Zodra de speler zelf zoomt of sleept, stopt de automatische "jou + volgende
@@ -1777,7 +1840,28 @@ function updateMapProgress(routeContext, legs) {
     }
   }
   routeLineUnlocked.setLatLngs(combined);
-  routeLineCurrentLeg.setLatLngs(currentLegCoords);
+
+  // De "huidige etappe" verandert zodra je bij een andere stop-overgang bent — dan
+  // begint de voortgang (het afgelegde stuk) weer vers bij 0. targetStop.originalIndex
+  // zit ook in de sleutel zodat dit ook klopt na "Ga verder met de volledige route"
+  // (waar STOPS een heel andere, resterende lijst wordt, met currentStep weer vanaf -1).
+  const legKey = `${state.currentStep}:${hasNextTarget ? targetStop.originalIndex : "end"}`;
+  if (state.currentLegProgressKey !== legKey) {
+    state.currentLegProgressKey = legKey;
+    state.currentLegProgress = 0;
+    saveState();
+  }
+  currentLegCoordsForProgress = currentLegCoords;
+  currentLegCumForProgress = currentLegCoords.length > 1 ? cumulativeDistances(currentLegCoords) : null;
+
+  if (currentLegCumForProgress && state.currentLegProgress > 0) {
+    const { done, remaining } = splitAtDistance(currentLegCoords, currentLegCumForProgress, state.currentLegProgress);
+    routeLineLegDone.setLatLngs(done);
+    routeLineCurrentLeg.setLatLngs(remaining);
+  } else {
+    routeLineLegDone.setLatLngs([]);
+    routeLineCurrentLeg.setLatLngs(currentLegCoords);
+  }
 
   // Alleen opgeloste stops + de eerstvolgende (nog niet opgeloste) bestemming zijn zichtbaar.
   routeMarkers.forEach((m) => leafletMap.removeLayer(m));
@@ -2990,7 +3074,7 @@ function chooseRoute(routeType) {
   state.routeType = routeType;
   STOPS = buildActiveStops(routeType);
   rememberActiveStops();
-  resetGpsTrail(); // nieuwe tour -> vers spoor (i.t.t. "Ga verder met de volledige route")
+  resetLegProgress(); // nieuwe tour -> verse voortgang (i.t.t. "Ga verder met de volledige route")
   saveState();
   render();
 }
@@ -3455,7 +3539,7 @@ btnRestartTour.addEventListener("click", () => {
     // routeType ontbreekt bewust — render() toont dan weer het keuzescherm.
   };
   STOPS = [];
-  resetGpsTrail();
+  resetLegProgress();
   render();
 });
 
@@ -3466,7 +3550,6 @@ btnBack.addEventListener("click", () => {
   render();
 });
 
-loadGpsTrail();
 loadState();
 render();
 // Bij een paginaherlaad halverwege de tour (dus na het introscherm) meteen weer
