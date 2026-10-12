@@ -235,8 +235,19 @@ const ROUTE_COORDS = [
   [52.3824868, 4.6391539], // Waalse Kerk
   [52.3846693, 4.6374257], // Huis Barnaart
   [52.3873225, 4.6369366], // Monument Kenau Simonsdochter
-  [52.387054, 4.633841],   // Vrouw in het Verzet monument
+  [52.387054, 4.633841],   // Vrouw in het Verzet monument (Hannie Schaft)
+  // Geen eigen opdracht — puur voor de looproute: door het Kenaupark naar de
+  // westkant, dan langs de Kinderhuisvest, en bij de Magdalenastraat naar binnen.
+  [52.3863, 4.6319],       // Kenaupark, westkant
+  [52.3843, 4.6309],       // Kinderhuisvest
+  [52.384, 4.6318],        // Magdalenastraat (ingang)
   [52.3840052, 4.6314806], // Lutherse Hofje
+  // Geen eigen opdracht — puur voor de looproute naar het Hofje van Oorschot:
+  // via de Witte Herenstraat, de Zijlstraat, de Zoetestraat en de Krocht.
+  [52.3834483, 4.6316727], // Witte Herenstraat
+  [52.3825, 4.6321],       // Zijlstraat
+  [52.3829009, 4.6333409], // Zoetestraat
+  [52.3830186, 4.6347567], // Krocht
   [52.3832175, 4.6349943], // Hofje van Oorschot
   [52.382251, 4.6353127],  // Ten Boom Museum
   [52.3814994, 4.6334517], // Prinsenhof
@@ -249,8 +260,17 @@ const ROUTE_COORDS = [
 
 // Koppelt elke ROUTE_COORDS-positie aan de bijbehorende STOPS-index, of null als dat
 // punt geen eigen opdracht heeft (de looproute loopt er wel gewoon langs, bv. het
-// Stadsklooster). Hierdoor hoeven ROUTE_COORDS en STOPS niet meer 1-op-1 gelijk te lopen.
-const ROUTE_STOP_INDEX = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, null, 20];
+// Stadsklooster, en sinds kort ook de route rond de Lutherse Kerk). Hierdoor hoeven
+// ROUTE_COORDS en STOPS niet meer 1-op-1 gelijk te lopen.
+const ROUTE_STOP_INDEX = [
+  0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+  null, null, null, // Kenaupark / Kinderhuisvest / Magdalenastraat
+  13, // Lutherse Hofje
+  null, null, null, null, // Witte Herenstraat / Zijlstraat / Zoetestraat / Krocht
+  14, 15, 16, 17, 18, 19,
+  null, // Stadsklooster
+  20
+];
 
 // Omgekeerde opzoektabel: voor een STOPS-index, op welke ROUTE_COORDS-positie staat 'ie.
 const STOP_TO_ROUTE_INDEX = ROUTE_STOP_INDEX.reduce((acc, stopIdx, routeIdx) => {
@@ -967,7 +987,7 @@ function truncateAtRadius(legCoords, center, radius) {
 // hierboven), moet een al-gecachete looproute in de browser van een eerdere bezoeker
 // verdwijnen i.p.v. de oude (nu foute) route te blijven tonen. Simpelweg deze key
 // ophogen forceert dat voor alle varianten (volledige route, korte route, vervolg).
-const LEGS_CACHE_KEY = "haarlemTourRouteLegsCacheV6";
+const LEGS_CACHE_KEY = "haarlemTourRouteLegsCacheV7";
 
 function loadCachedLegsByKey(key, expectedCount) {
   try {
