@@ -1794,10 +1794,25 @@ function updateMapProgress(routeContext, legs) {
 // ver inzoomt als je al vlakbij bent. Is je locatie (nog) niet bekend, dan
 // zoomt hij in plaats daarvan op de huidige stop + de volgende stop.
 // Doet niets zolang mapAutoFollow uit staat (de speler zit zelf aan de kaart).
+// .map-rotate-wrapper (zie tour.css, voor het meedraaien met je kijkrichting) is
+// altijd 160% van het zichtbare kaartvenster, ook als er niet gedraaid wordt —
+// Leaflet kent alleen die volle (deels onzichtbare) containergrootte. Zonder
+// compensatie verdeelt fitBounds de inhoud dus over een container die 60% groter
+// is dan wat je echt ziet, en oogt de kaart daardoor onnodig uitgezoomd. Deze
+// functie rekent dat om naar echte pixel-padding, zodat het resultaat past
+// binnen het werkelijk zichtbare venster.
+function getRotationAwarePadding(basePaddingPx) {
+  if (!leafletMap) return [basePaddingPx, basePaddingPx];
+  const size = leafletMap.getSize();
+  const hiddenMarginX = size.x * 0.3;
+  const hiddenMarginY = size.y * 0.3;
+  return [hiddenMarginX + basePaddingPx, hiddenMarginY + basePaddingPx];
+}
+
 function applyAutoMapView() {
   if (!leafletMap || !mapViewState || !mapAutoFollow) return;
   const { allCoords, hasNextTarget, targetIndex, searchCircle: circle, currentLegCoords, combined } = mapViewState;
-  const viewOptions = { padding: [50, 50], maxZoom: 18 };
+  const viewOptions = { padding: getRotationAwarePadding(24), maxZoom: 19 };
 
   if (!hasNextTarget) {
     // Geen volgende stop meer (tour voltooid) — dan juist wel de hele
