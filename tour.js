@@ -1822,9 +1822,18 @@ function updateMapProgress(routeContext, legs) {
     ? targetStop.searchCenter || getSearchCircleCenter(allCoords[targetIndex], targetIndex, circleRadius)
     : null;
 
-  // Het laatste stukje (van je vorige stop naar de nieuwste/huidige stop) gaat apart
-  // in routeLineCurrentLeg i.p.v. bij de rest — maar alleen als er ook echt een
-  // huidige stop is; anders (tour voltooid) blijft alles gewoon samen zoals voorheen.
+  // Alles SINDS je laatst voltooide échte stop (niet: alleen het allerlaatste
+  // opgehaalde OSRM-stukje) gaat in routeLineCurrentLeg i.p.v. bij de rest. Tussen
+  // twee stops kunnen meerdere losse OSRM-stukjes zitten — bv. via een onzichtbaar
+  // tussenpunt dat de route een bepaalde straat in stuurt (zie bv. de Korte
+  // Houtstraat tussen Nieuwe Kerk en Frans Hals) — en die horen dan ALLEMAAL nog
+  // bij "nog te lopen", niet alleen het laatste stukje. Zonder dit werd zo'n
+  // eerder tussenstukje altijd meteen goud getekend, ongeacht of je er al liep.
+  const prevStopAllCoordsIndex = hasNextTarget
+    ? state.currentStep >= 0
+      ? allCoordsIndexForStop[state.currentStep]
+      : 0
+    : 0;
   let combined = [];
   let currentLegCoords = [];
   for (let i = 0; i < targetIndex && i < legs.length; i++) {
@@ -1833,8 +1842,8 @@ function updateMapProgress(routeContext, legs) {
       isLastLegToTarget && targetIsPhotoSearch
         ? truncateAtRadius(legs[i], circleCenter, circleRadius)
         : legs[i];
-    if (isLastLegToTarget && hasNextTarget) {
-      currentLegCoords = leg;
+    if (hasNextTarget && i >= prevStopAllCoordsIndex) {
+      currentLegCoords = currentLegCoords.concat(leg);
     } else {
       combined = combined.concat(leg);
     }
