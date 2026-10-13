@@ -307,21 +307,15 @@ STOPS_NL[0].hintSearchRadius = 30;
 STOPS_NL[3].skipCircle = true;
 // Op het antwoordscherm is de kaart hier overbodig — alleen de foto is nodig.
 STOPS_NL[3].skipRevealMap = true;
-// Zonder deze tip fotograferen spelers vaak het hele gebouw i.p.v. alleen het
-// beeldengroepje op het dak (dat is het enige wat de foto-check verwacht).
-STOPS_NL[3].tip = "Tip: fotografeer alleen het beeldengroepje op het dak, niet het hele gebouw.";
 
 // Stop 6 (Molen De Adriaan): geen kaartje bij de extra hint nodig (de hoofdkaart
-// wijst al de weg) — wel een kleine tip onder de eerste hint.
+// wijst al de weg).
 STOPS_NL[5].skipHintMap = true;
-STOPS_NL[5].tip = "Tip: maak de foto vanaf de brug, aan de overkant van het water.";
 
 // Stop 8 (Amsterdamse Poort): geen zoekcirkel, de kaart wijst direct naar de stop —
 // en op de antwoordpagina is alleen de foto nodig, geen kaart.
 STOPS_NL[7].skipCircle = true;
 STOPS_NL[7].skipRevealMap = true;
-// De foto-check verwacht de drie wapentekens, niet de hele poort.
-STOPS_NL[7].tip = "Tip: zoom in op de drie wapentekens boven de doorgang, niet de hele poort.";
 
 // Stop 10 (Waalse Kerk): het te fotograferen beeldje is klein en lastig te vinden —
 // een kleinere cirkel, precies gecentreerd op het beeldje zelf, maakt de zoektocht behapbaar.
@@ -343,13 +337,9 @@ STOPS_NL[11].hintSearchRadius = 30;
 STOPS_NL[19].skipCircle = true;
 // Op het antwoordscherm is de kaart hier overbodig — alleen de foto is nodig.
 STOPS_NL[19].skipRevealMap = true;
-// De foto-check verwacht alleen de geveltop, niet het hele gebouw.
-STOPS_NL[19].tip = "Tip: fotografeer alleen de geveltop, niet het hele gebouw.";
 
 // Stop 21 (Stadhuis Haarlem): geen zoekcirkel, de kaart wijst direct naar de stop.
 STOPS_NL[20].skipCircle = true;
-// De foto-check verwacht de gevelsteen boven de ingang, niet het hele stadhuis.
-STOPS_NL[20].tip = "Tip: fotografeer de gevelsteen boven de ingang, niet het hele stadhuis.";
 
 // Gedeelde uitlegpagina over Romeinse cijfers (met een willekeurig ander voorbeeldjaar,
 // nooit het echte antwoord) — herbruikbaar bij elke stop waar het jaartal zo genoteerd staat.
@@ -439,7 +429,6 @@ const EN_OVERRIDES = [
     hint: "High above the facade, a weathered company keeps watch, green with age.",
     extraHint: "A winged figure raises two laurel wreaths, while her companions look on in silence.",
     answer: "The group of weathered green bronze statues on top of the roof of Teylers Museum.",
-    tip: "Tip: photograph just the statue group on the roof, not the whole building.",
     type: "photo"
   },
   {
@@ -458,7 +447,6 @@ const EN_OVERRIDES = [
     hint: "By the water, a giant with waving arms has been turning for centuries.",
     extraHint: "It's a real windmill with wooden sails, right next to the water where boats are moored.",
     answer: "Windmill De Adriaan, the wooden polder windmill on the Spaarne river.",
-    tip: "Tip: take the photo from the bridge, across the water.",
     type: "photo"
   },
   {
@@ -476,7 +464,6 @@ const EN_OVERRIDES = [
     hint: "High in the brick wall of the gate, three silent emblems hide, built into the stone through the centuries.",
     extraHint: "Look for the row of three diamond-shaped emblems above the passage, with a woven knot in the middle.",
     answer: "The three diamond-shaped emblems built into the wall of the Amsterdam Gate, with a woven knot in the middle.",
-    tip: "Tip: zoom in on the three emblems above the passage, not the whole gate.",
     type: "photo"
   },
   {
@@ -586,7 +573,6 @@ const EN_OVERRIDES = [
     hint: "Not the door, but the top of the facade hides two stone guardians.",
     extraHint: "Between them stands a coat of arms with a year that begins with 19.",
     answer: "The gable top with the year 1912, two statues on the corners, and a small statue at the very top.",
-    tip: "Tip: photograph just the top of the gable, not the whole building.",
     type: "photo"
   },
   {
@@ -595,7 +581,6 @@ const EN_OVERRIDES = [
     hint: "Above the entrance, a facade has been speaking for centuries in an old, forgotten language.",
     extraHint: "Golden letters on a dark background, a Latin inscription above the door.",
     answer: "The gable stone above the entrance, inscribed 'S.P.Q.H.' with the year 1630.",
-    tip: "Tip: photograph the gable stone above the entrance, not the whole city hall.",
     type: "photo"
   }
 ];
@@ -2273,8 +2258,12 @@ function renderStep() {
   stepKicker.textContent = t("stopKicker", { n: displayStopNumber(), total: displayStopTotal() });
   stepTitle.textContent = stop.title;
   stepHint.textContent = stop.hint;
-  stepTip.textContent = stop.tip || "";
-  stepTip.classList.toggle("hidden", !stop.tip);
+  // Eén gedeelde, generieke tip voor elke foto-opdracht (niet per stop apart
+  // geschreven, zodat 'ie nooit per ongeluk te veel weggeeft over wat je precies
+  // moet vinden) — zie "photoTip" in i18n.js.
+  const isPhotoStop = stop.type === "photo";
+  stepTip.textContent = isPhotoStop ? t("photoTip") : "";
+  stepTip.classList.toggle("hidden", !isPhotoStop);
 
   // Hint/antwoord-status blijft bewaard per stop, ook na weg- en terugnavigeren
   // of een paginaherlaad — dus we resetten dit niet meer bij elk bezoek.
