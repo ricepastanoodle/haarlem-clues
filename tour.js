@@ -230,7 +230,9 @@ const ROUTE_COORDS = [
   [52.3820564, 4.6432713], // Teylers Hofje
   [52.3829127, 4.6429872], // Molen De Adriaan — Catharijnebrug, mooi zicht op de molen over het water
   [52.3835597, 4.6455402], // De Koepel
-  [52.3805162, 4.6465988], // Amsterdamse Poort
+  [52.3803858, 4.6460264], // Amsterdamse Poort — exact in de doorgang, eind van de Spaarnwouderstraat
+  // (dit is zelfs een apart getagde weg genaamd "Amsterdamse Poort" in OpenStreetMap,
+  // dus deze coördinaat is geverifieerd, niet geschat)
   [52.3802938, 4.6411002], // Gravestenenbrug
   [52.3824868, 4.6391539], // Waalse Kerk
   [52.3846693, 4.6374257], // Huis Barnaart
@@ -856,6 +858,7 @@ const btnContinue = document.getElementById("btnContinue");
 const btnAudio = document.getElementById("btnAudio");
 
 const mapKicker = document.getElementById("mapKicker");
+const mapCircleHint = document.getElementById("mapCircleHint");
 const btnRecenterMap = document.getElementById("btnRecenterMap");
 const btnEnableLocation = document.getElementById("btnEnableLocation");
 const btnToggleRotate = document.getElementById("btnToggleRotate");
@@ -1085,7 +1088,7 @@ function splitAtDistance(legCoords, cum, targetDistM) {
 // hierboven), moet een al-gecachete looproute in de browser van een eerdere bezoeker
 // verdwijnen i.p.v. de oude (nu foute) route te blijven tonen. Simpelweg deze key
 // ophogen forceert dat voor alle varianten (volledige route, korte route, vervolg).
-const LEGS_CACHE_KEY = "haarlemTourRouteLegsCacheV9";
+const LEGS_CACHE_KEY = "haarlemTourRouteLegsCacheV10";
 
 function loadCachedLegsByKey(key, expectedCount) {
   try {
@@ -1818,6 +1821,10 @@ function updateMapProgress(routeContext, legs) {
     : allCoords.length - 1; // geen stops meer over -> toon de hele resterende route, incl. routepunten zonder stop
   const targetStop = hasNextTarget ? STOPS[state.currentStep + 1] : null;
   const targetIsPhotoSearch = hasNextTarget && targetStop.type === "photo" && !targetStop.skipCircle;
+  // De extra uitlegregel over de gouden cirkel alleen tonen als de volgende stop er
+  // ook écht een heeft (bv. niet bij de Molen, die skipCircle heeft) — puur
+  // data-gedreven via dezelfde targetIsPhotoSearch-check die de cirkel zelf tekent.
+  mapCircleHint.classList.toggle("hidden", !targetIsPhotoSearch);
   // Sommige stops hebben een eigen straal/middelpunt (bv. stop 1 op de Grote Markt).
   const circleRadius = targetIsPhotoSearch ? targetStop.searchRadius || SEARCH_RADIUS_METERS : null;
   const circleCenter = targetIsPhotoSearch
