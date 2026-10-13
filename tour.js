@@ -254,7 +254,11 @@ const ROUTE_COORDS = [
   [52.3832175, 4.6349943], // Hofje van Oorschot
   [52.382251, 4.6353127],  // Ten Boom Museum
   [52.3814994, 4.6334517], // Prinsenhof
-  [52.3812145, 4.6297315], // Jopen
+  // Geen eigen opdracht — puur voor de looproute: via de Drossestraat, dan het
+  // Hortusplein naar de Jopenkerk (niet achterlangs via Zuiderstraat/Boereplein).
+  [52.3814903, 4.6310771], // Drossestraat
+  [52.3815, 4.6298],       // Hortusplein
+  [52.3813, 4.6298],       // Jopenkerk — voorkant aan het Hortusplein (niet de achterkant in)
   // Geen eigen opdracht — puur voor de looproute: vanaf de Botermarkt via de
   // Gierstraat, de Breestraat en de Lange Raamstraat naar de Nieuwe Kerk.
   [52.3791222, 4.6322415], // Gierstraat
@@ -276,7 +280,9 @@ const ROUTE_STOP_INDEX = [
   null, // Kenaupark, westkant
   13, // Lutherse Hofje (poort)
   null, null, null, null, // Witte Herenstraat / Zijlstraat / Zoetestraat / Krocht
-  14, 15, 16, 17, // t/m Jopen
+  14, 15, 16, // t/m Prinsenhof
+  null, null, // Drossestraat / Hortusplein
+  17, // Jopen (voorkant, aan het Hortusplein)
   null, null, null, // Gierstraat / Breestraat / Lange Raamstraat
   18, // Nieuwe Kerk
   null, // Korte Houtstraat
@@ -1073,7 +1079,7 @@ function splitAtDistance(legCoords, cum, targetDistM) {
 // hierboven), moet een al-gecachete looproute in de browser van een eerdere bezoeker
 // verdwijnen i.p.v. de oude (nu foute) route te blijven tonen. Simpelweg deze key
 // ophogen forceert dat voor alle varianten (volledige route, korte route, vervolg).
-const LEGS_CACHE_KEY = "haarlemTourRouteLegsCacheV10";
+const LEGS_CACHE_KEY = "haarlemTourRouteLegsCacheV11";
 
 function loadCachedLegsByKey(key, expectedCount) {
   try {
