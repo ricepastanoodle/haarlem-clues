@@ -6,7 +6,7 @@
 // Belangrijk bij een deploy: verhoog CACHE_VERSION als je iets in
 // PRECACHE_URLS verandert (nieuw stopfoto, nieuw audiobestand) zodat oude
 // caches worden opgeruimd en de nieuwe inhoud alsnog gedownload wordt.
-const CACHE_VERSION = "v46";
+const CACHE_VERSION = "v47";
 const SHELL_CACHE = `haarlem-shell-${CACHE_VERSION}`;
 const CONTENT_CACHE = `haarlem-content-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `haarlem-runtime-${CACHE_VERSION}`;
@@ -43,10 +43,10 @@ const PRECACHE_URLS = [
   "audio/11-huis-barnaart.mp3",
   "audio/12-monument-kenau-simonsdochter.mp3",
   "audio/13-vrouw-in-het-verzet-monument.mp3",
-  "audio/14-hofje-van-oorschot.mp3",
-  "audio/15-ten-boom-museum.mp3",
-  "audio/16-prinsenhof.mp3",
-  "audio/17-lutherse-hofje.mp3",
+  "audio/14-lutherse-hofje.mp3",
+  "audio/15-hofje-van-oorschot.mp3",
+  "audio/16-ten-boom-museum.mp3",
+  "audio/17-prinsenhof.mp3",
   "audio/18-jopen.mp3",
   "audio/19-nieuwe-kerk.mp3",
   "audio/20-frans-hals-museum.mp3",
@@ -64,10 +64,10 @@ const PRECACHE_URLS = [
   "audio/en/11-huis-barnaart.mp3",
   "audio/en/12-monument-kenau-simonsdochter.mp3",
   "audio/en/13-vrouw-in-het-verzet-monument.mp3",
-  "audio/en/14-hofje-van-oorschot.mp3",
-  "audio/en/15-ten-boom-museum.mp3",
-  "audio/en/16-prinsenhof.mp3",
-  "audio/en/17-lutherse-hofje.mp3",
+  "audio/en/14-lutherse-hofje.mp3",
+  "audio/en/15-hofje-van-oorschot.mp3",
+  "audio/en/16-ten-boom-museum.mp3",
+  "audio/en/17-prinsenhof.mp3",
   "audio/en/18-jopen.mp3",
   "audio/en/19-nieuwe-kerk.mp3",
   "audio/en/20-frans-hals-museum.mp3",

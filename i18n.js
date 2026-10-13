@@ -30,7 +30,7 @@ const STRINGS = {
     heroLabel: "Een digitale speurtocht door",
     heroTitle: "Haarlem, zoals je het nog nooit hebt gezien",
     heroTagline: "De gratis speurtocht langs de verborgen verhalen van Haarlem",
-    heroSub: "21 stops door de binnenstad, of de korte route van 9 stops in ± 1 uur, met een audioverhaal bij elke plek. Volg poëtische hints, los onderweg vragen en foto-opdrachten op, en verzamel punten tot je de hele route hebt afgelegd.",
+    heroSub: "21 stops door de binnenstad, of de korte route van 9 stops in ± 1 à 1,5 uur, met een audioverhaal bij elke plek. Volg poëtische hints, los onderweg vragen en foto-opdrachten op, en verzamel punten tot je de hele route hebt afgelegd.",
     heroStartEnd: "Start en eind op de Grote Markt",
     heroBegin: "Begin je tour",
     heroMetaStops: "stops",
@@ -105,7 +105,7 @@ const STRINGS = {
     // Topbar / algemeen (tour.html)
     tourLogo: "Haarlem Walk",
     btnHelpAria: "Uitleg opnieuw bekijken",
-    stepLabel: "Stap {done} / {total}",
+    stepLabel: "Stop {done} / {total}",
     pointsLabelText: "{points} punten",
 
     // Routekeuzescherm
@@ -115,7 +115,7 @@ const STRINGS = {
     routeShortDesc: "9 stops, ± 2,5 km, ± 1 à 1,5 uur",
     routeFullTitle: "Volledige route",
     routeFullDesc: "21 stops, ± 7 km, ± 3 uur",
-    routeStartEnd: "Start: Standbeeld Laurens Coster · Eind: Stadhuis Haarlem (beide op de Grote Markt)",
+    routeStartEnd: "Start: Standbeeld Laurens Janszoon Coster · Eind: Stadhuis Haarlem (beide op de Grote Markt)",
     btnChooseRoute: "Kies deze route",
 
     // Introscherm
@@ -208,9 +208,7 @@ const STRINGS = {
     finishTitle: "Je hebt de tour voltooid!",
     finishText: "Je hebt alle stops gevonden en Haarlem ontdekt zoals maar weinig bezoekers dat doen. Bedankt voor het meelopen.",
     finishTitleShort: "Je hebt de korte route voltooid!",
-    finishTextShort: "Je hebt de korte route gelopen en alvast een stukje Haarlem ontdekt. Zin om de rest van de stad ook te zien?",
-    btnContinueFullRoute: "Ga verder met de volledige route",
-    continueFullRouteEndpointText: "Dat vervolg eindigt bij: {title}",
+    finishTextShort: "Je hebt de korte route gelopen en alvast een stukje Haarlem ontdekt.",
     leaderboardTabShort: "Kort",
     leaderboardTabFull: "Volledig",
     finishStatTime: "Tijd",
@@ -289,8 +287,8 @@ const STRINGS = {
 
     heroLabel: "A digital scavenger hunt through",
     heroTitle: "Haarlem, like you've never seen it before",
-    heroTagline: "The free puzzle walk through Haarlem's hidden stories",
-    heroSub: "21 stops through the city center, or the short route of 9 stops in about 1 hour, with an audio story at every spot. Follow poetic hints, solve questions and photo challenges along the way, and collect points until you've completed the whole route.",
+    heroTagline: "The free scavenger hunt through Haarlem's hidden stories",
+    heroSub: "21 stops through the city center, or the short route of 9 stops in about 1 to 1.5 hours, with an audio story at every spot. Follow poetic hints, solve questions and photo challenges along the way, and collect points until you've completed the whole route.",
     heroStartEnd: "Start and finish at the Grote Markt",
     heroBegin: "Begin your tour",
     heroMetaStops: "stops",
@@ -357,7 +355,7 @@ const STRINGS = {
 
     tourLogo: "Haarlem Walk",
     btnHelpAria: "View instructions again",
-    stepLabel: "Step {done} / {total}",
+    stepLabel: "Stop {done} / {total}",
     pointsLabelText: "{points} points",
 
     // Route choice screen
@@ -367,7 +365,7 @@ const STRINGS = {
     routeShortDesc: "9 stops, ± 2.5 km, ± 1 to 1.5 hours",
     routeFullTitle: "Full route",
     routeFullDesc: "21 stops, ± 7 km, ± 3 hours",
-    routeStartEnd: "Start: Laurens Coster statue · Finish: Stadhuis Haarlem (both on the Grote Markt)",
+    routeStartEnd: "Start: Laurens Janszoon Coster statue · Finish: Stadhuis Haarlem (both on the Grote Markt)",
     btnChooseRoute: "Choose this route",
 
     introKicker: "The tour begins",
@@ -451,9 +449,7 @@ const STRINGS = {
     finishTitle: "You've completed the tour!",
     finishText: "You've found every stop and discovered Haarlem the way few visitors do. Thanks for joining.",
     finishTitleShort: "You've completed the short route!",
-    finishTextShort: "You've walked the short route and discovered a piece of Haarlem. Fancy seeing the rest of the city too?",
-    btnContinueFullRoute: "Continue with the full route",
-    continueFullRouteEndpointText: "That continuation ends at: {title}",
+    finishTextShort: "You've walked the short route and discovered a piece of Haarlem.",
     leaderboardTabShort: "Short",
     leaderboardTabFull: "Full",
     finishStatTime: "Time",

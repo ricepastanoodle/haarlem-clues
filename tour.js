@@ -15,7 +15,7 @@ const STOPS_NL = [
     description: "a green weathered bronze statue of a man in long robes standing on a stone pedestal, one arm raised holding a small object, with a tall gothic church tower in the background"
   },
   {
-    title: "De St. Bavokerk",
+    title: "De Sint-Bavokerk",
     audio: "audio/02-achterzijde-van-de-kerk.mp3",
     hint: "Voorbij de kerk wordt de stad steeds stiller, tot je uitkomt bij de plek waar recht wordt gesproken.",
     extraHint: "Zoek de stenen poort met een leeuwenkop erboven.",
@@ -59,6 +59,10 @@ const STOPS_NL = [
     hint: "Aan het water draait al eeuwen een reus met wapperende armen.",
     extraHint: "Het is een echte molen met houten wieken, vlak naast het water waar bootjes liggen.",
     answer: "Molen De Adriaan, de houten poldermolen aan het Spaarne.",
+    // Overschrijft hier de standaard mapCircleHint-tekst: vanaf de cirkel bij de
+    // Catharijnebrug zie je de molen al liggen, dus "ligt ergens binnen de cirkel"
+    // past hier niet.
+    circleHint: "Vanuit de gouden cirkel heb je zicht op je volgende stop.",
     type: "photo",
     description: "a Dutch windmill with sails standing next to water and boats"
   },
@@ -67,7 +71,7 @@ const STOPS_NL = [
     audio: "audio/07-de-koepel.mp3",
     hint: "Ga naar binnen, waar een ronde reus ooit honderden zielen bewaakte achter genummerde deuren.",
     extraHint: "Kijk goed omhoog: de nummers lopen op naarmate je hoger in de koepel kijkt, tot je bij de bovenste verdieping het hoogste nummer vindt.",
-    question: "Wat is het hoogst genummerde gevangeniscel binnen De Koepel?",
+    question: "Wat is de hoogst genummerde gevangeniscel binnen De Koepel?",
     answer: "204",
     type: "quiz"
   },
@@ -130,7 +134,7 @@ const STOPS_NL = [
   },
   {
     title: "Lutherse Hofje",
-    audio: "audio/17-lutherse-hofje.mp3",
+    audio: "audio/14-lutherse-hofje.mp3",
     hint: "Bij de poort van dit rustige hofje zwemmen statige witte vogels in de gracht ernaast.",
     extraHint: "Kijk eens goed bij de voedselkast.",
     question: "Hoeveel zwanen kun je bij de ingang vinden?",
@@ -140,28 +144,28 @@ const STOPS_NL = [
   },
   {
     title: "Hofje van Oorschot",
-    audio: "audio/14-hofje-van-oorschot.mp3",
+    audio: "audio/15-hofje-van-oorschot.mp3",
     hint: "Achter een eenvoudige poort schuilt een hofje waar vrouwen ooit een veilig thuis vonden.",
     extraHint: "Het jaartal staat gebeiteld boven de poort, ergens in de jaren zestig of zeventig van de achttiende eeuw.",
-    question: "In welk jaar is de Begijnhof opgericht?",
+    question: "In welk jaar is het Hofje van Oorschot opgericht?",
     answer: "1769",
     type: "quiz"
   },
   {
     title: "Ten Boom Museum",
-    audio: "audio/15-ten-boom-museum.mp3",
+    audio: "audio/16-ten-boom-museum.mp3",
     hint: "Op de zijmuur van dit huis valt iets te ontdekken, als je goed om je heen kijkt.",
     extraHint: "Het is een kaart van haar wereldreizen. Daarop vind je het jaartal.",
-    question: "In welk jaar reisde Ten Boom voor het eerst af naar Australië?",
+    question: "In welk jaar reisde Corrie ten Boom voor het eerst af naar Australië?",
     answer: "1953",
     type: "quiz"
   },
   {
     title: "Prinsenhof",
-    audio: "audio/16-prinsenhof.mp3",
+    audio: "audio/17-prinsenhof.mp3",
     hint: "In een rustige tuin vol groen staat een bekend gezicht dat je al eerder tegenkwam.",
     extraHint: "Dezelfde man die op de Grote Markt de letter omhooghoudt, staat hier ook. Zijn naam staat gebeiteld onder zijn voeten.",
-    question: "Wie is de man die in de Hortus tuin staat?",
+    question: "Wie is de man die in de tuin van het Prinsenhof staat?",
     answer: "Laurens Janszoon Coster",
     // Ruime lijst geaccepteerde varianten van dezelfde naam — samen met de fuzzy-match
     // in isAnswerCorrect() (zie verderop in dit bestand) worden ook kleine tikfouten
@@ -194,7 +198,7 @@ const STOPS_NL = [
     audio: "audio/19-nieuwe-kerk.mp3",
     hint: "Aan een rustig pleintje, niet ver van het centrum, staat een kerk die ondanks haar naam allang niet meer nieuw is.",
     extraHint: "Loop naar de oostkant van het gebouw. Daar staat het jaartal in Romeinse cijfers gebeiteld.",
-    question: "In welk jaar is de Nieuwe Kerk opgebouwd?",
+    question: "In welk jaar is de Nieuwe Kerk gebouwd?",
     answer: "1649",
     type: "quiz"
   },
@@ -224,7 +228,7 @@ const STOPS_NL = [
 const START_COORD = [52.381395, 4.6359467];
 const ROUTE_COORDS = [
   [52.3814641, 4.6366262], // Standbeeld Laurens Janszoon Coster
-  [52.3811669, 4.6385832], // De St. Bavokerk — stopt bij het begin van de steeg naar de rechtbank, bij Brasserie Van Beinum
+  [52.3811669, 4.6385832], // De Sint-Bavokerk — stopt bij het begin van de steeg naar de rechtbank, bij Brasserie Van Beinum
   [52.380213, 4.6397552],  // Taverne De Waag
   [52.3803511, 4.6403448], // Teylers Museum
   [52.3820564, 4.6432713], // Teylers Hofje
@@ -417,7 +421,7 @@ const EN_OVERRIDES = [
     extraHint: "Look for the stone gate with a lion's head above it.",
     question: "What is Haarlem's courthouse called?",
     answer: "De Appelaar",
-    answers: ["De Appelaar", "Appelaar", "Gerechtsgebouw", "Courthouse"],
+    answers: ["De Appelaar", "Appelaar", "Gerechtsgebouw"],
     type: "quiz"
   },
   {
@@ -453,6 +457,7 @@ const EN_OVERRIDES = [
     hint: "By the water, a giant with waving arms has been turning for centuries.",
     extraHint: "It's a real windmill with wooden sails, right next to the water where boats are moored.",
     answer: "Windmill De Adriaan, the wooden polder windmill on the Spaarne river.",
+    circleHint: "From inside the gold circle you can see your next stop.",
     type: "photo"
   },
   {
@@ -516,7 +521,7 @@ const EN_OVERRIDES = [
     type: "quiz"
   },
   {
-    audio: "audio/en/17-lutherse-hofje.mp3",
+    audio: "audio/en/14-lutherse-hofje.mp3",
     title: "Lutherse Hofje",
     hint: "At the gate of this quiet courtyard, stately white birds glide along the canal nearby.",
     extraHint: "Take a good look around the food cupboard.",
@@ -526,29 +531,29 @@ const EN_OVERRIDES = [
     type: "quiz"
   },
   {
-    audio: "audio/en/14-hofje-van-oorschot.mp3",
+    audio: "audio/en/15-hofje-van-oorschot.mp3",
     title: "Van Oorschot Almshouse",
     hint: "Behind a simple gate lies a hofje where women once found a safe home.",
     extraHint: "The year is carved above the gate, somewhere in the 1760s or 1770s.",
-    question: "In what year was the Begijnhof founded?",
+    question: "In what year was the Van Oorschot Almshouse founded?",
     answer: "1769",
     type: "quiz"
   },
   {
-    audio: "audio/en/15-ten-boom-museum.mp3",
+    audio: "audio/en/16-ten-boom-museum.mp3",
     title: "Ten Boom Museum",
     hint: "On the side wall of this house there's something to discover, if you look closely.",
     extraHint: "It's a map of her travels around the world. You'll find the year on it.",
-    question: "In what year did Ten Boom first travel to Australia?",
+    question: "In what year did Corrie ten Boom first travel to Australia?",
     answer: "1953",
     type: "quiz"
   },
   {
-    audio: "audio/en/16-prinsenhof.mp3",
+    audio: "audio/en/17-prinsenhof.mp3",
     title: "Prinsenhof",
     hint: "In a quiet, green garden stands a familiar face you've already met before.",
     extraHint: "The same man who holds up the letter on the Grote Markt stands here too. His name is carved beneath his feet.",
-    question: "Who is the man standing in the Hortus garden?",
+    question: "Who is the man standing in the Prinsenhof garden?",
     // Geen eigen answer/answers hier — de naam wordt niet vertaald, dus deze stop
     // erft gewoon de (ruimere) lijst van STOPS_NL via de spread in STOPS_EN hieronder.
     type: "quiz"
@@ -618,16 +623,6 @@ function buildStopsFromOriginalIndices(indices) {
 function buildActiveStops(routeType) {
   const full = getFullStopsForLang();
   const indices = routeType === "short" ? SHORT_ROUTE_INDICES : full.map((_, i) => i);
-  return buildStopsFromOriginalIndices(indices);
-}
-
-// Bouwt de resterende stops van de volledige route (alles wat niet in de korte
-// route zat), in de oorspronkelijke volgorde — gebruikt door "Ga verder met de
-// volledige route" op het eindscherm van de korte route.
-function buildRemainingFullStops() {
-  const full = getFullStopsForLang();
-  const done = new Set(SHORT_ROUTE_INDICES);
-  const indices = full.map((_, i) => i).filter((i) => !done.has(i));
   return buildStopsFromOriginalIndices(indices);
 }
 
@@ -821,7 +816,6 @@ const finishTextEl = document.getElementById("finishText");
 const finishGallery = document.getElementById("finishGallery");
 const finishStats = document.getElementById("finishStats");
 const finishBadges = document.getElementById("finishBadges");
-const btnContinueFullRoute = document.getElementById("btnContinueFullRoute");
 const btnShareScore = document.getElementById("btnShareScore");
 const linkShareWhatsapp = document.getElementById("linkShareWhatsapp");
 const shareStatus = document.getElementById("shareStatus");
@@ -855,7 +849,6 @@ const btnEnableLocation = document.getElementById("btnEnableLocation");
 const btnToggleRotate = document.getElementById("btnToggleRotate");
 const mapRotateWrapper = document.getElementById("mapRotateWrapper");
 const rotateNorthArrow = document.getElementById("rotateNorthArrow");
-const continueFullRouteEndpoint = document.getElementById("continueFullRouteEndpoint");
 const btnMapContinue = document.getElementById("btnMapContinue");
 const btnMapBack = document.getElementById("btnMapBack");
 const btnInfoBack = document.getElementById("btnInfoBack");
@@ -1239,47 +1232,6 @@ function buildDirectRouteContext() {
           : await fetchSingleLeg(allCoords[i], allCoords[i + 1])
       );
     }
-    try {
-      localStorage.setItem(cacheKey, JSON.stringify(legs));
-    } catch (e) {
-      // opslag vol of niet beschikbaar — geen probleem, gewoon niet cachen
-    }
-    return legs;
-  }
-
-  return { allCoords, stopIndexAt, allCoordsIndexForStop, getLegs };
-}
-
-// Bouwt de kaartcontext voor het vervolg van de korte route: de speler staat niet
-// meer bij de Grote Markt maar bij de laatste stop van de korte route, en moet naar
-// de eerste nog niet gelopen stop van de volledige route. Daarvoor is maar één
-// nieuwe (losse) etappe nodig — de rest van de etappes bestaat al (gecached via
-// fetchRouteLegs) en wordt gewoon hergebruikt.
-function buildRouteContextForContinuation(fromCoord) {
-  const positions = STOPS.map((s) => STOP_TO_ROUTE_INDEX[s.originalIndex]);
-  const firstPos = Math.min(...positions);
-  const lastPos = Math.max(...positions);
-  const sliceCoords = ROUTE_COORDS.slice(firstPos, lastPos + 1);
-  const allCoords = [fromCoord, ...sliceCoords];
-
-  const stopIndexAt = new Array(allCoords.length).fill(null);
-  const allCoordsIndexForStop = new Array(STOPS.length).fill(null);
-  for (let i = 1; i < allCoords.length; i++) {
-    const origIdx = ROUTE_STOP_INDEX[firstPos + i - 1];
-    if (origIdx === null) continue;
-    const activeIdx = STOPS.findIndex((s) => s.originalIndex === origIdx);
-    if (activeIdx === -1) continue;
-    stopIndexAt[i] = activeIdx;
-    allCoordsIndexForStop[activeIdx] = i;
-  }
-
-  const cacheKey = `${LEGS_CACHE_KEY}Continue:${firstPos}:${lastPos}`;
-  async function getLegs() {
-    const cached = loadCachedLegsByKey(cacheKey, allCoords.length - 1);
-    if (cached) return cached;
-    const bridgeLeg = await fetchSingleLeg(fromCoord, sliceCoords[0]);
-    const fullLegs = await fetchRouteLegs(); // al gecached vanaf het begin van de tour
-    const legs = [bridgeLeg, ...fullLegs.slice(firstPos, lastPos)];
     try {
       localStorage.setItem(cacheKey, JSON.stringify(legs));
     } catch (e) {
@@ -1813,9 +1765,14 @@ function updateMapProgress(routeContext, legs) {
   const targetStop = hasNextTarget ? STOPS[state.currentStep + 1] : null;
   const targetIsPhotoSearch = hasNextTarget && targetStop.type === "photo" && !targetStop.skipCircle;
   // De extra uitlegregel over de gouden cirkel alleen tonen als de volgende stop er
-  // ook écht een heeft (bv. niet bij de Molen, die skipCircle heeft) — puur
-  // data-gedreven via dezelfde targetIsPhotoSearch-check die de cirkel zelf tekent.
+  // ook écht een heeft (bv. niet bij Teylers Museum of Frans Hals, die skipCircle
+  // hebben) — puur data-gedreven via dezelfde targetIsPhotoSearch-check die de
+  // cirkel zelf tekent. Een stop kan de standaardtekst zelf overschrijven via een
+  // eigen circleHint (bv. de Molen, waar je de volgende stop al vanuit de cirkel ziet).
   mapCircleHint.classList.toggle("hidden", !targetIsPhotoSearch);
+  if (targetIsPhotoSearch) {
+    mapCircleHint.textContent = targetStop.circleHint || t("mapCircleHint");
+  }
   // Sommige stops hebben een eigen straal/middelpunt (bv. stop 1 op de Grote Markt).
   const circleRadius = targetIsPhotoSearch ? targetStop.searchRadius || SEARCH_RADIUS_METERS : null;
   const circleCenter = targetIsPhotoSearch
@@ -2052,26 +2009,18 @@ async function renderMap() {
   const nextStopNumber = state.currentStep + 2; // 1-based nummer van de volgende, nog op te lossen stop
   mapKicker.textContent =
     nextStopNumber <= STOPS.length
-      ? t("mapKickerNext", { n: nextStopNumber + (state.displayOffset || 0), total: displayStopTotal() })
+      ? t("mapKickerNext", { n: nextStopNumber, total: displayStopTotal() })
       : t("mapKickerDone");
   initMapIfNeeded();
 
-  // Elke keer dat de kaart (opnieuw) geopend wordt — ook na een paginaherlaad of
-  // na "Ga verder met de volledige route" — begint de automatische weergave
-  // weer vers, ongeacht of de speler bij de vórige stop zelf aan de kaart zat.
+  // Elke keer dat de kaart (opnieuw) geopend wordt — ook na een paginaherlaad —
+  // begint de automatische weergave weer vers, ongeacht of de speler bij de
+  // vórige stop zelf aan de kaart zat.
   mapAutoFollow = true;
   btnRecenterMap.classList.add("hidden");
   updateEnableLocationButton();
 
-  // Net na "Ga verder met de volledige route" staat de speler niet meer bij de Grote
-  // Markt, maar bij de laatste stop van de korte route — de kaart moet dan vanaf dat
-  // punt naar de eerstvolgende (nog niet gelopen) stop wijzen i.p.v. vanaf het begin.
-  const isResumingFromShort = state.currentStep === -1 && !!state.resumingFromShort;
-  const routeContext = isResumingFromShort
-    ? buildRouteContextForContinuation(
-        ROUTE_COORDS[STOP_TO_ROUTE_INDEX[SHORT_ROUTE_INDICES[SHORT_ROUTE_INDICES.length - 1]]]
-      )
-    : buildRouteContextFromStart();
+  const routeContext = buildRouteContextFromStart();
   currentRouteContext = routeContext;
 
   // Zorg dat de kaartcontainer zijn UITEINDELIJKE grootte heeft vóórdat we
@@ -2093,20 +2042,28 @@ async function renderMap() {
   updateMapProgress(routeContext, legs);
 }
 
-// Na "Ga verder met de volledige route" telt de stopteller door vanaf waar de korte
-// route ophield (bv. "Stop 10 van 21" i.p.v. "Stop 1 van 12") — STOPS zelf bevat dan
-// wel alleen de resterende stops, maar deze twee functies tonen het grotere geheel.
 function displayStopNumber() {
-  return state.currentStep + 1 + (state.displayOffset || 0);
+  return state.currentStep + 1;
 }
 
 function displayStopTotal() {
-  return state.displayTotal || STOPS.length;
+  return STOPS.length;
+}
+
+// Toont in de bovenbalk precies hetzelfde stopnummer als de kaart ("Op weg naar
+// stop N") en het stopscherm zelf (displayStopNumber()) — op de kaart loop je
+// immers al naar de vólgende stop, dus dat nummer ligt daar 1 hoger dan het
+// nummer van de stop die je net hebt afgesloten.
+function progressStopNumber() {
+  const total = displayStopTotal();
+  const current = displayStopNumber();
+  const n = state.phase === "map" ? current + 1 : current;
+  return Math.max(0, Math.min(n, total));
 }
 
 function updateProgressBar() {
   const total = displayStopTotal();
-  const done = Math.min(Math.max(state.currentStep, 0) + (state.displayOffset || 0), total);
+  const done = progressStopNumber();
   progressFill.style.width = `${(done / total) * 100}%`;
   progressLabel.textContent = t("stepLabel", { done, total });
   pointsLabel.textContent = t("pointsLabelText", { points: state.points });
@@ -2457,17 +2414,6 @@ function renderFinish() {
   const isShortRoute = state.routeType === "short";
   finishTitleEl.textContent = t(isShortRoute ? "finishTitleShort" : "finishTitle");
   finishTextEl.textContent = t(isShortRoute ? "finishTextShort" : "finishText");
-  btnContinueFullRoute.classList.toggle("hidden", !isShortRoute);
-  if (isShortRoute) {
-    // Het eindpunt van dat vervolg ligt niet meer bij het Stadhuis (dat zat al
-    // in de korte route) maar bij de laatste van de 12 resterende stops.
-    const remaining = buildRemainingFullStops();
-    const endpointTitle = remaining[remaining.length - 1].title;
-    continueFullRouteEndpoint.textContent = t("continueFullRouteEndpointText", { title: endpointTitle });
-    continueFullRouteEndpoint.classList.remove("hidden");
-  } else {
-    continueFullRouteEndpoint.classList.add("hidden");
-  }
   activeLeaderboardTab = isShortRoute ? "short" : "full";
   renderFinishStats();
   renderFinishGallery();
@@ -2480,13 +2426,8 @@ function renderFinishStats() {
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
   const timeLabel = minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`;
-  // Bij "Ga verder met de volledige route" worden hintsUsed/answersRevealed gereset
-  // (die staan immers op de nieuwe, resterende stops) — priorHintsUsedCount/
-  // priorAnswersRevealedCount bewaren wat er al van de korte route meetelde.
-  const hintsUsedCount =
-    Object.values(state.hintsUsed || {}).filter(Boolean).length + (state.priorHintsUsedCount || 0);
-  const answersRevealedCount =
-    Object.values(state.answersRevealed || {}).filter(Boolean).length + (state.priorAnswersRevealedCount || 0);
+  const hintsUsedCount = Object.values(state.hintsUsed || {}).filter(Boolean).length;
+  const answersRevealedCount = Object.values(state.answersRevealed || {}).filter(Boolean).length;
 
   finishStatsData = { totalSeconds, hintsUsedCount, points: state.points };
 
@@ -3484,7 +3425,6 @@ btnToggleRotate.addEventListener("click", toggleHeadingUp);
 btnMapContinue.addEventListener("click", () => {
   state.currentStep += 1;
   state.phase = "challenge";
-  delete state.resumingFromShort; // alleen relevant voor de allereerste kaart na de overstap
   saveState();
   render();
   if (state.currentStep >= STOPS.length) {
@@ -3513,37 +3453,6 @@ btnInfoBack.addEventListener("click", () => {
 btnFinishBack.addEventListener("click", () => {
   state.currentStep = STOPS.length - 1;
   state.phase = "map";
-  saveState();
-  render();
-});
-
-// Vanaf het eindscherm van de korte route verder met de 12 stops die nog niet
-// gelopen zijn — met behoud van punten, maar met een schone lei voor de nieuwe
-// (nog niet aangeraakte) stops zelf. Telt straks mee voor het scorebord van de
-// volledige route.
-btnContinueFullRoute.addEventListener("click", () => {
-  // Hints/onthulde antwoorden van de korte route blijven meetellen op het
-  // uiteindelijke eindscherm, ook al worden de trackingobjecten zelf gereset
-  // (die staan straks op de nieuwe, resterende stops).
-  state.priorHintsUsedCount =
-    (state.priorHintsUsedCount || 0) + Object.values(state.hintsUsed || {}).filter(Boolean).length;
-  state.priorAnswersRevealedCount =
-    (state.priorAnswersRevealedCount || 0) + Object.values(state.answersRevealed || {}).filter(Boolean).length;
-  // De stopteller loopt door: "Stop 10 van 21" i.p.v. "Stop 1 van 12".
-  state.displayOffset = STOPS.length;
-  state.displayTotal = getFullStopsForLang().length;
-
-  STOPS = buildRemainingFullStops();
-  rememberActiveStops();
-  state.routeType = "full";
-  state.currentStep = -1;
-  state.phase = "map";
-  state.completed = {};
-  state.hintsUsed = {};
-  state.answersRevealed = {};
-  state.photos = {};
-  state.scoreSubmitted = false;
-  state.resumingFromShort = true;
   saveState();
   render();
 });
