@@ -1031,23 +1031,24 @@ function cumulativeDistances(legCoords) {
 }
 
 // Hoever ben je (in meters vanaf het begin van de etappe) op basis van een nieuwe
-// GPS-meting? Zoekt alleen binnen een venster rond je huidige, al bekende
-// voortgang — niet over de hele etappe — zodat een route die verderop toevallig
-// weer dicht langs dit punt komt je voortgang niet per ongeluk laat "springen".
-// Geeft null terug als er (binnen dat venster) geen punt dicht genoeg bij ligt.
-const LEG_PROGRESS_BACK_WINDOW_M = 60;
-const LEG_PROGRESS_FORWARD_WINDOW_M = 150;
+// GPS-meting? Geeft null terug als er geen punt dicht genoeg bij ligt (zie
+// LEG_PROGRESS_OFFROUTE_M, gebruikt door de aanroeper).
 const LEG_PROGRESS_OFFROUTE_M = 40;
 
-function matchProgressOnLeg(legCoords, cum, gpsLatLng, priorProgressM) {
-  const totalLen = cum[cum.length - 1];
-  const windowStart = Math.max(0, priorProgressM - LEG_PROGRESS_BACK_WINDOW_M);
-  const windowEnd = Math.min(totalLen, priorProgressM + LEG_PROGRESS_FORWARD_WINDOW_M);
+// Zoekt over de HELE huidige etappe (niet over de rest van de route — dat is
+// precies wat de kruis-etappe-bug voorkwam, zie hierboven) naar het dichtstbijzijnde
+// punt. Bewust geen apart "zoekvenster" meer rond de vorige voortgang: as een
+// GPS-update een keer overslaat (bv. zwak signaal, of de locatie werd pas
+// halverwege de etappe aangezet), kon de voortgang anders blijvend vastlopen —
+// het venster zelf was gebaseerd op die oude, nooit meer bijgewerkte voortgang,
+// dus een update die er net buiten viel, viel er voor altijd buiten. Binnen één
+// etappe (die niet zelf naar zichzelf terugbuigt) is dat risico groter dan de
+// kans dat een niet-geplande lus binnen dezelfde etappe verkeerd matcht.
+function matchProgressOnLeg(legCoords, cum, gpsLatLng) {
   let best = null;
   for (let i = 1; i < legCoords.length; i++) {
     const segStart = cum[i - 1];
     const segEnd = cum[i];
-    if (segEnd < windowStart || segStart > windowEnd) continue;
     const { point, t } = closestPointOnSegment(legCoords[i - 1], legCoords[i], gpsLatLng);
     const progressM = segStart + t * (segEnd - segStart);
     const distM = haversineMeters(point, gpsLatLng);
@@ -1344,7 +1345,7 @@ function updateLegProgress(gpsLatLng, accuracy) {
   if (typeof accuracy === "number" && accuracy > LEG_PROGRESS_MIN_ACCURACY) return;
   if (!currentLegCoordsForProgress || !currentLegCumForProgress) return;
   const prior = state.currentLegProgress || 0;
-  const match = matchProgressOnLeg(currentLegCoordsForProgress, currentLegCumForProgress, gpsLatLng, prior);
+  const match = matchProgressOnLeg(currentLegCoordsForProgress, currentLegCumForProgress, gpsLatLng);
   if (!match || match.distM > LEG_PROGRESS_OFFROUTE_M) return; // geen (goed genoeg) punt binnen bereik
   const newProgress = Math.max(prior, match.progressM); // voortgang mag alleen vooruit
   if (newProgress === prior) return;
@@ -2021,6 +2022,24 @@ function autoFitBounds(map, points, options) {
   suppressFollowEvents = false;
 }
 
+// Wacht op het eerstvolgende animatieframe (dus op een échte layout-tick), met
+// een vangnet-timeout: als de pagina op dat moment verborgen is (bv. je wisselt
+// heel even naar een andere app op je telefoon), vuurt requestAnimationFrame
+// soms gewoon nooit — zonder dit vangnet zou renderMap() hieronder dan voorgoed
+// blijven hangen i.p.v. gewoon (iets minder nauwkeurig getimed) door te gaan.
+function waitForNextFrame(timeoutMs = 300) {
+  return new Promise((resolve) => {
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      resolve();
+    };
+    requestAnimationFrame(finish);
+    setTimeout(finish, timeoutMs);
+  });
+}
+
 async function renderMap() {
   const nextStopNumber = state.currentStep + 2; // 1-based nummer van de volgende, nog op te lossen stop
   mapKicker.textContent =
@@ -2047,10 +2066,21 @@ async function renderMap() {
     : buildRouteContextFromStart();
   currentRouteContext = routeContext;
 
+  // Zorg dat de kaartcontainer zijn UITEINDELIJKE grootte heeft vóórdat we
+  // inzoomen. Dit scherm is net zichtbaar geworden (de "hidden"-klasse ging er
+  // in render() vlak hiervoor af) — zonder dit kon fitBounds soms nog de oude
+  // (bv. 0×0) grootte van vlak daarvoor gebruiken, wat een willekeurige zoom/
+  // positie gaf. requestAnimationFrame wacht een echte layout/paint-tick af,
+  // in plaats van de eerdere gegokte vaste timeout van 50ms.
+  await waitForNextFrame();
+  leafletMap.invalidateSize();
+
   // Meteen de cirkel/markers tekenen (die hangen niet af van de looproute-data),
   // zodat je nooit een lege kaart ziet terwijl de wandelroutes nog opgehaald worden.
+  // mapAutoFollow staat hierboven alweer op true, dus dit zoomt ook meteen vers in
+  // — een eerdere zoom/positie van de vorige keer dat dit scherm open stond blijft
+  // dus nooit per ongeluk hangen.
   updateMapProgress(routeContext, []);
-  setTimeout(() => leafletMap && leafletMap.invalidateSize(), 50);
   const legs = await routeContext.getLegs();
   updateMapProgress(routeContext, legs);
 }
