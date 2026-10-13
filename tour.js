@@ -237,11 +237,12 @@ const ROUTE_COORDS = [
   [52.3873225, 4.6369366], // Monument Kenau Simonsdochter
   [52.387054, 4.633841],   // Vrouw in het Verzet monument (Hannie Schaft)
   // Geen eigen opdracht — puur voor de looproute: door het Kenaupark naar de
-  // westkant, dan langs de Kinderhuisvest, en bij de Magdalenastraat naar binnen.
+  // westkant, vanwaar de looproute vanzelf een echte brug oversteekt (bij de
+  // Katoenbrug) naar de Lutherse Kerk. Eerdere tussenpunten hier (via een los
+  // "Kinderhuisvest"- en "Magdalenastraat"-punt) dwongen de route onbedoeld om
+  // langs de oever te blijven lopen i.p.v. over te steken — verwijderd.
   [52.3863, 4.6319],       // Kenaupark, westkant
-  [52.3843, 4.6309],       // Kinderhuisvest
-  [52.384, 4.6318],        // Magdalenastraat (ingang)
-  [52.3840052, 4.6314806], // Lutherse Hofje
+  [52.3841608, 4.6318116], // Lutherse Kerk — poort aan de Magdalenastraat (niet het hofje/de tuin zelf in)
   // Geen eigen opdracht — puur voor de looproute naar het Hofje van Oorschot:
   // via de Witte Herenstraat, de Zijlstraat, de Zoetestraat en de Krocht.
   [52.3834483, 4.6316727], // Witte Herenstraat
@@ -270,8 +271,8 @@ const ROUTE_COORDS = [
 // ROUTE_COORDS en STOPS niet meer 1-op-1 gelijk te lopen.
 const ROUTE_STOP_INDEX = [
   0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
-  null, null, null, // Kenaupark / Kinderhuisvest / Magdalenastraat
-  13, // Lutherse Hofje
+  null, // Kenaupark, westkant
+  13, // Lutherse Hofje (poort)
   null, null, null, null, // Witte Herenstraat / Zijlstraat / Zoetestraat / Krocht
   14, 15, 16, 17, // t/m Jopen
   null, null, null, // Gierstraat / Breestraat / Lange Raamstraat
@@ -1084,7 +1085,7 @@ function splitAtDistance(legCoords, cum, targetDistM) {
 // hierboven), moet een al-gecachete looproute in de browser van een eerdere bezoeker
 // verdwijnen i.p.v. de oude (nu foute) route te blijven tonen. Simpelweg deze key
 // ophogen forceert dat voor alle varianten (volledige route, korte route, vervolg).
-const LEGS_CACHE_KEY = "haarlemTourRouteLegsCacheV8";
+const LEGS_CACHE_KEY = "haarlemTourRouteLegsCacheV9";
 
 function loadCachedLegsByKey(key, expectedCount) {
   try {
